@@ -1,0 +1,181 @@
+/* Styling for animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Common styles */
+form {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea,
+select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+button[type="submit"] {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+/* Form specific styles */
+#formQuestion,
+#formQuotation {
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.hidden {
+  display: none;
+}
+
+/* display error message */
+.error {
+  color: red;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Styles for Question form */
+#formQuestion {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+#formQuestion h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Styles for Quotation form */
+#formQuotation {
+  background-color: #e6f7ff;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+#formQuotation h2 {
+  margin-bottom: 20px;
+  color: #007bff;
+}
+
+.container,
+.containerClone {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.input-group {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.button-group {
+  flex-basis: 100%;
+  margin-top: 10px;
+}
+
+/* Styles for dynamically created display elements */
+#display {
+  margin-top: 20px;
+}
+
+/* Styles for delete button */
+.btn-delete {
+  background-color: #ff6961;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-delete:hover {
+  background-color: #ff5750;
+}
+
+/* Styles for trash icon */
+.delete-icon {
+  color: #f52d22;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+/* Styles for add button */
+.btn-add {
+  background-color: #4c63af;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-add:hover {
+  background-color: #5645a0;
+}
+
+/* Media query for mobile responsiveness */
+@media screen and (max-width: 600px) {
+  .container,
+  .containerClone {
+    flex-direction: column;
+  }
+
+  .input-group {
+    margin-right: 0;
+  }
+
+  /* Adjust padding for forms */
+  #formQuestion,
+  #formQuotation {
+    padding: 10px;
+  }
+  
+  /* Adjust padding for buttons */
+  .button-group button {
+    padding: 8px 16px;
+  }
+}
