@@ -13,72 +13,72 @@ class MailSender
 
     public function send_email_quote($quote_data)
     {
-        // Instantiate PHPMailer
-        $mail = new PHPMailer();
+        try {
+            // Instantiate PHPMailer
+            $mail = new PHPMailer();
 
-        // Set mailer to use SMTP
-        $mail->isSMTP();
+            // Set mailer to use SMTP
+            $mail->isSMTP();
 
-        // MailHog configuration
-        $mail->Host = '127.0.0.1';
-        $mail->SMTPAuth = false;
-        $mail->Username = '';
-        $mail->Password = '';
-        $mail->Port = 1025;
+            // MailHog configuration
+            $mail->Host = '127.0.0.1';
+            $mail->SMTPAuth = false;
+            $mail->Username = '';
+            $mail->Password = '';
+            $mail->Port = 1025;
 
-        // SMTP configuration
-        // $mail->Host       = 'smtp.example.com';  // SMTP host
-        // $mail->SMTPAuth   = true;                 // Enable SMTP authentication
-        // $mail->Username   = 'your@example.com';   // SMTP username
-        // $mail->Password   = 'your_password';      // SMTP password
-        // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
-        // $mail->Port       = 587;                  // TCP port to connect to
+            // SMTP configuration
+            // $mail->Host       = 'smtp.example.com';  // SMTP host
+            // $mail->SMTPAuth   = true;                 // Enable SMTP authentication
+            // $mail->Username   = 'your@example.com';   // SMTP username
+            // $mail->Password   = 'your_password';      // SMTP password
+            // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
+            // $mail->Port       = 587;                  // TCP port to connect to
 
-        // Sender information
-        $mail->setFrom('microzoo@example.com', 'Micro Zoo');
+            // Sender information
+            $mail->setFrom('microzoo@example.com', 'Micro Zoo');
 
-        // Add recipients
-        $mail->addAddress('client@example.com', 'Client Example'); // Client's email, name is optional
-        $mail->addBCC('microzoo@example.com'); // Admin's email
+            // Add recipients
+            $mail->addAddress('client@example.com', 'Client Example'); // Client's email, name is optional
+            $mail->addBCC('microzoo@example.com'); // Admin's email
 
-        // Add reply address
-        $mail->addReplyTo('mz@example.com', 'Information');
+            // Add reply address
+            $mail->addReplyTo('mz@example.com', 'Information');
 
-        // Attachments
-        $pdfFileName = 'devis_microzoo_' . $quote_data->number_quote . '.pdf'; // Custom PDF file name
-        $pdfFilePath = plugin_dir_path(__FILE__) . '../src/save/' . $pdfFileName; // Full path to the PDF file
-        if (file_exists($pdfFilePath)) {
-            $mail->addAttachment($pdfFilePath, $pdfFileName); // Add attachment
-        } else {
-            echo 'Attachment file does not exist: ' . $pdfFilePath;
-        }
+            // Attachments
+            $pdfFileName = 'devis_microzoo_' . $quote_data->number_quote . '.pdf'; // Custom PDF file name
+            $pdfFilePath = plugin_dir_path(__FILE__) . '../src/save/' . $pdfFileName; // Full path to the PDF file
+            if (file_exists($pdfFilePath)) {
+                $mail->addAttachment($pdfFilePath, $pdfFileName); // Add attachment
+            } else {
+                echo 'Attachment file does not exist: ' . $pdfFilePath;
+            }
 
-        // var_dump($quote_data->number_quote);
-        // var_dump($pdfFilePath);
-        // die();
+            // var_dump($quote_data->number_quote);
+            // var_dump($pdfFilePath);
+            // die();
 
-        // Email subject
-        $mail->isHTML(true);
-        $client = (!empty($quote_data->companyName) ? (strtoupper($quote_data->companyName)) : ($quote_data->firstname_quot . ' ' . strtoupper($quote_data->lastname_quot)));
-        $mail->Subject = 'MicroZoo devis pour ' . $client;
+            // Email subject
+            $mail->isHTML(true);
+            $client = (!empty($quote_data->companyName) ? (strtoupper($quote_data->companyName)) : ($quote_data->firstname_quot . ' ' . strtoupper($quote_data->lastname_quot)));
+            $mail->Subject = 'MicroZoo devis pour ' . $client;
 
-        // Email body from a separate file
-        include(plugin_dir_path(__FILE__) . '../template/template.email.php');
-        $emailBody = ob_get_clean();
-        $mail->Body = $emailBody;
+            // Email body from a separate html file
+            include(plugin_dir_path(__FILE__) . '../template/template.email.php');
+            $emailBody = ob_get_clean();
+            $mail->Body = $emailBody;
 
-        // Email alt body from a separate file in plain text for non-HTML mail clients
-        // include(plugin_dir_path(__FILE__) . '../template/template.email.php');
-        // $altBody = ob_get_clean();
-        $altBody = 'Email alt body from a separate file in plain text for non-HTML mail clients';
-        $mail->AltBody = $altBody;
+            // Email alt body from a separate file in plain text for non-HTML mail clients
+            include(plugin_dir_path(__FILE__) . '../template/template.email_plaintext.php');
+            $altBody = ob_get_clean();
+            $mail->AltBody = $altBody;
 
-        // Send email
-        if (!$mail->send()) {
+            // Send email
+            $mail->send();
+
+        } catch (Exception $e) {
             echo 'Message could not be sent.';
-            echo 'Mailer Error: ' . $mail->ErrorInfo;
-        } else {
-            // echo 'Email has been sent successfully';
+            echo 'Mailer Error: ' . $e->getMessage();
         }
     }
 
