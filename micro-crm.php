@@ -92,6 +92,9 @@ class MicroCrm
 		// load css file, email style
 		wp_enqueue_style('email-style', plugin_dir_url(__FILE__) . 'src/css/email_style.css', array(), 1, 'all');
 
+		// load css file, email style
+		wp_enqueue_style('pdf-style', plugin_dir_url(__FILE__) . 'src/css/pdf_style.css', array(), 1, 'all');
+
 		// load Font Awesome cdn
 		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4');
 

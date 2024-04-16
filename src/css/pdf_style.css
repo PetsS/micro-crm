@@ -1,0 +1,131 @@
+/* PDF style */
+
+/* Document style */
+.container {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+}
+
+/* Header style */
+.table-header {
+  width: 100%;
+  font-size: 10pt;
+  text-align: left;
+}
+
+.table-header td {
+  width: 50%;
+  vertical-align: top;
+  border: hidden;
+}
+
+.table-header th {
+  border: hidden;
+  vertical-align: center;
+}
+
+.span-head-title {
+  text-align: end;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16pt;
+  font-weight: bold;
+}
+
+.span-head-header {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+}
+
+/* Details style */
+.table-details {
+  border: 1px solid #dddddd;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 9pt;
+  padding: 5px;
+}
+
+.table-details th {
+  background-color: #f5f5f5;
+  border: 1px solid #dddddd;
+  text-align: left;
+}
+
+.table-details td {
+  border: 1px solid #dddddd;
+}
+
+.cell-30 {
+  width: 30%;
+}
+
+.cell-10 {
+  width: 10%;
+}
+
+.span-details-quote-id {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 14pt;
+}
+
+/* Footer style */
+.table-footer {
+  border: hidden;
+  width: 100%;
+  font-size: 10pt;
+  padding: 5px;
+}
+
+.table-footer td {
+  border: hidden;
+  width: 50%;
+  vertical-align: top;
+}
+
+.table-footer-payment {
+  background-color: #f5f5f5;
+  padding: 5px;
+  margin: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+}
+
+.table-footer-payment-td-left {
+  text-align: left;
+}
+
+.table-footer-payment-td-right {
+  text-align: right;
+}
+
+.table-footer-payment-tr-biggerfont {
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.crocodile {
+  width: 200px;
+  height: auto;
+}
+
+.span-thanks {
+  font-size: 8pt;
+  text-align: center;
+}
+
+.quote-payment {
+  text-align: center;
+}
+
+.span-terms {
+  font-size: 6pt;
+}
