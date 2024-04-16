@@ -31,7 +31,6 @@ class CustomTCPDF extends TCPDF
         include(plugin_dir_path(__FILE__) . '../template/template.footer_pdf.php');
         $htmlFooter = ob_get_clean();
 
-        ob_end_clean();
         // Add custom footer content
         $this->writeHTML($htmlFooter, true, false, true, false, 'L');
     }
@@ -116,7 +115,7 @@ class DocumentConverter
         // Set cell paddings (top, right, bottom, left)
         // $pdf->setCellPaddings(0, 0, 0, 0); // Adjust the bottom padding (5mm) to set the margin between paragraphs
         
-        
+        ob_start();
         // Read HTML content from the template file
         include(plugin_dir_path(__FILE__) . '../template/template.quotation.php');
         $html = ob_get_clean(); // Get the contents of the output buffer and clean it
@@ -137,8 +136,6 @@ class DocumentConverter
         // Save the PDF, overwriting any existing file
         $pdf->Output($pdfPath, 'F');
 
-        // Clean sent headers
-        header_remove();
     }
 
     public function convert_pdf_save_redirect()

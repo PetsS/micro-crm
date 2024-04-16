@@ -54,20 +54,18 @@ class MailSender
                 echo 'Attachment file does not exist: ' . $pdfFilePath;
             }
 
-            // var_dump($quote_data->number_quote);
-            // var_dump($pdfFilePath);
-            // die();
-
             // Email subject
             $mail->isHTML(true);
             $client = (!empty($quote_data->companyName) ? (strtoupper($quote_data->companyName)) : ($quote_data->firstname_quot . ' ' . strtoupper($quote_data->lastname_quot)));
             $mail->Subject = 'MicroZoo devis pour ' . $client;
 
+            ob_start(); // Start output buffering
             // Email body from a separate html file
             include(plugin_dir_path(__FILE__) . '../template/template.email.php');
             $emailBody = ob_get_clean();
             $mail->Body = $emailBody;
 
+            ob_start(); // Start another buffer
             // Email alt body from a separate file in plain text for non-HTML mail clients
             include(plugin_dir_path(__FILE__) . '../template/template.email_plaintext.php');
             $altBody = ob_get_clean();
@@ -75,55 +73,107 @@ class MailSender
 
             // Send email
             $mail->send();
-
         } catch (Exception $e) {
             echo 'Message could not be sent.';
             echo 'Mailer Error: ' . $e->getMessage();
         }
     }
 
-    // Method for handling question form submissions and sending emails
-    public function send_email_question($form_data)
+    // Method for handling question form submission and sending email to admin
+    public function send_email_question_to_admin($form_data)
     {
 
-        // Instantiate PHPMailer
-        $mail = new PHPMailer();
+        try {
+            // Instantiate PHPMailer
+            $mail = new PHPMailer();
 
-        // Set mailer to use SMTP
-        $mail->isSMTP();
+            // Set mailer to use SMTP
+            $mail->isSMTP();
 
-        // Configure SMTP settings (MailHog or any other SMTP server)
-        $mail->Host = 'localhost';
-        $mail->SMTPAuth = false;
-        $mail->Username = '';
-        $mail->Password = '';
-        $mail->Port = 1025;
+            // Configure SMTP settings (MailHog or any other SMTP server)
+            $mail->Host = 'localhost';
+            $mail->SMTPAuth = false;
+            $mail->Username = '';
+            $mail->Password = '';
+            $mail->Port = 1025;
 
-        // Set email sender
-        $mail->setFrom('mz@example.com', 'MicroZoo Admin');
+            // Set noreply email sender
+            $mail->setFrom('noreply@microzoo.fr', 'MicroZoo');
 
-        // Add recipients (Admin's email)
-        $mail->addAddress('microzoo@example.com');
+            // Add recipients (Admin's email)
+            $mail->addAddress('microzoo@example.com');
 
-        // Set email subject
-        $mail->Subject = 'Question from Website';
+            // Set email subject
+            $mail->Subject = 'Question du ' . $form_data['firstname_quest'] . ' ' . $form_data['lastname_quest'] . ' (' . $form_data['email_quest'] . ') ' . 'sur le site web';
 
-        // Construct email body
-        $emailBody = "Email: " . $form_data['email_quest'] . "\n";
-        $emailBody .= "Nom: " . $form_data['lastname_quest'] . "\n";
-        $emailBody .= "Prénom: " . $form_data['firstname_quest'] . "\n";
-        $emailBody .= "Téléphone: " . $form_data['phone_quest'] . "\n";
-        $emailBody .= "Message: " . $form_data['message'];
+            // Construct email body
+            $emailBody = "Email: " . $form_data['email_quest'] . "\n";
+            $emailBody .= "Nom: " . $form_data['lastname_quest'] . "\n";
+            $emailBody .= "Prénom: " . $form_data['firstname_quest'] . "\n";
+            $emailBody .= "Téléphone: " . $form_data['phone_quest'] . "\n";  
+            $emailBody .= "Message: " . stripslashes($form_data['message']); // stripslashes removes all slash characters
+            
+            // Set email body
+            $mail->Body = $emailBody;
 
-        // Set email body
-        $mail->Body = $emailBody;
+            // Set Reply-To header to null to prevent replies
+            $mail->addReplyTo('', '');
 
-        // Send email
-        if (!$mail->send()) {
+            // Send email
+            $mail->send();
+        } catch (Exception $e) {
             echo 'Message could not be sent.';
-            echo 'Mailer Error: ' . $mail->ErrorInfo;
-        } else {
-            echo 'Email has been sent successfully';
+            echo 'Mailer Error: ' . $e->getMessage();
+        }
+    }
+
+    // Method for handling question form submission and sending email to client
+    public function send_email_question_to_client($form_data)
+    {
+
+        try {
+            // Instantiate PHPMailer
+            $mail = new PHPMailer();
+
+            // Set mailer to use SMTP
+            $mail->isSMTP();
+
+            // Configure SMTP settings (MailHog or any other SMTP server)
+            $mail->Host = 'localhost';
+            $mail->SMTPAuth = false;
+            $mail->Username = '';
+            $mail->Password = '';
+            $mail->Port = 1025;
+
+            // Set noreply email sender
+            $mail->setFrom('noreply@microzoo.fr', 'MicroZoo');
+
+            // Add recipients (Client's email)
+            $mail->addAddress($form_data['email_quest']);
+
+            // Set email subject
+            $mail->Subject = 'Question du site web MicroZoo';
+
+            ob_start(); // Start another buffer
+            // Email body from a separate html file
+            include(plugin_dir_path(__FILE__) . '../template/template.email_client.php');
+            $emailBody = ob_get_clean();
+            $mail->Body = $emailBody;
+
+            ob_start(); // Start another buffer
+            // Email alt body from a separate file in plain text for non-HTML mail clients
+            include(plugin_dir_path(__FILE__) . '../template/template.email_client_plaintext.php');
+            $altBody = ob_get_clean();
+            $mail->AltBody = $altBody;
+
+            // Set Reply-To header to null to prevent replies
+            $mail->addReplyTo('', '');
+
+            // Send email
+            $mail->send();
+        } catch (Exception $e) {
+            echo 'Message could not be sent.';
+            echo 'Mailer Error: ' . $e->getMessage();
         }
     }
 }

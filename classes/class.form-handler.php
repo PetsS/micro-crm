@@ -57,12 +57,11 @@ class FormHandler
 
                     // successful submit send an email to client
                     $mailSender = new MailSender();
-                    $mailSender->send_email_question($_POST); // Pass post form data to the method
+                    $mailSender->send_email_question_to_admin($_POST); // Pass post form data to the method and send email to admin 
+                    $mailSender->send_email_question_to_client($_POST); // Pass post form data to the method and send email to client
 
-                    var_dump('Sent Succesfuuuuulllyy');
-                    die();
-
-                    wp_redirect(esc_url(wp_get_referer()));
+                    // Redirect to the referer page with a parameter
+                    wp_redirect(remove_query_arg('form_error', add_query_arg('confirm', 'true', wp_get_referer())));
 
                     $this->eraseMemory();
 

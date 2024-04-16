@@ -8,45 +8,13 @@ if ($form_data_transient && isset($form_data_transient['quote_id'])) {
     $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover quotation data from database
 }
 
+// Read CSS file content and inline it because PHPMailer does not directly handle external CSS styling for email templates.
+$css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/email_style.css');
 ?>
 
+<!-- Include inline custom css library -->
 <style>
-    /* Document style */
-    .container_email {
-        box-sizing: border-box;
-        max-width: 600px;
-        margin: 0 auto;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 12pt;
-        padding: 20px;
-        background-color: #f9f9f9;
-    }
-
-    .container_email h1 {
-        color: #333333;
-        text-align: center;
-    }
-
-    .email_header {
-        background-color: #23a455;
-        color: #fff;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .email_footer {
-        background-color: #23a455;
-        color: #fff;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .link_facebook,
-    .link_instagram {
-        color: #fff;
-        text-decoration: none;
-        margin-right: 10px;
-    }
+    <?php echo $css_content; ?>
 </style>
 
 <!DOCTYPE html>

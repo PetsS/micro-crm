@@ -86,14 +86,11 @@ class MicroCrm
 
 	public function load_assets()
 	{
-		// load css file
-		wp_enqueue_style(
-			'style',
-			plugin_dir_url(__FILE__) . 'src/css/style.css',
-			array(),
-			1,
-			'all'
-		);
+		// load css file, general style
+		wp_enqueue_style('general-style', plugin_dir_url(__FILE__) . 'src/css/style.css', array(), 1, 'all');
+
+		// load css file, email style
+		wp_enqueue_style('email-style', plugin_dir_url(__FILE__) . 'src/css/email_style.css', array(), 1, 'all');
 
 		// load Font Awesome cdn
 		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4');
@@ -108,13 +105,7 @@ class MicroCrm
 		wp_enqueue_style('bootstrap-icons-css', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
 
 		// load the js file
-		wp_enqueue_script(
-			'script',
-			plugin_dir_url(__FILE__) . 'src/js/form-handling-scripts.js',
-			array('jquery'),
-			1,
-			true
-		);
+		wp_enqueue_script('script', plugin_dir_url(__FILE__) . 'src/js/form-handling-scripts.js', array('jquery'), 1, true);
 
 		// Localize the script with the AJAX URL
 		wp_localize_script('script', 'ajax_object', array('ajaxurl' => admin_url('admin-ajax.php')));
@@ -127,8 +118,8 @@ class MicroCrm
 
 		// Include the template file
 		include(plugin_dir_path(__FILE__) . 'template/template.main.php');
-		
-		// Get the captured HTML output and return it
+
+		// Get the captured HTML output, clean it and return it
 		return ob_get_clean();
 	}
 
@@ -144,7 +135,6 @@ class MicroCrm
 		$document_converter = new DocumentConverter;
 		// $document_converter->convert_html_to_pdf();
 		$document_converter->convert_pdf_save_redirect();
-		
 	}
 
 	// Function to create tables
@@ -189,7 +179,7 @@ class MicroCrm
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			// Function dbDelta is in the file upgrade.php
 			dbDelta($sql);
-			
+
 			// Insert fixed data into age table category column
 			insertAgeData($wpdb, $age_table);
 		}
@@ -210,7 +200,6 @@ class MicroCrm
 			// Function dbDelta is in the file upgrade.php
 			dbDelta($sql);
 		}
-		
 	}
 
 	// Function to drop tables
