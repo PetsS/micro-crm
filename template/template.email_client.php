@@ -1,6 +1,9 @@
 <?php
 // Read CSS file content and inline it because PHPMailer does not directly handle external CSS styling for email templates.
 $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/email_style.css');
+
+// include logo from src
+$logo_header = file_get_contents(plugin_dir_url(__FILE__) . '../src/images/logo_email.png');
 ?>
 
 <!-- Include inline custom css library -->
@@ -19,12 +22,13 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/email_st
 </head>
 
 <body>
-    <div class="container_email">
 
-        <!-- Header -->
-        <header class="email_header">
-            <img src="https://www.microzoo.com/wp-content/uploads/2022/01/logo-light.svg" alt="MicroZoo Logo" style="max-width: 200px;">
-        </header>
+    <!-- Header -->
+    <header class="email_header">
+        <img src="data:image/png;base64,<?php echo base64_encode($logo_header); ?>" alt="MicroZoo Logo">
+    </header>
+
+    <div class="container_email">
 
         <!-- Email Body -->
         <p>Bonjour,</p>
@@ -73,19 +77,17 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/email_st
 
         <p>Merci de votre intérêt pour le MicroZoo et restons à votre disposition pour toute information complémentaire.</p>
         <p>À bientôt !</p>
-        <p>L'équipe MicroZoo</p>
-
-        <!-- Email Footer -->
-        <footer class="email_footer">
-            <p>Micro Zoo Saint-Malo</p>
-            <p>9 Place Vauban, 35400 Saint-Malo</p>
-            <p>Téléphone: +33 6 22 91 83 04 | Email: contact@microzoo.fr​</p>
-            <div>
-                <a class="link_facebook" href="https://www.facebook.com/microzoosaintmalo">Facebook</a>
-                <a class="link_instagram" href="https://www.instagram.com/microzoosaintmalo">Instagram</a>
-            </div>
-        </footer>
+        <p>L'équipe Micro Zoo</p>
     </div>
+
+    <!-- Email Footer -->
+    <footer class="email_footer">
+        <p>Micro <span>Zoo</span> Saint-Malo</p>
+        <p>9 Place Vauban, 35400 Saint-Malo</p>
+        <p>Téléphone: <a href="tel:+33622918304">+33 6 22 91 83 04</a> | Email: <a href="mailto:contact@microzoo.fr">contact@microzoo.fr</a></p>
+        <p><a href="https://www.facebook.com/microzoosaintmalo">Facebook</a> | <a href="https://www.instagram.com/microzoosaintmalo">Instagram</a></p>
+    </footer>
+
 </body>
 
 </html>

@@ -15,22 +15,43 @@
 }
 
 .email_header {
-  background-color: #23a455;
+  box-sizing: border-box;
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12pt;
+  background-color: #000000;
   color: #fff;
-  padding: 10px;
   text-align: center;
+}
+
+.email_header img {
+  max-width: 100%;
+  height: auto;
 }
 
 .email_footer {
-  background-color: #23a455;
+  box-sizing: border-box;
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12pt;
+  background-color: #000000;
   color: #fff;
   padding: 10px;
   text-align: center;
 }
 
-.link_facebook,
-.link_instagram {
-  color: #fff;
-  text-decoration: none;
-  margin-right: 10px;
+.email_footer span {
+  color: #f1e840;
+}
+
+.email_footer a {
+  color: #fff; /* Set default color for links */
+    text-decoration: none; /* Remove underline from links */
+}
+
+.email_footer a:hover {
+    color: #f1e840; /* Change color on hover */
+    cursor: pointer; /* Change cursor on hover */
 }
