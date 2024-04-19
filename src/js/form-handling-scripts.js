@@ -5,6 +5,7 @@
 var buttonDiv = document.getElementById("formButtons");
 var addButton = document.getElementById("btn-add-persons");
 var addButtonUpd = document.getElementById("btn-add-persons-update");
+var pageElement = document.getElementById("scroll_here");
 
 // Use DOMContentLoaded event to ensure DOM is fully loaded while executing the scripts
 document.addEventListener("DOMContentLoaded", function () {
@@ -22,6 +23,12 @@ document.addEventListener("DOMContentLoaded", function () {
   // addDynamicDisplayInfoToOriginal();
   showVisitetypeOptions();
   showDisplayInfo();
+  // scroll the screen to the div when the page is loaded
+  setTimeout(function () {
+    if (pageElement) {
+      scrollToTop(pageElement);
+    }
+  }, 100);
 });
 
 /**
@@ -79,26 +86,28 @@ function handleFormdata() {
   });
 
   // Call the function to scroll to the top of the form if there are error data
-  if (document.querySelectorAll(".error").length > 0) {
-    // delay the execution of scrollToFormTop to execute by a few milliseconds the scroll function after the redirection of the page after onloading the window
-    setTimeout(scrollToFormTop, 200);
-  }
+  // if (document.querySelectorAll(".error").length > 0) {
+  //   // delay the execution of scrollToFormTop to execute by a few milliseconds the scroll function after the redirection of the page after onloading the window
+  //   setTimeout(scrollToFormTop, 200);
+  // }
 }
 
-function scrollToFormTop() {
-  // const formElement = document.querySelector("form"); // Select the first <form> element
-  const formElement = document.getElementById("scrollHereIfErrors");
-  const formElementUpdate = document.getElementById(
-    "scrollHereIfErrorsInUpdate"
-  );
+// function scrollToFormTop() {
+//   // const formElement = document.querySelector("form"); // Select the first <form> element
+//   const formElement = document.getElementById("scrollHereIfErrors");
+//   const formElementUpdate = document.getElementById("scrollHereIfErrorsInUpdate");
 
-  if (formElement) {
-    formElement.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the form if found
-  } else if (formElementUpdate) {
-    formElementUpdate.scrollIntoView({ behavior: "smooth", block: "start" });
-  } else {
-    console.log("Form not found"); // Log an error if form not found
-  }
+//   if (formElement) {
+//     formElement.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the form if found
+//   } else if (formElementUpdate) {
+//     formElementUpdate.scrollIntoView({ behavior: "smooth", block: "start" });
+//   } else {
+//     console.log("Form not found"); // Log an error if form not found
+//   }
+// }
+
+function scrollToTop(element) {
+  element.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the tag if found with delay
 }
 
 // Function to clone container with persons and ages
@@ -243,9 +252,11 @@ function showVisitetypeOptions() {
   var visitetypeInfo = document.getElementById("info-visiteType");
 
   // Check the initial value of visitetypeSelect on page load
-  if (visitetypeSelect.value === "2") {
-    // If the initial value is '2', remove the 'hidden' class from visitetypeInfo
-    visitetypeInfo.classList.remove("hidden");
+  if (visitetypeSelect) {
+    if (visitetypeSelect.value === "2") {
+      // If the initial value is '2', remove the 'hidden' class from visitetypeInfo
+      visitetypeInfo.classList.remove("hidden");
+    }
   }
 
   // Attach a change event listener to the select, when the option is selected do the action
@@ -282,25 +293,27 @@ function showDisplayInfo() {
         totalNbPersons += parseInt(nbPersonsInput.value) || 0;
       }
     });
-    
+
     // Check if the total number of persons is greater than 14 and there have been changes
-    if (totalNbPersons > 14) {
-      infoPersonsDiscount.classList.remove("hidden");
-      infoPersonsDiscount.style.animationName = "fadeIn";
+    if (infoPersons || infoPersonsDiscount) {
+      if (totalNbPersons > 14) {
+        infoPersonsDiscount.classList.remove("hidden");
+        infoPersonsDiscount.style.animationName = "fadeIn";
 
-      infoPersons.classList.add("hidden");
-      infoPersons.style.animationName = "fadeOut";
-    } else {
-      infoPersonsDiscount.classList.add("hidden");
-      infoPersonsDiscount.style.animationName = "fadeOut";
+        infoPersons.classList.add("hidden");
+        infoPersons.style.animationName = "fadeOut";
+      } else {
+        infoPersonsDiscount.classList.add("hidden");
+        infoPersonsDiscount.style.animationName = "fadeOut";
 
-      infoPersons.classList.remove("hidden");
-      infoPersons.style.animationName = "fadeIn";
-    }
-
-    if (totalNbPersons === 0 || isNaN(parseInt(nbPersonsInput))) {
-      infoPersons.classList.add("hidden");
-      infoPersons.style.animationName = "fadeOut";
+        infoPersons.classList.remove("hidden");
+        infoPersons.style.animationName = "fadeIn";
+      }
+      
+      if (totalNbPersons === 0 ) {
+        infoPersons.classList.add("hidden");
+        infoPersons.style.animationName = "fadeOut";
+      }
     }
   };
 
@@ -326,88 +339,10 @@ function showDisplayInfo() {
   });
 }
 
-
 // Add event listener to clear form data on page exit or refresh using JavaScript
-window.addEventListener('beforeunload', function() {
-    // Call an AJAX request to clear form data on page exit or refresh
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", ajax_object.ajaxurl + "?action=clear_form_data", false);
-    xhr.send();
+window.addEventListener("beforeunload", function () {
+  // Call an AJAX request to clear form data on page exit or refresh
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", ajax_object.ajaxurl + "?action=clear_form_data", false);
+  xhr.send();
 });
-
-
-// Function to add dynamic display info based on selected category and number of persons
-// function addDynamicDisplayInfo(container) {
-//   var displayInfo = container.querySelector('[name="display-info"]');
-
-//   var nbPersonsInput = container.querySelector('input[name="nbPersons[]"]');
-//   var agesSelect = container.querySelector('select[name="ages[]"]');
-
-//   nbPersonsInput.addEventListener("change", updateDisplayInfo);
-//   agesSelect.addEventListener("change", updateDisplayInfo);
-
-//   updateDisplayInfo();
-
-//   function updateDisplayInfo() {
-//     var nbPersons = parseInt(nbPersonsInput.value) || 0;
-//     var selectedAge = agesSelect.options[agesSelect.selectedIndex].text;
-
-//     var dynamicText = "";
-//     if (selectedAge !== "Choisissez âge..." && nbPersons > 0) {
-//       dynamicText =
-//         "You have selected " +
-//         nbPersons +
-//         " person(s) with category: " +
-//         selectedAge;
-//     } else {
-//       // dynamicText = "Please select a category and enter the number of persons.";
-//       dynamicText = "sdfsdf " + "fsd";
-//     }
-
-//     if (displayInfo) {
-//       displayInfo.textContent = dynamicText;
-//     } else {
-//       // If display info doesn't exist, create it and append it to the container
-//       displayInfo = document.createElement("div");
-//       displayInfo.setAttribute("name", "display-info");
-//       displayInfo.textContent = dynamicText;
-//       container.appendChild(displayInfo);
-//     }
-//   }
-// }
-
-// // function to load dynamic display info text to the original container on page load
-// function addDynamicDisplayInfoToOriginal() {
-//   container = document.getElementById("container-0");
-
-//   if (!container.querySelector('[name="display-info"]')) {
-//     addDynamicDisplayInfo(container);
-//   }
-// }
-
-// function to fetch data from the REST API
-// function fetchAgeData() {
-//     fetch('/wp-json/custom/v1/age-data')
-//         .then(response => response.json())
-//         .then(data => {
-//             // Work with the fetched age data
-//             console.log(data);
-
-//             // Access individual data items
-//             data.forEach(ageItem => {
-//                 console.log(ageItem.id); // Access the ID of each age item
-//                 console.log(ageItem.category); // Access the category of each age item
-//                 console.log(ageItem.price); // Access the price of each age item
-
-//                 // Perform operations with individual data items
-//                 // For example, update the DOM with the fetched data
-//                 // Example:
-//                 // var ageListElement = document.createElement('li');
-//                 // ageListElement.textContent = `Category: ${ageItem.category}, Price: ${ageItem.price}`;
-//                 // document.getElementById('age-list').appendChild(ageListElement);
-//             });
-//         })
-//         .catch(error => {
-//             console.error('Error fetching age data:', error);
-//         });
-// }

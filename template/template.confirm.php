@@ -15,10 +15,11 @@ if ($isCancelled) {
 
 ?>
 
+<div id="scroll_here"></div>
 
 <!-- Condition for the if the cancel action is set -->
 <?php if (!$isCancelled) : ?>
-    <div class="container">
+    <div class="container" style="max-width: 500px;">
         <div class="row">
             <div class="col-md-12">
                 <h1>Révisez votre devis!</h1>
@@ -44,7 +45,6 @@ if ($isCancelled) {
                     </form> -->
 
                 <!-- download PDF -->
-                <br>
                 <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error'), add_query_arg('pdf', 'true', wp_get_referer()))); ?>" target="_blank" class="btn btn-success">Télécharger PDF</a>
                 <!-- <a href="#" class="btn btn-primary">Télécharger PDF</a> -->
 

@@ -128,16 +128,18 @@ class FormHandler
                     $errors['phone_quot'] = 'Veuillez saisir un numéro de téléphone valide.';
                 }
                 // Visit Type validation
-                
                 if ($visitetype === 'default') {
                     $errors['visitetype'] = 'Veuillez sélectionner un type de visite.';
                 } else if ($visitetype === '2' && array_sum($_POST['nbPersons']) > 6) {
                     $errors['visitetype'] = 'Visite guidé jusqu\'à 6 personnes maximum.';
                 }
-
                 // Date and time of visit validation
                 if ($datetimeVisit < date('Y-m-d\TH:i')) {
                     $errors['datetimeVisit'] = 'La visite doit être dans le futur.';
+                }
+                // Payment validation
+                if ($payment === 'default') {
+                    $errors['payment'] = 'Veuillez sélectionner un type de paiement.';
                 }
                 // Persons validation                
                 foreach ($_POST['nbPersons'] as $index => $nbPerson) {

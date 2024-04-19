@@ -56,6 +56,8 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
     <?php echo $css_content; ?>
 </style>
 
+<div id="scroll_here"></div>
+
 <body>
     <div class="container">
         <!-- PDF Header -->
@@ -149,14 +151,14 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                         <?php
                         $age_data = getAgeById($person->age_id); // ger one row of age data in the current quote
                         $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // total number of paying person, excluding the age category 1 (age less than 3 years old)
-                        
+
                         // calculate prices
                         if ($total_paying_persons < 15) {
                             $unit_ttc = $age_data->price; // one unit price with tax at normal rate
                         } else {
                             $unit_ttc = $age_data->price - GROUP_DISCOUNT; // one discounted unit price with tax at discounted rate
                         }
-                        
+
                         $unit_ht = ($unit_ttc / (1 + (TVA / 100))); // one unit price without tax
                         $amount_ht = ($unit_ttc / (1 + (TVA / 100))) * ($person->nbPersons); // full price based on the number of person without tax
                         $amount_ttc = $unit_ttc * $person->nbPersons; // full price based on the number of person with tax

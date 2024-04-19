@@ -1,3 +1,7 @@
+<?php if (isset($_GET['form_error'])) : ?>
+    <div id="scroll_here"></div>
+<?php endif; ?>
+
 <h2>Choisissez une option :</h2>
 
 <div id="formButtons">
@@ -5,7 +9,7 @@
     <button id="buttonQuestion">Posez une question</button>
 </div>
 
-<div id="scrollHereIfErrors"></div>
+<!-- <div id="scrollHereIfErrors"></div> -->
 
 <div id="formQuestion" class="hidden">
 
@@ -219,7 +223,11 @@
             <?php foreach (getPaymentList() as $payment) : ?>
                 <option value="<?php echo $payment->id ?>" <?php echo (isset($form_data['payment']) && $form_data['payment'] == $payment->id) ? ' selected' : ''; ?>><?php echo $payment->category ?></option>
             <?php endforeach; ?>
-        </select><br><br>
+        </select>
+        <?php if (isset($form_errors) && isset($form_errors['payment'])) : ?>
+            <span class="error"><?php echo $form_errors['payment']; ?><br></span>
+        <?php endif; ?><br>
+        <br>
 
         <label for="comment">Commentaire:</label>
         <textarea id="comment" name="comment" rows="4" placeholder="Votre commentaire"><?php echo isset($form_data['comment']) ? esc_textarea(stripslashes($form_data['comment'])) : ''; ?></textarea>
