@@ -142,7 +142,7 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     $total_tva = 0;
                     $total_ht = 0;
                     $total_ttc = 0;
-                    $total_nbPersons = 0;
+                    $total_paying_persons = 0;
                     ?>
                     <?php foreach ($person_data as $person) : ?>
                         <?php $age_data = getAgeById($person->age_id); ?>
@@ -156,8 +156,7 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                         $total_tva += $amount_tva; // total tax
                         $total_ht += $amount_ht; // total price without tax
                         $total_ttc += $amount_ttc; // total price with tax
-                        $total_nbPersons += $person->nbPersons; // total number of person
-                        // $free_person = ;
+                        $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // total number of paying person, excluding the age category 1 (age less than 3 years old)
                         ?>
                         <tr class="tr-details">
                             <td class="cell-10">ref</td>
@@ -172,7 +171,7 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     <?php endforeach; ?>
 
                     <!-- Calculate and include the person for free -->
-                    <?php if ($total_nbPersons >= 15) : ?>
+                    <?php if ($total_paying_persons >= 15) : ?>
                         <?php
                         // run a query in the database to get the category name
                         $age_list = getAgeList();
@@ -181,7 +180,7 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                         $free_person = 1;
 
                         // For every additional 10 persons beyond the initial 15, add another free person.
-                        $add_free_person = floor(($total_nbPersons - 15) / 10); // The floor function rounds down to the nearest whole number.
+                        $add_free_person = floor(($total_paying_persons - 15) / 10); // The floor function rounds down to the nearest whole number.
 
                         // Total number of free persons
                         $total_free_persons = $free_person + $add_free_person;

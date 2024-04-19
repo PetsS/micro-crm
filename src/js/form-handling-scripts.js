@@ -8,7 +8,7 @@ var addButtonUpd = document.getElementById("btn-add-persons-update");
 
 // Use DOMContentLoaded event to ensure DOM is fully loaded while executing the scripts
 document.addEventListener("DOMContentLoaded", function () {
-  // Call the functions
+  // Call the functions when the page is loaded
   if (buttonDiv) {
     showFormsType(); // call only if div exists in the template
   }
@@ -18,7 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
   } else if (addButtonUpd) {
     clonePersons(addButtonUpd); // call the function if the button with the id exists in the update form
   }
-  restoreDeleteButtons();
+  restoreElements();
+  // addDynamicDisplayInfoToOriginal();
+  showVisitetypeOptions();
+  showDisplayInfo();
 });
 
 /**
@@ -62,8 +65,6 @@ function clearErrorMessages() {
   errorElements.forEach(function (element) {
     element.parentNode.removeChild(element);
   });
-  // Clear URL parameters with history.replaceState() method to replace the current URL with a new one that doesn't contain the query parameters.
-  // history.replaceState({}, document.title, window.location.pathname);
 }
 
 // Remove hidden class from elements with error messages when the window loads
@@ -108,7 +109,8 @@ function clonePersons(buttonElement) {
     var clonedContainer = container.cloneNode(true);
 
     // Increment container ID by 1
-    var lastContainerId = document.querySelectorAll(".containerClone").length - 1;
+    var lastContainerId =
+      document.querySelectorAll(".containerClone").length - 1;
     var newContainerId = "container-" + (parseInt(lastContainerId) + 1);
 
     // Check if the new container ID already exists, if yes, increment by 1 until it's unique
@@ -174,9 +176,11 @@ function clonePersons(buttonElement) {
       lastClonedContainer.nextSibling
     );
 
+    // Add dynamic display info for the cloned container
+    // addDynamicDisplayInfo(clonedContainer);
+
     // // add a delete button the each cloned container
     addDeleteButton(clonedContainer);
-
   });
 }
 
@@ -188,81 +192,19 @@ function addDeleteButton(clonedContainer) {
   deleteButton.addEventListener("click", () => {
     // Remove the cloned container when delete button is clicked
     clonedContainer.parentNode.removeChild(clonedContainer);
-    // Remove the stored information about delete button for this container from local storage
-    // deleteFromLocalStorage(clonedContainer);
   });
+
+  // Append the buttonas a child of the cloned container
   clonedContainer.appendChild(deleteButton);
 }
 
-// Function to store the presence of delete button for a container in local storage
-// function saveToLocalStorage(container) {
-//   var containerData = {
-//     id: container.id, // the id of the cloned containers
-//     inputs: [], // inputs array to load it with the attribute values
-//   };
-
-//   // Save container's ID
-//   // localStorage.setItem(container.id, "true");
-
-//   // Save input IDs, values, and their corresponding 'for' attribute values
-//   container.querySelectorAll("label, input, select").forEach((element) => {
-//     if (element.tagName === "LABEL") {
-//       var forAttribute = element.getAttribute("for");
-//       containerData.inputs.push({ for: forAttribute });
-//     } else if (element.tagName === "INPUT" || element.tagName === "SELECT") {
-//       var inputId = element.getAttribute("id");
-//       containerData.inputs.push({ id: inputId });
-//     }
-//   });
-
-//   // Serialize and save container data
-//   localStorage.setItem(container.id + "_data", JSON.stringify(containerData));
-// }
-
-// Function to remove the stored information about delete button for a container from local storage
-// function deleteFromLocalStorage(container) {
-//   localStorage.removeItem(container.id + "_data");
-// }
-
-// Function to restore delete buttons for cloned containers from local storage
-// function restoreDeleteButtons() {
-//   document.querySelectorAll(".containerClone").forEach((container) => {
-//     var containerData = JSON.parse(localStorage.getItem(container.id + "_data"));
-
-//     if (containerData) {
-//       if (containerData.id === container.id) {
-//         containerData.inputs.forEach((inputData) => {
-//           if (inputData.hasOwnProperty("id")) {
-//             var inputId = inputData.id;
-//             var inputElement = container.querySelector(`#${inputId}`);
-//             if (inputElement) {
-//               inputElement.setAttribute("id", container.id + "-" + inputId.split("-")[1]);
-//             }
-//           }
-//           if (inputData.hasOwnProperty("for")) {
-//             var forAttribute = inputData.for;
-//             var labelElement = container.querySelector(`label[for="${forAttribute}"]`);
-//             if (labelElement) {
-//               labelElement.setAttribute("for", container.id + "-" + forAttribute.split("-")[1]);
-//             }
-//           }
-//         });
-//       }
-
-//       // Restore delete button
-//       if (container.id !== "container-0") {
-//         addDeleteButton(container);
-//       }
-//     }
-//   });
-// }
-
 // Function to restore delete buttons for cloned containers and reassign field attributes
-function restoreDeleteButtons() {
+function restoreElements() {
   var containers = document.querySelectorAll(".containerClone");
 
   containers.forEach((container, index) => {
-    if (index !== 0) { // Skip the original container
+    if (index !== 0) {
+      // Skip the original container
       // Increment container ID by 1
       var newContainerId = "container-" + index;
       container.id = newContainerId;
@@ -279,11 +221,15 @@ function restoreDeleteButtons() {
         if (input.tagName === "LABEL") {
           var forAttribute = input.getAttribute("for");
           if (forAttribute) {
-            var newForAttribute = forAttribute.replace(/\d+$/, "") + "-" + index;
+            var newForAttribute =
+              forAttribute.replace(/\d+$/, "") + "-" + index;
             input.setAttribute("for", newForAttribute);
           }
         }
       });
+
+      // Restore display info
+      // addDynamicDisplayInfo(container);
 
       // Restore delete button
       addDeleteButton(container);
@@ -291,6 +237,164 @@ function restoreDeleteButtons() {
   });
 }
 
+// Function to show info on selected visit type
+function showVisitetypeOptions() {
+  var visitetypeSelect = document.getElementById("visitetype");
+  var visitetypeInfo = document.getElementById("info-visiteType");
+
+  // Check the initial value of visitetypeSelect on page load
+  if (visitetypeSelect.value === "2") {
+    // If the initial value is '2', remove the 'hidden' class from visitetypeInfo
+    visitetypeInfo.classList.remove("hidden");
+  }
+
+  // Attach a change event listener to the select, when the option is selected do the action
+  if (visitetypeSelect) {
+    visitetypeSelect.addEventListener("change", function () {
+      if (visitetypeSelect.value === "2") {
+        visitetypeInfo.classList.remove("hidden");
+        visitetypeInfo.style.animationName = "fadeIn";
+      } else {
+        visitetypeInfo.classList.add("hidden");
+        visitetypeInfo.style.animationName = "fadeOut";
+      }
+    });
+  }
+}
+
+// Function to show info based on number of persons
+function showDisplayInfo() {
+  var infoPersons = document.getElementById("info-persons");
+  var infoPersonsDiscount = document.getElementById("info-persons-discount");
+
+  // Function to calculate total number of persons and update display info
+  var updateDisplayInfo = function () {
+    var totalNbPersons = 0;
+    var containers = document.querySelectorAll(".containerClone");
+
+    // Iterate over each container to sum up nbPersons inputs
+    containers.forEach((container) => {
+      var nbPersonsInput = container.querySelector('input[name="nbPersons[]"]');
+      var agesSelect = container.querySelector('select[name="ages[]"]');
+      var selectedAge = agesSelect.value;
+
+      if (selectedAge !== "1") {
+        totalNbPersons += parseInt(nbPersonsInput.value) || 0;
+      }
+    });
+
+    // Check if the total number of persons is greater than 14
+    if (totalNbPersons > 14) {
+      infoPersonsDiscount.classList.remove("hidden");
+      infoPersonsDiscount.style.animationName = "fadeIn";
+    } else {
+      infoPersonsDiscount.classList.add("hidden");
+      infoPersonsDiscount.style.animationName = "fadeOut";
+    }
+  };
+
+  // Call updateDisplayInfo initially
+  updateDisplayInfo();
+
+  // Add event listener to dynamically added containerClone divs
+  document.addEventListener("input", function (event) {
+    var target = event.target;
+    if (
+      target &&
+      target.matches(
+        '.containerClone input[name="nbPersons[]"], .containerClone select[name="ages[]"]'
+      )
+    ) {
+      updateDisplayInfo();
+    }
+
+    // Check if the input is nbPersons and reveal infoPersons if value is entered
+    if (target && target.matches('.containerClone input[name="nbPersons[]"]')) {
+      var enteredValue = parseInt(target.value);
+      if (!isNaN(enteredValue) && enteredValue > 0) {
+        infoPersons.classList.remove("hidden");
+        infoPersons.style.animationName = "fadeIn";
+      } else {
+        infoPersons.classList.add("hidden");
+        infoPersons.style.animationName = "fadeOut";
+      }
+    }
+  });
+}
 
 
+// Function to add dynamic display info based on selected category and number of persons
+// function addDynamicDisplayInfo(container) {
+//   var displayInfo = container.querySelector('[name="display-info"]');
 
+//   var nbPersonsInput = container.querySelector('input[name="nbPersons[]"]');
+//   var agesSelect = container.querySelector('select[name="ages[]"]');
+
+//   nbPersonsInput.addEventListener("change", updateDisplayInfo);
+//   agesSelect.addEventListener("change", updateDisplayInfo);
+
+//   updateDisplayInfo();
+
+//   function updateDisplayInfo() {
+//     var nbPersons = parseInt(nbPersonsInput.value) || 0;
+//     var selectedAge = agesSelect.options[agesSelect.selectedIndex].text;
+
+//     var dynamicText = "";
+//     if (selectedAge !== "Choisissez âge..." && nbPersons > 0) {
+//       dynamicText =
+//         "You have selected " +
+//         nbPersons +
+//         " person(s) with category: " +
+//         selectedAge;
+//     } else {
+//       // dynamicText = "Please select a category and enter the number of persons.";
+//       dynamicText = "sdfsdf " + "fsd";
+//     }
+
+//     if (displayInfo) {
+//       displayInfo.textContent = dynamicText;
+//     } else {
+//       // If display info doesn't exist, create it and append it to the container
+//       displayInfo = document.createElement("div");
+//       displayInfo.setAttribute("name", "display-info");
+//       displayInfo.textContent = dynamicText;
+//       container.appendChild(displayInfo);
+//     }
+//   }
+// }
+
+// // function to load dynamic display info text to the original container on page load
+// function addDynamicDisplayInfoToOriginal() {
+//   container = document.getElementById("container-0");
+
+//   if (!container.querySelector('[name="display-info"]')) {
+//     addDynamicDisplayInfo(container);
+//   }
+// }
+
+// function to fetch data from the REST API
+// function fetchAgeData() {
+//     fetch('/wp-json/custom/v1/age-data')
+//         .then(response => response.json())
+//         .then(data => {
+//             // Work with the fetched age data
+//             console.log(data);
+
+//             // Access individual data items
+//             data.forEach(ageItem => {
+//                 console.log(ageItem.id); // Access the ID of each age item
+//                 console.log(ageItem.category); // Access the category of each age item
+//                 console.log(ageItem.price); // Access the price of each age item
+
+//                 // Perform operations with individual data items
+//                 // For example, update the DOM with the fetched data
+//                 // Example:
+//                 // var ageListElement = document.createElement('li');
+//                 // ageListElement.textContent = `Category: ${ageItem.category}, Price: ${ageItem.price}`;
+//                 // document.getElementById('age-list').appendChild(ageListElement);
+//             });
+//         })
+//         .catch(error => {
+//             console.error('Error fetching age data:', error);
+//         });
+// }

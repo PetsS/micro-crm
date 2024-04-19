@@ -46,7 +46,7 @@ function getQuoteDataById($quote_id)
 }
 
 // Method to insert all quotation data to the database and return the ID of the inserted row
-function insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitType, $datetimeVisit, $payment, $comment)
+function insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype_id, $datetimeVisit, $payment_id, $comment)
 {
     global $wpdb;
     $quote_table = $wpdb->prefix . 'quote';
@@ -67,9 +67,9 @@ function insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyN
             'companyName' => $companyName,
             'address' => $address,
             'phone_quot' => $phone_quot,
-            'visitType' => $visitType,
+            'visitetype_id' => $visitetype_id,
             'datetimeVisit' => $formattedDateTimeVisit,
-            'payment' => $payment,
+            'payment_id' => $payment_id,
             'comment' => $comment,
             'number_quote' => $number_quote
         ),
@@ -104,7 +104,7 @@ function insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyN
 }
 
 // Method to update quotation data in the database
-function updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitType, $datetimeVisit, $payment, $comment)
+function updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype_id, $datetimeVisit, $payment_id, $comment)
 {
     global $wpdb;
     $quote_table = $wpdb->prefix . 'quote';
@@ -125,9 +125,9 @@ function updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot
             'companyName' => $companyName,
             'address' => $address,
             'phone_quot' => $phone_quot,
-            'visitType' => $visitType,
+            'visitetype_id' => $visitetype_id,
             'datetimeVisit' => $formattedDateTimeVisit,
-            'payment' => $payment,
+            'payment_id' => $payment_id,
             'comment' => $comment,
         ),
         array('id' => $quote_id), // Array defining the WHERE clause to identify which rows to update.

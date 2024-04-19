@@ -89,7 +89,7 @@ class FormHandler
                 $companyName = sanitize_text_field(stripslashes($_POST['companyName']));
                 $address = sanitize_text_field($_POST['address']);
                 $phone_quot = sanitize_text_field($_POST['phone_quot']);
-                $visitType = sanitize_text_field($_POST['visitType']);
+                $visitetype = sanitize_text_field($_POST['visitetype']);
                 $nbPersons = sanitize_text_field($_POST['nbPersons']);
                 $ages = sanitize_text_field($_POST['ages']);
                 $datetimeVisit = sanitize_text_field($_POST['datetimeVisit']);
@@ -128,9 +128,13 @@ class FormHandler
                     $errors['phone_quot'] = 'Veuillez saisir un numéro de téléphone valide.';
                 }
                 // Visit Type validation
-                if ($visitType === 'default') {
-                    $errors['visitType'] = 'Veuillez sélectionner un type de visite.';
+                
+                if ($visitetype === 'default') {
+                    $errors['visitetype'] = 'Veuillez sélectionner un type de visite.';
+                } else if ($visitetype === '2' && array_sum($_POST['nbPersons']) > 6) {
+                    $errors['visitetype'] = 'Visite guidé jusqu\'à 6 personnes maximum.';
                 }
+
                 // Date and time of visit validation
                 if ($datetimeVisit < date('Y-m-d\TH:i')) {
                     $errors['datetimeVisit'] = 'La visite doit être dans le futur.';
@@ -157,13 +161,13 @@ class FormHandler
                     // If the update URL parameter exist and maching with the id, it proceed to the function that updates the database at id
                     if (isset($_GET['update']) && trim($_GET['update']) === trim($quote_id)) {
                         // Update quotation data in the database
-                        updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitType, $datetimeVisit, $payment, $comment);
+                        updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
 
                         // Call method which updates person data in the database
                         $this->updatePersons($quote_id);
                     } else {
                         // Insert quotation data and capture the ID
-                        $quote_id = insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitType, $datetimeVisit, $payment, $comment);
+                        $quote_id = insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
 
                         // Call method which inserts data into the person table
                         $this->insertPersons($quote_id);
@@ -317,11 +321,5 @@ class FormHandler
     {
         // Delete transient
         delete_transient('form_data_transient');
-
-        // Clear local storage
-        // echo '<script>window.localStorage.clear();</script>';
-
-        // Clear session storage
-        // echo '<script>window.sessionStorage.clear();</script>';
     }
 }

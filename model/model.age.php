@@ -42,9 +42,9 @@ function insertAgeData($wpdb, $age_table)
 
     $prices = array(
         0,
-        6.5,
-        9.5,
-        7.5
+        6.9,
+        9.9,
+        7.9
     );
 
     // Loop to insert into columns from arrays

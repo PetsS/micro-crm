@@ -26,6 +26,8 @@ require_once(plugin_dir_path(__FILE__) . 'classes/class.quotation-calculator.php
 require_once(plugin_dir_path(__FILE__) . 'model/model.quote.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.person.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.age.php');
+require_once(plugin_dir_path(__FILE__) . 'model/model.visitetype.php');
+require_once(plugin_dir_path(__FILE__) . 'model/model.payment.php');
 
 // As a security precaution, it’s a good practice to disallow access if the ABSPATH global is not defined.
 if (!defined('ABSPATH')) {
@@ -145,31 +147,11 @@ class MicroCrm
 	{
 		// Declare global $wpdb object and table names
 		global $wpdb;
+		$age_table = $wpdb->prefix . 'age';
+		$visitetype_table = $wpdb->prefix . 'visitetype';
+		$payment_table = $wpdb->prefix . 'payment';
 		$quote_table = $wpdb->prefix . 'quote';
 		$person_table = $wpdb->prefix . 'person';
-		$age_table = $wpdb->prefix . 'age';
-
-		// Create quote table
-		if ($wpdb->get_var("SHOW TABLES LIKE '$quote_table'") != $quote_table) {
-			$sql = "
-            CREATE TABLE IF NOT EXISTS $quote_table (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                email_quot VARCHAR(255),
-                lastname_quot VARCHAR(255),
-                firstname_quot VARCHAR(255),
-				companyName VARCHAR(255),
-				address VARCHAR(255),
-				phone_quot VARCHAR(255),
-				visitType INT,
-				datetimeVisit DATETIME,
-				payment INT,
-				comment TEXT,
-				number_quote VARCHAR(255)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-			// Function dbDelta is in the file upgrade.php
-			dbDelta($sql);
-		}
 
 		// Create age table
 		if ($wpdb->get_var("SHOW TABLES LIKE '$age_table'") != $age_table) {
@@ -187,6 +169,60 @@ class MicroCrm
 			insertAgeData($wpdb, $age_table);
 		}
 
+		// Create visitetype table
+		if ($wpdb->get_var("SHOW TABLES LIKE '$visitetype_table'") != $visitetype_table) {
+			$sql = "
+            CREATE TABLE IF NOT EXISTS $visitetype_table (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255),
+                price FLOAT
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			// Function dbDelta is in the file upgrade.php
+			dbDelta($sql);
+
+			// Insert fixed data into table
+			insertVisiteTypeData($wpdb, $visitetype_table);
+		}
+
+		// Create payment table
+		if ($wpdb->get_var("SHOW TABLES LIKE '$payment_table'") != $payment_table) {
+			$sql = "
+            CREATE TABLE IF NOT EXISTS $payment_table (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                category VARCHAR(255)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			// Function dbDelta is in the file upgrade.php
+			dbDelta($sql);
+
+			// Insert fixed data into table
+			insertPaymentData($wpdb, $payment_table);
+		}
+
+		// Create quote table
+		if ($wpdb->get_var("SHOW TABLES LIKE '$quote_table'") != $quote_table) {
+			$sql = "
+            CREATE TABLE IF NOT EXISTS $quote_table (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                email_quot VARCHAR(255),
+                lastname_quot VARCHAR(255),
+                firstname_quot VARCHAR(255),
+				companyName VARCHAR(255),
+				address VARCHAR(255),
+				phone_quot VARCHAR(255),
+				visitetype_id INT,
+				datetimeVisit DATETIME,
+				payment_id INT,
+				comment TEXT,
+				number_quote VARCHAR(255),
+				FOREIGN KEY (visitetype_id) REFERENCES $visitetype_table(id) ON DELETE CASCADE ON UPDATE CASCADE,
+				FOREIGN KEY (payment_id) REFERENCES $payment_table(id) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			// Function dbDelta is in the file upgrade.php
+			dbDelta($sql);
+		}
 
 		// Create person table
 		if ($wpdb->get_var("SHOW TABLES LIKE '$person_table'") != $person_table) {
@@ -211,8 +247,10 @@ class MicroCrm
 		// Declare global $wpdb object and table names
 		global $wpdb;
 		$person_table = $wpdb->prefix . 'person';
-		$age_table = $wpdb->prefix . 'age';
 		$quote_table = $wpdb->prefix . 'quote';
+		$payment_table = $wpdb->prefix . 'payment';
+		$visitetype_table = $wpdb->prefix . 'visitetype';
+		$age_table = $wpdb->prefix . 'age';
 
 		// Check if plugin is being completely uninstalled
 		if (defined('WP_UNINSTALL_PLUGIN') && WP_UNINSTALL_PLUGIN == plugin_basename(__FILE__)) {
@@ -220,11 +258,17 @@ class MicroCrm
 			if ($wpdb->get_var("SHOW TABLES LIKE '$person_table'") == $person_table) {
 				$wpdb->query("DROP TABLE IF EXISTS $person_table");
 			}
-			if ($wpdb->get_var("SHOW TABLES LIKE '$age_table'") == $age_table) {
-				$wpdb->query("DROP TABLE IF EXISTS $age_table");
-			}
 			if ($wpdb->get_var("SHOW TABLES LIKE '$quote_table'") == $quote_table) {
 				$wpdb->query("DROP TABLE IF EXISTS $quote_table");
+			}
+			if ($wpdb->get_var("SHOW TABLES LIKE '$payment_table'") == $payment_table) {
+				$wpdb->query("DROP TABLE IF EXISTS $payment_table");
+			}
+			if ($wpdb->get_var("SHOW TABLES LIKE '$visitetype_table'") == $visitetype_table) {
+				$wpdb->query("DROP TABLE IF EXISTS $visitetype_table");
+			}
+			if ($wpdb->get_var("SHOW TABLES LIKE '$age_table'") == $age_table) {
+				$wpdb->query("DROP TABLE IF EXISTS $age_table");
 			}
 		} else {
 			// If plugin is just being deactivated, do not drop tables
