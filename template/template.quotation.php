@@ -24,6 +24,7 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 // Define constants
 define('TVA', 5.50);
 define('DISCOUNT', 100.00); // the percentage of discount can be modified here
+define('GROUP_DISCOUNT', 1); // the amount of € discount
 
 // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
 $form_data_transient = get_transient('form_data_transient');
@@ -31,8 +32,8 @@ $form_data_transient = get_transient('form_data_transient');
 // Retrieve quote ID from transient if available
 if ($form_data_transient && isset($form_data_transient['quote_id'])) {
     $quote_id = $form_data_transient['quote_id'];
-    $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover quotation data from database
-    $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover person data from database
+    $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover a single quotation row from database
+    $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover a single person row from database
 
 } else {
     // Display an error message
@@ -145,30 +146,59 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     $total_paying_persons = 0;
                     ?>
                     <?php foreach ($person_data as $person) : ?>
-                        <?php $age_data = getAgeById($person->age_id); ?>
                         <?php
+                        $age_data = getAgeById($person->age_id); // ger one row of age data in the current quote
+                        $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // total number of paying person, excluding the age category 1 (age less than 3 years old)
+                        
                         // calculate prices
-                        $unit_ht = ($age_data->price / (1 + (TVA / 100))); // one unit price without tax
-                        $unit_ttc = $age_data->price; // one uit price with tax - this is recovered from database
-                        $amount_ht = ($age_data->price / (1 + (TVA / 100))) * ($person->nbPersons); // full price based on the number of person without tax
-                        $amount_ttc = ($age_data->price) * ($person->nbPersons); // full price based on the number of person with tax
+                        if ($total_paying_persons < 15) {
+                            $unit_ttc = $age_data->price; // one unit price with tax at normal rate
+                        } else {
+                            $unit_ttc = $age_data->price - GROUP_DISCOUNT; // one discounted unit price with tax at discounted rate
+                        }
+                        
+                        $unit_ht = ($unit_ttc / (1 + (TVA / 100))); // one unit price without tax
+                        $amount_ht = ($unit_ttc / (1 + (TVA / 100))) * ($person->nbPersons); // full price based on the number of person without tax
+                        $amount_ttc = $unit_ttc * $person->nbPersons; // full price based on the number of person with tax
                         $amount_tva = $amount_ttc - $amount_ht; // full amount of the tax
                         $total_tva += $amount_tva; // total tax
                         $total_ht += $amount_ht; // total price without tax
                         $total_ttc += $amount_ttc; // total price with tax
-                        $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // total number of paying person, excluding the age category 1 (age less than 3 years old)
                         ?>
+                        <!-- details -->
                         <tr class="tr-details">
                             <td class="cell-10">ref</td>
                             <td class="cell-30"><?php echo $age_data->category; ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format($person->nbPersons); ?></td>
                             <td class="cell-10"><?php echo $number_currency->format($unit_ht); ?></td>
-                            <td class="cell-10">0,00</td>
+                            <td class="cell-10"><?php echo $number_decimal->format(0); ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format(TVA); ?> %</td>
                             <td class="cell-10"><?php echo $number_currency->format($amount_ht); ?></td>
                             <td class="cell-10"><?php echo $number_currency->format($amount_ttc); ?></td>
                         </tr>
                     <?php endforeach; ?>
+
+                    <!-- Add guided option if exists -->
+                    <?php if ($quote_data->visitetype_id === "2") : ?>
+                        <?php
+                        // run a query in the database to get the guided category row
+                        $visitetype_guided = getVisiteTypeById($quote_data->visitetype_id);
+
+                        // Calculate the guided price excluding TVA
+                        $guided_price_ht = $visitetype_guided->price / (1 + (TVA / 100));
+
+                        ?>
+                        <tr class="tr-details">
+                            <td class="cell-10">ref</td>
+                            <td class="cell-30"><?php echo "Visite " . $visitetype_guided->name; ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format(1); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($guided_price_ht); ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format(0); ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format(TVA); ?> %</td>
+                            <td class="cell-10"><?php echo $number_currency->format($guided_price_ht); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($visitetype_guided->price); ?></td>
+                        </tr>
+                    <?php endif; ?>
 
                     <!-- Calculate and include the person for free -->
                     <?php if ($total_paying_persons >= 15) : ?>

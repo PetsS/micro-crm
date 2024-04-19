@@ -282,14 +282,25 @@ function showDisplayInfo() {
         totalNbPersons += parseInt(nbPersonsInput.value) || 0;
       }
     });
-
-    // Check if the total number of persons is greater than 14
+    
+    // Check if the total number of persons is greater than 14 and there have been changes
     if (totalNbPersons > 14) {
       infoPersonsDiscount.classList.remove("hidden");
       infoPersonsDiscount.style.animationName = "fadeIn";
+
+      infoPersons.classList.add("hidden");
+      infoPersons.style.animationName = "fadeOut";
     } else {
       infoPersonsDiscount.classList.add("hidden");
       infoPersonsDiscount.style.animationName = "fadeOut";
+
+      infoPersons.classList.remove("hidden");
+      infoPersons.style.animationName = "fadeIn";
+    }
+
+    if (totalNbPersons === 0 || isNaN(parseInt(nbPersonsInput))) {
+      infoPersons.classList.add("hidden");
+      infoPersons.style.animationName = "fadeOut";
     }
   };
 
@@ -310,17 +321,19 @@ function showDisplayInfo() {
 
     // Check if the input is nbPersons and reveal infoPersons if value is entered
     if (target && target.matches('.containerClone input[name="nbPersons[]"]')) {
-      var enteredValue = parseInt(target.value);
-      if (!isNaN(enteredValue) && enteredValue > 0) {
-        infoPersons.classList.remove("hidden");
-        infoPersons.style.animationName = "fadeIn";
-      } else {
-        infoPersons.classList.add("hidden");
-        infoPersons.style.animationName = "fadeOut";
-      }
+      updateDisplayInfo();
     }
   });
 }
+
+
+// Add event listener to clear form data on page exit or refresh using JavaScript
+window.addEventListener('beforeunload', function() {
+    // Call an AJAX request to clear form data on page exit or refresh
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", ajax_object.ajaxurl + "?action=clear_form_data", false);
+    xhr.send();
+});
 
 
 // Function to add dynamic display info based on selected category and number of persons

@@ -62,6 +62,11 @@ class MicroCrm
 		add_action('admin_post_form_submission', array($this, 'form_submission'));
 		add_action('admin_post_nopriv_form_submission', array($this, 'form_submission')); // For non-logged-in users
 
+		// AJAX handler to clear form data
+		add_action('wp_ajax_clear_form_data', array($this, 'clear_form_data'));
+		add_action('wp_ajax_nopriv_clear_form_data', array($this, 'clear_form_data')); // For non-logged-in users
+
+
 	}
 
 	// creating a custom post type using register_post_type() function
@@ -140,6 +145,13 @@ class MicroCrm
 		$document_converter = new DocumentConverter;
 		// $document_converter->convert_html_to_pdf();
 		$document_converter->convert_pdf_save_redirect();
+	}
+
+	function clear_form_data()
+	{
+		$form_handler = new FormHandler();
+		$form_handler->eraseMemory();
+		wp_die(); // End AJAX request
 	}
 
 	// Function to create tables
