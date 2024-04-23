@@ -87,9 +87,9 @@
                         </div>
 
                         <div class="input-group">
-                            <label for="ages_upd">Age des personnes et tarif:</label>
+                            <label for="ages_upd">Tarif:</label>
                             <select name="ages[]" id="ages_upd">
-                                <option value="default" <?php echo (isset($form_data['ages'][$i]) && $form_data['ages'][$i] == 'default') ? ' selected' : ''; ?>>Choisissez âge...</option>
+                                <option value="default" <?php echo (isset($form_data['ages'][$i]) && $form_data['ages'][$i] == 'default') ? ' selected' : ''; ?>>Choisissez...</option>
                                 <?php foreach (getAgeList() as $age) : ?>
                                     <option value="<?php echo $age->id ?>" <?php echo (isset($form_data['ages'][$i]) && $form_data['ages'][$i] == $age->id) ? ' selected' : ''; ?>><?php echo $age->category ?></option>
                                 <?php endforeach; ?>
@@ -115,9 +115,9 @@
                     </div>
 
                     <div class="input-group">
-                        <label for="ages_upd">Age des personnes et tarif:</label>
+                        <label for="ages_upd">Tarif:</label>
                         <select name="ages[]" id="ages_upd">
-                            <option value="default" <?php echo (isset($form_data['ages']) && $form_data['ages'] == 'default') ? ' selected' : ''; ?>>Choisissez âge...</option>
+                            <option value="default" <?php echo (isset($form_data['ages']) && $form_data['ages'] == 'default') ? ' selected' : ''; ?>>Choisissez...</option>
                             <?php foreach (getAgeList() as $age) : ?>
                                 <option value="<?php echo $age->id ?>" <?php echo (isset($form_data['ages']) && $form_data['ages'] == $age->id) ? ' selected' : ''; ?>><?php echo $age->category ?></option>
                             <?php endforeach; ?>
@@ -136,7 +136,7 @@
                 <ul>
                     <li>1 accompagnement gratuit.</li>
                     <li>chaque dixième personne est gratuite.</li>
-                    <li>1 € moins / personne.</li>
+                    <li>réduction / personne.</li>
                     </p>
                 </ul>
             </div>

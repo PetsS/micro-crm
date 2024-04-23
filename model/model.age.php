@@ -37,35 +37,60 @@ function insertAgeData($wpdb, $age_table)
         "Gratuit (1 à 2 ans)",
         "Enfant (3 à 12 ans)",
         "Adulte (13 ans et plus)",
-        "Tarif réduit (13 ans et plus)"
+        "Tarif réduit (13 ans et plus)",
+        "Abonnement annuel (Enfant)",
+        "Abonnement annuel (Adulte)",
+        "Soigneur d'un jour (Enfant)",
+        "Soigneur d'un jour (Adulte)",
+        "Soigneur d'un jour (Tarif réduit)"
     );
 
     $prices = array(
         0,
         6.9,
         9.9,
-        7.9
+        7.9,
+        15,
+        20,
+        50,
+        70,
+        60
     );
 
     $prices_disc = array(
         0,
         5.9,
         8.9,
-        7.9
+        7.9,
+        15,
+        20,
+        50,
+        70,
+        60
     );
 
     $references = array(
         "EE-3",
         "EE",
         "EA",
-        "TR"
+        "TR",
+        "AE",
+        "AA",
+        "SE",
+        "SA",
+        "STR"
     );
 
     $references_disc = array(
         "EE-3",
         "GEE",
         "GEA",
-        "TR"
+        "TR",
+        "AE",
+        "AA",
+        "SE",
+        "SA",
+        "STR"
     );
 
     // Loop to insert into columns from arrays
