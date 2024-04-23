@@ -24,7 +24,6 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 // Define constants
 define('TVA', 5.50);
 define('DISCOUNT', 100.00); // the percentage of discount can be modified here
-define('GROUP_DISCOUNT', 1); // the amount of € discount
 
 // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
 $form_data_transient = get_transient('form_data_transient');
@@ -147,16 +146,22 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     $total_ttc = 0;
                     $total_paying_persons = 0;
                     ?>
+                    <?php foreach ($person_data as $person) {
+                        $age_data = getAgeById($person->age_id);
+                        $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // total number of paying person, excluding the age category 1 (age less than 3 years old)
+                    }
+                    ?>
                     <?php foreach ($person_data as $person) : ?>
                         <?php
                         $age_data = getAgeById($person->age_id); // ger one row of age data in the current quote
-                        $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // total number of paying person, excluding the age category 1 (age less than 3 years old)
 
                         // calculate prices
                         if ($total_paying_persons < 15) {
                             $unit_ttc = $age_data->price; // one unit price with tax at normal rate
+                            $ref = $age_data->ref; // reference for the normal category
                         } else {
-                            $unit_ttc = $age_data->price - GROUP_DISCOUNT; // one discounted unit price with tax at discounted rate
+                            $unit_ttc = $age_data->price_disc; // one unit price with tax at discounted rate
+                            $ref = $age_data->ref_disc; // reference for the discounted category
                         }
 
                         $unit_ht = ($unit_ttc / (1 + (TVA / 100))); // one unit price without tax
@@ -166,10 +171,12 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                         $total_tva += $amount_tva; // total tax
                         $total_ht += $amount_ht; // total price without tax
                         $total_ttc += $amount_ttc; // total price with tax
+
                         ?>
+
                         <!-- details -->
                         <tr class="tr-details">
-                            <td class="cell-10">ref</td>
+                            <td class="cell-10"><?php echo $ref; ?></td>
                             <td class="cell-30"><?php echo $age_data->category; ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format($person->nbPersons); ?></td>
                             <td class="cell-10"><?php echo $number_currency->format($unit_ht); ?></td>
@@ -185,28 +192,41 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                         <?php
                         // run a query in the database to get the guided category row
                         $visitetype_guided = getVisiteTypeById($quote_data->visitetype_id);
-
                         // Calculate the guided price excluding TVA
                         $guided_price_ht = $visitetype_guided->price / (1 + (TVA / 100));
 
+                        if ($total_paying_persons <= 10) {
+                            $guided_amount_ttc = $visitetype_guided->price;
+                            $guided_qty = 1;
+                        } else if ($total_paying_persons > 10 && $total_paying_persons <= 20) {
+                            $guided_amount_ttc = $visitetype_guided->price * 2;
+                            $guided_qty = 2;
+                        } else if ($total_paying_persons > 20) {
+                            $guided_amount_ttc = $visitetype_guided->price * 3;
+                            $guided_qty = 3;
+                        }; // price with tax
+
+                        $guided_amount_ht = $guided_amount_ttc / (1 + (TVA / 100));
+
                         ?>
                         <tr class="tr-details">
-                            <td class="cell-10">ref</td>
+                            <td class="cell-10"><?php echo $visitetype_guided->ref; ?></td>
                             <td class="cell-30"><?php echo "Visite " . $visitetype_guided->name; ?></td>
-                            <td class="cell-10"><?php echo $number_decimal->format(1); ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format($guided_qty); ?></td>
                             <td class="cell-10"><?php echo $number_currency->format($guided_price_ht); ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format(0); ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format(TVA); ?> %</td>
-                            <td class="cell-10"><?php echo $number_currency->format($guided_price_ht); ?></td>
-                            <td class="cell-10"><?php echo $number_currency->format($visitetype_guided->price); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($guided_amount_ht); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($guided_amount_ttc); ?></td>
                         </tr>
                     <?php endif; ?>
 
                     <!-- Calculate and include the person for free -->
                     <?php if ($total_paying_persons >= 15) : ?>
                         <?php
-                        // run a query in the database to get the category name
-                        $age_list = getAgeList();
+                        $age_list = getAgeList(); // run a query in the database to get the category name
+                        $unit_ttc = $age_list[2]->price_disc; // discounted unit price with tax
+                        $unit_ht = ($unit_ttc / (1 + (TVA / 100))); // one unit price without tax
 
                         // The initial free person for the first 15 persons.
                         $free_person = 1;
@@ -223,7 +243,7 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
 
                         ?>
                         <tr class="tr-details">
-                            <td class="cell-10">ref</td>
+                            <td class="cell-10"><?php echo $age_list[2]->ref_disc; ?></td>
                             <td class="cell-30"><?php echo $age_list[2]->category; ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format($total_free_persons); ?></td>
                             <td class="cell-10"><?php echo $number_currency->format($unit_ht); ?></td>

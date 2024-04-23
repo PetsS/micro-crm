@@ -130,8 +130,8 @@ class FormHandler
                 // Visit Type validation
                 if ($visitetype === 'default') {
                     $errors['visitetype'] = 'Veuillez sélectionner un type de visite.';
-                } else if ($visitetype === '2' && array_sum($_POST['nbPersons']) > 6) {
-                    $errors['visitetype'] = 'Visite guidé jusqu\'à 6 personnes maximum.';
+                } else if ($visitetype === '2' && array_sum($_POST['nbPersons']) > 30) {
+                    $errors['visitetype'] = 'Visite guidé jusqu\'à 30 personnes maximum.';
                 }
                 // Date and time of visit validation
                 if ($datetimeVisit < date('Y-m-d\TH:i')) {

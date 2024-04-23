@@ -84,27 +84,7 @@ function handleFormdata() {
       closestHidden.classList.remove("hidden");
     }
   });
-
-  // Call the function to scroll to the top of the form if there are error data
-  // if (document.querySelectorAll(".error").length > 0) {
-  //   // delay the execution of scrollToFormTop to execute by a few milliseconds the scroll function after the redirection of the page after onloading the window
-  //   setTimeout(scrollToFormTop, 200);
-  // }
 }
-
-// function scrollToFormTop() {
-//   // const formElement = document.querySelector("form"); // Select the first <form> element
-//   const formElement = document.getElementById("scrollHereIfErrors");
-//   const formElementUpdate = document.getElementById("scrollHereIfErrorsInUpdate");
-
-//   if (formElement) {
-//     formElement.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the form if found
-//   } else if (formElementUpdate) {
-//     formElementUpdate.scrollIntoView({ behavior: "smooth", block: "start" });
-//   } else {
-//     console.log("Form not found"); // Log an error if form not found
-//   }
-// }
 
 function scrollToTop(element) {
   element.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the tag if found with delay
@@ -339,10 +319,3 @@ function showDisplayInfo() {
   });
 }
 
-// Add event listener to clear form data on page exit or refresh using JavaScript
-window.addEventListener("beforeunload", function () {
-  // Call an AJAX request to clear form data on page exit or refresh
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", ajax_object.ajaxurl + "?action=clear_form_data", false);
-  xhr.send();
-});

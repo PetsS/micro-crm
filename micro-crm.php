@@ -62,11 +62,6 @@ class MicroCrm
 		add_action('admin_post_form_submission', array($this, 'form_submission'));
 		add_action('admin_post_nopriv_form_submission', array($this, 'form_submission')); // For non-logged-in users
 
-		// AJAX handler to clear form data
-		add_action('wp_ajax_clear_form_data', array($this, 'clear_form_data'));
-		add_action('wp_ajax_nopriv_clear_form_data', array($this, 'clear_form_data')); // For non-logged-in users
-
-
 	}
 
 	// creating a custom post type using register_post_type() function
@@ -147,13 +142,6 @@ class MicroCrm
 		$document_converter->convert_pdf_save_redirect();
 	}
 
-	function clear_form_data()
-	{
-		$form_handler = new FormHandler();
-		$form_handler->eraseMemory();
-		wp_die(); // End AJAX request
-	}
-
 	// Function to create tables
 	function create_tables()
 	{
@@ -170,8 +158,11 @@ class MicroCrm
 			$sql = "
             CREATE TABLE IF NOT EXISTS $age_table (
                 id INT AUTO_INCREMENT PRIMARY KEY,
+				ref VARCHAR(100),
+				ref_disc VARCHAR(100),
                 category VARCHAR(255),
-                price FLOAT
+                price FLOAT,
+				price_disc FLOAT
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			// Function dbDelta is in the file upgrade.php
@@ -187,6 +178,7 @@ class MicroCrm
             CREATE TABLE IF NOT EXISTS $visitetype_table (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255),
+				ref VARCHAR(100),
                 price FLOAT
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

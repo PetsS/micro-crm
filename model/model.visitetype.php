@@ -38,9 +38,14 @@ function insertVisiteTypeData($wpdb, $visitetype_table)
         "Guidé"
     );
 
+    $references = array(
+        "L",
+        "VG"
+    );
+
     $prices = array(
         0,
-        79
+        70
     );
 
     // Loop to insert data into columns from arrays
@@ -49,6 +54,7 @@ function insertVisiteTypeData($wpdb, $visitetype_table)
             $visitetype_table,
             array(
                 'name' => $names[$i],
+                'ref' => $references[$i],
                 'price' => $prices[$i]
             )
         );

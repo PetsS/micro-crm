@@ -47,13 +47,37 @@ function insertAgeData($wpdb, $age_table)
         7.9
     );
 
+    $prices_disc = array(
+        0,
+        5.9,
+        8.9,
+        7.9
+    );
+
+    $references = array(
+        "EE-3",
+        "EE",
+        "EA",
+        "TR"
+    );
+
+    $references_disc = array(
+        "EE-3",
+        "GEE",
+        "GEA",
+        "TR"
+    );
+
     // Loop to insert into columns from arrays
     for ($i = 0; $i < count($categories); $i++) {
         $wpdb->insert(
             $age_table,
             array(
                 'category' => $categories[$i],
-                'price' => $prices[$i]
+                'price' => $prices[$i],
+                'price_disc' => $prices_disc[$i],
+                'ref' => $references[$i],
+                'ref_disc' => $references_disc[$i]
             )
         );
     }

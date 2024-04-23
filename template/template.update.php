@@ -1,6 +1,4 @@
-<?php if (isset($_GET['form_error'])) : ?>
-    <div id="scroll_here"></div>
-<?php endif; ?>
+<div id="scroll_here"></div>
 
 <h2>Mettre à jour</h2>
 
@@ -66,8 +64,14 @@
 
         <div id="info-visiteType" class="hidden">
             <!-- TODO replace price with database data -->
-            <p>Visite guidée avec nourrissage commenté :</p>
-            <p>1 à 6 personnes maximum (2 heures) : <?php echo getVisiteTypeById(2)->price; ?> € au total.</p>
+            <p>
+                Option supplémentaire visite guidée avec nourrissages commentés (2h) :
+            <ul>
+                <li><?php echo getVisiteTypeById(2)->price; ?> € en plus du prix entrée pour 1 à 10 visiteurs, </li>
+                <li><?php echo getVisiteTypeById(2)->price * 2; ?> € pour 11 à 20 visiteurs,</li>
+                <li><?php echo getVisiteTypeById(2)->price * 3; ?> € pour 21 à 30 visiteurs.</li>
+            </ul>
+            </p>
         </div>
 
         <div>
@@ -126,26 +130,28 @@
             <?php endif; ?><br>
 
             <div id="info-persons" class="hidden">
+                <p>
+                    Avantages d'un groupe de 15 personnes ou plus :<br>
+                    (les enfants de moins de 3 ans ne comptent pas)
                 <ul>
-                    <span>Avantages d'un groupe de 15 personnes ou plus : </span>
-                    <span>(les enfants de moins de 3 ans ne comptent pas)</span><br>
                     <li>1 accompagnement gratuit.</li>
-                    <li> chaque dixième personne est gratuite.</li>
-                    <li> 1 € moins / personne.</li>
+                    <li>chaque dixième personne est gratuite.</li>
+                    <li>1 € moins / personne.</li>
+                    </p>
                 </ul>
-                <br>
             </div>
 
             <div id="info-persons-discount" class="hidden">
+                <p>
+                    Vous êtes au dessus de 15 personnes payantes.<br>
+                    Vous avez droit à une réduction.<br>
+                    (les enfants de moins de 3 ans ne comptent pas)
                 <ul>
-                    <span>Vous êtes au dessus de 15 personnes payantes.</span>
-                    <span>Vous avez droit à une réduction.</span>
-                    <span>(les enfants de moins de 3 ans ne comptent pas)</span><br>
                     <?php foreach (getAgeList() as $age) : ?>
-                        <li><?php echo $age->category . ' : ' . ($age->price === "0" ? "gratuit" : $age->price . " €"); ?></li>
+                        <li><?php echo $age->category . ' : ' . ($age->price === "0" ? "gratuit" : $age->price_disc . " €"); ?></li>
                     <?php endforeach; ?>
                 </ul>
-                <br>
+                </p>
             </div>
 
             <div>
