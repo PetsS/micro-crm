@@ -269,9 +269,10 @@ function showDisplayInfo() {
       var agesSelect = container.querySelector('select[name="ages[]"]');
       var selectedAge = agesSelect.value;
 
-      if (selectedAge !== "1") {
-        totalNbPersons += parseInt(nbPersonsInput.value) || 0;
+      if (selectedAge !== "1" && selectedAge < "5") {
+        totalNbPersons += parseInt(nbPersonsInput.value) || 0; // if the selected category is true, it sets the total of nbPersons to 0
       }
+
     });
 
     // Check if the total number of persons is greater than 14 and there have been changes
