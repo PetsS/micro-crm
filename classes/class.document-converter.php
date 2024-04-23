@@ -133,8 +133,14 @@ class DocumentConverter
         // Empty the save folder before saving the PDF
         $this->deletePdfFilesInSaveFolder();
 
-        // Save the PDF, overwriting any existing file
-        $pdf->Output($pdfPath, 'F');
+        // Convert HTML to PDF and get the PDF content as a string
+        $content = $pdf->Output('', 'S');
+
+        // Save the PDF content to a file
+        file_put_contents($pdfPath, $content);
+
+        // Save the PDF content to the database
+        insertPdfdocumentData($this->quote_data->id, $pdfFileName, $content);
 
     }
 

@@ -28,6 +28,7 @@ require_once(plugin_dir_path(__FILE__) . 'model/model.person.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.age.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.visitetype.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.payment.php');
+require_once(plugin_dir_path(__FILE__) . 'model/model.pdfdocument.php');
 
 // As a security precaution, it’s a good practice to disallow access if the ABSPATH global is not defined.
 if (!defined('ABSPATH')) {
@@ -152,6 +153,7 @@ class MicroCrm
 		$payment_table = $wpdb->prefix . 'payment';
 		$quote_table = $wpdb->prefix . 'quote';
 		$person_table = $wpdb->prefix . 'person';
+		$pdfdocument_table = $wpdb->prefix . 'pdfdocument';
 
 		// Create age table
 		if ($wpdb->get_var("SHOW TABLES LIKE '$age_table'") != $age_table) {
@@ -243,6 +245,21 @@ class MicroCrm
 			// Function dbDelta is in the file upgrade.php
 			dbDelta($sql);
 		}
+
+		// Create pdfdocument table
+		if ($wpdb->get_var("SHOW TABLES LIKE '$pdfdocument_table'") != $pdfdocument_table) {
+			$sql = "
+            CREATE TABLE IF NOT EXISTS $pdfdocument_table (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+				quote_id INT,
+				filename VARCHAR (255),
+                content MEDIUMBLOB,
+				FOREIGN KEY (quote_id) REFERENCES $quote_table(id) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			// Function dbDelta is in the file upgrade.php
+			dbDelta($sql);
+		}
 	}
 
 	// Function to drop tables
@@ -250,6 +267,7 @@ class MicroCrm
 	{
 		// Declare global $wpdb object and table names
 		global $wpdb;
+		$pdfdocument_table = $wpdb->prefix . 'pdfdocument';
 		$person_table = $wpdb->prefix . 'person';
 		$quote_table = $wpdb->prefix . 'quote';
 		$payment_table = $wpdb->prefix . 'payment';
@@ -259,6 +277,9 @@ class MicroCrm
 		// Check if plugin is being completely uninstalled
 		if (defined('WP_UNINSTALL_PLUGIN') && WP_UNINSTALL_PLUGIN == plugin_basename(__FILE__)) {
 			// If plugin is being completely uninstalled, drop tables
+			if ($wpdb->get_var("SHOW TABLES LIKE '$pdfdocument_table'") == $pdfdocument_table) {
+				$wpdb->query("DROP TABLE IF EXISTS $pdfdocument_table");
+			}
 			if ($wpdb->get_var("SHOW TABLES LIKE '$person_table'") == $person_table) {
 				$wpdb->query("DROP TABLE IF EXISTS $person_table");
 			}
