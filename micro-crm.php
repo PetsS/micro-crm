@@ -22,7 +22,7 @@ require_once(plugin_dir_path(__FILE__) . 'vendor/PHPMailer/src/SMTP.php'); // In
 require_once(plugin_dir_path(__FILE__) . 'classes/class.form-handler.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.mail-sender.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.document-converter.php');
-require_once(plugin_dir_path(__FILE__) . 'classes/class.quotation-calculator.php');
+require_once(plugin_dir_path(__FILE__) . 'classes/class.admin-menu.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.quote.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.person.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.age.php');
@@ -47,14 +47,17 @@ class MicroCrm
 		// Drop tables when deactivating the plugin
 		register_deactivation_hook(__FILE__, array($this, 'drop_tables'));
 
-		// create custom post type hook
-		add_action('init', array($this, 'create_custom_post_type'));
-
 		// hook action for PDF conversion
 		add_action('init', array($this, 'document_conversion'));
+		
+		// Enqueue front assets
+		add_action('wp_enqueue_scripts', array($this, 'load_front_assets'));
+		
+		// Add admin menu items
+		add_action('admin_menu', array($this, 'handle_admin_menus'));
 
-		// add assets (js, css, etc)
-		add_action('wp_enqueue_scripts', array($this, 'load_assets'));
+		// Enqueue assets for all admin pages
+		add_action('admin_enqueue_scripts', array($this, 'load_admin_assets'));
 
 		// add shortcode which is called 'micro-crm'
 		add_shortcode('micro-crm', array($this, 'load_shortcode_plugin'));
@@ -66,38 +69,15 @@ class MicroCrm
 	}
 
 	// creating a custom post type using register_post_type() function
-	public function create_custom_post_type()
+	public function handle_admin_menus()
 	{
-		$labels = array(
-			'name' => 'Micro CRM',
-			'singular_name' => 'ContactForm Entry'
-		);
-
-		$args = array(
-			'labels' => $labels,
-			'public' => true,
-			'has-archive' => true,
-			'supports' => array('title'),
-			'exclude_from_search' => true,
-			'publicly_queryable' => false,
-			'capability' => 'manage_options',
-			'menu_icon' => 'dashicons-media-text',
-		);
-
-		register_post_type('micro_crm', $args);
+		$admin_menu = new AdminMenu();
+		$admin_menu->add_admin_menus();
 	}
 
-	public function load_assets()
+	// Enqueue CSS stylesheets for all admin pages on the admin side
+	public function load_admin_assets()
 	{
-		// load css file, general style
-		wp_enqueue_style('general-style', plugin_dir_url(__FILE__) . 'src/css/style.css', array(), 1, 'all');
-
-		// load css file, email style
-		wp_enqueue_style('email-style', plugin_dir_url(__FILE__) . 'src/css/email_style.css', array(), 1, 'all');
-
-		// load css file, email style
-		wp_enqueue_style('pdf-style', plugin_dir_url(__FILE__) . 'src/css/pdf_style.css', array(), 1, 'all');
-
 		// load Font Awesome cdn
 		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4');
 
@@ -110,6 +90,37 @@ class MicroCrm
 		// load Bootstrap icons cdn
 		wp_enqueue_style('bootstrap-icons-css', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
 
+		// Enqueue general style
+		wp_enqueue_style('admin-style', plugin_dir_url(__FILE__) . 'src/css/admin_style.css', array(), 1, 'all');
+
+		// Enqueue js file
+		wp_enqueue_script('admin-pages-scripts', plugin_dir_url(__FILE__) . '/src/js/admin-pages-scripts.js', array(), 1, true);
+	}
+
+	// Enqueue CSS qnd JS on the Front End side
+	public function load_front_assets()
+	{
+		// load Font Awesome cdn
+		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4');
+		
+		// load Bootstrap css cdn
+		wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css', array(), '5.3.3');
+		
+		// load Bootstrap js cdn
+		wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.3.3', true);
+		
+		// load Bootstrap icons cdn
+		wp_enqueue_style('bootstrap-icons-css', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
+
+		// load css file, general style
+		wp_enqueue_style('general-style', plugin_dir_url(__FILE__) . 'src/css/style.css', array(), 1, 'all');
+
+		// load css file, email style
+		wp_enqueue_style('email-style', plugin_dir_url(__FILE__) . 'src/css/email_style.css', array(), 1, 'all');
+
+		// load css file, email style
+		wp_enqueue_style('pdf-style', plugin_dir_url(__FILE__) . 'src/css/pdf_style.css', array(), 1, 'all');
+		
 		// load the js file
 		wp_enqueue_script('script', plugin_dir_url(__FILE__) . 'src/js/form-handling-scripts.js', array('jquery'), 1, true);
 
@@ -131,7 +142,6 @@ class MicroCrm
 
 	public function form_submission()
 	{
-		// Instantiate the FormHandler class
 		$form_handler = new FormHandler();
 		$form_handler->handle_form_submission();
 	}
@@ -139,7 +149,6 @@ class MicroCrm
 	public function document_conversion()
 	{
 		$document_converter = new DocumentConverter;
-		// $document_converter->convert_html_to_pdf();
 		$document_converter->convert_pdf_save_redirect();
 	}
 

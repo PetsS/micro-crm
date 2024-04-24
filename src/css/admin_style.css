@@ -1,0 +1,32 @@
+/* Styles for Admin pages */
+.fixed-column {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding-right: 15px; /* Add padding to create space for the shadow */
+  overflow: visible; /* Allow overflow to display the shadow */
+}
+
+.additional-row {
+  display: none;
+  transition: all 0.3s ease; /* CSS transition for smooth animation */
+}
+
+.additional-row.expanded {
+  display: table-row;
+}
+
+/* Media query for mobile responsiveness */
+@media screen and (max-width: 768px) {
+  
+  .fixed-column::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -10px; /* Adjust this value to control the width of the shadow */
+    width: 10px; /* Adjust this value to control the width of the shadow */
+    background: linear-gradient(to left, transparent, rgba(41, 41, 41, 0.1)); /* Gradient shadow */
+    z-index: -1; /* Ensure the shadow is behind the content */
+  }
+}

@@ -12,12 +12,11 @@ function getQuoteDataList()
     $quote_table = $wpdb->prefix . 'quote';
 
     // Retrieve all rows from the quote table
-    $sql = $wpdb->get_results("SELECT * FROM $quote_table", ARRAY_A); // ARRAY_A means each row in the result will be an associative array where the keys are column names.
+    $sql = $wpdb->get_results("SELECT * FROM $quote_table");
 
     // Check if there was an error in the retrieval operation
     if (!$sql) {
         // Retrieval failed
-        // echo "Error: " . $wpdb->last_error;
         return false;
     } else {
         // Retrieval successful
