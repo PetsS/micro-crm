@@ -111,9 +111,6 @@ function updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot
     // Format datetimeVisit into the MySQL datetime format
     $formattedDateTimeVisit = date('Y-m-d H:i:s', strtotime($datetimeVisit));
 
-    // Generate a dynamic formatted number
-    $number_quote = generateQuoteNumber();
-
     // Update quotation data in the database
     $result = $wpdb->update(
         $quote_table, // What table

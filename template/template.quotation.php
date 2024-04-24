@@ -82,7 +82,7 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                 <!-- Left column -->
                 <td>
                     <!-- Header Information -->
-                    <div class=" quote-header">
+                    <div class="quote-header">
                         <span class="span-head-header">MICRO-ZOO ST MALO</span><br>
                         <span>9 place Vauban</span><br>
                         <span>35400 SAINT-MALO</span><br>

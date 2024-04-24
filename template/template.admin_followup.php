@@ -24,19 +24,19 @@ $quote_data = getQuoteDataList();
             <tbody>
                 <?php foreach ($quote_data as $quote) : ?>
                     <tr class="main-row" onclick="toggleDetails(this)">
-                        <td class="fixed-column">2024-04-23</td>
-                        <td>Company A</td>
-                        <td>Meeting</td>
-                        <td>Monday</td>
-                        <td>123 Main St</td>
-                        <td>123-456-7890</td>
-                        <td>Normal</td>
-                        <td>2</td>
+                        <td class="fixed-column">???</td>
+                        <td><?php echo ($quote->companyName ? $quote->companyName  . " - " : "") . $quote->lastname_quot . " " . $quote->firstname_quot; ?></td>
+                        <td><?php echo getVisiteTypeById($quote->visitetype_id)->name; ?></td>
+                        <td><?php echo $quote->datetimeVisit; ?></td>
+                        <td><?php echo $quote->address; ?></td>
+                        <td><?php echo $quote->phone_quot; ?></td>
+                        <td>???</td>
+                        <td>???</td>
                         <td><?php echo $quote->number_quote; ?></td>
-                        <td>Credit Card</td>
-                        <td>$200</td>
-                        <td>$220</td>
-                        <td>Tag1, Tag2</td>
+                        <td><?php echo getPaymentById($quote->payment_id)->category; ?></td>
+                        <td>???</td>
+                        <td>???</td>
+                        <td>???, ???</td>
                     </tr>
                     <tr class="additional-row">
                         <td colspan="13">Additional details here...</td>
