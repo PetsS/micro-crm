@@ -7,7 +7,13 @@ var addButton = document.getElementById("btn-add-persons");
 var addButtonUpd = document.getElementById("btn-add-persons-update");
 var pageElement = document.getElementById("scroll_here");
 
-// Use DOMContentLoaded event to ensure DOM is fully loaded while executing the scripts
+// Using window.onload event to ensure the entire page is loaded
+window.onload = function () {
+  // Call scrollToTop function after the page is fully loaded
+  scrollToTop(pageElement);
+};
+
+// Using DOMContentLoaded event to ensure DOM is fully loaded while executing the scripts
 document.addEventListener("DOMContentLoaded", function () {
   // Call the functions when the page is loaded
   if (buttonDiv) {
@@ -20,15 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
     clonePersons(addButtonUpd); // call the function if the button with the id exists in the update form
   }
   restoreElements();
-  // addDynamicDisplayInfoToOriginal();
   showVisitetypeOptions();
   showDisplayInfo();
-  // scroll the screen to the div when the page is loaded
-  setTimeout(function () {
-    if (pageElement) {
-      scrollToTop(pageElement);
-    }
-  }, 200);
 });
 
 /**
