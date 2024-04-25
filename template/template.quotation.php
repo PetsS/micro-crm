@@ -15,6 +15,7 @@ $date = new DateTimeImmutable();
 // Format today's date
 $formatted_date = $formatter->format($date);
 
+// Create number formatter instance for currency and decimal formats
 $number_currency = new NumberFormatter("fr_FR", NumberFormatter::CURRENCY);
 $number_decimal = new NumberFormatter("fr_FR", NumberFormatter::DECIMAL);
 
@@ -41,6 +42,7 @@ if ($form_data_transient && isset($form_data_transient['quote_id'])) {
     $total_ht = $results['total_ht'];
     $total_ttc = $results['total_ttc'];
     $total_paying_persons = $results['total_paying_persons'];
+    $total_persons = $results['total_persons'];
     $unit_ht = $results['unit_ht'];
     $amount_ht = $results['amount_ht'];
     $amount_ttc = $results['amount_ttc'];

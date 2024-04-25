@@ -16,9 +16,12 @@
   display: table-row;
 }
 
+.main-row:hover {
+  cursor: pointer;
+}
+
 /* Media query for mobile responsiveness */
 @media screen and (max-width: 768px) {
-  
   .fixed-column::after {
     content: "";
     position: absolute;
@@ -26,7 +29,11 @@
     bottom: 0;
     right: -10px; /* Adjust this value to control the width of the shadow */
     width: 10px; /* Adjust this value to control the width of the shadow */
-    background: linear-gradient(to left, transparent, rgba(41, 41, 41, 0.1)); /* Gradient shadow */
+    background: linear-gradient(
+      to left,
+      transparent,
+      #2929291a
+    ); /* Gradient shadow */
     z-index: -1; /* Ensure the shadow is behind the content */
   }
 }

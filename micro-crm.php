@@ -79,6 +79,12 @@ class MicroCrm
 	// Enqueue CSS stylesheets for all admin pages on the admin side
 	public function load_admin_assets()
 	{
+		// Enqueue general style
+		wp_enqueue_style('admin-style', plugin_dir_url(__FILE__) . 'src/css/admin_style.css', array(), 1, 'all');
+
+		// Enqueue js file
+		wp_enqueue_script('admin-pages-scripts', plugin_dir_url(__FILE__) . '/src/js/admin-pages-scripts.js', array(), 1, true);
+		
 		// load Font Awesome cdn
 		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4');
 
@@ -90,12 +96,6 @@ class MicroCrm
 
 		// load Bootstrap icons cdn
 		wp_enqueue_style('bootstrap-icons-css', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
-
-		// Enqueue general style
-		wp_enqueue_style('admin-style', plugin_dir_url(__FILE__) . 'src/css/admin_style.css', array(), 1, 'all');
-
-		// Enqueue js file
-		wp_enqueue_script('admin-pages-scripts', plugin_dir_url(__FILE__) . '/src/js/admin-pages-scripts.js', array(), 1, true);
 	}
 
 	// Enqueue CSS qnd JS on the Front End side

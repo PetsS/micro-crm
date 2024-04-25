@@ -21,6 +21,7 @@ class QuoteCalculator
         $total_ht = 0;
         $total_ttc = 0;
         $total_paying_persons = 0;
+        $total_persons = 0;
         $unit_ht = [];
         $amount_ht = [];
         $amount_ttc = [];
@@ -37,7 +38,8 @@ class QuoteCalculator
         // Calculate total number of paying persons
         foreach ($person_data as $person) {
             $age_data = getAgeById($person->age_id);
-            $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // total number of paying person, excluding the age category 1 (age less than 3 years old)
+            $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // update total number of paying person, excluding the age category 1 (age less than 3 years old)
+            $total_persons += $person->nbPersons; // update total number of persons
         }
 
         // Calculate prices
@@ -98,7 +100,8 @@ class QuoteCalculator
 
         $total_free_persons = $free_person + $add_free_person; // Total number of free persons
 
-        
+        $total_persons += $total_free_persons;
+
         // calculate discounted prices for adult category
         $age_list = getAgeList(); // run a query in the database to get the category
         $discount_unit_ttc = $age_list[2]->price_disc; // discounted adult unit price with tax
@@ -118,6 +121,7 @@ class QuoteCalculator
             'total_ht' => $total_ht,
             'total_ttc' => $total_ttc,
             'total_paying_persons' => $total_paying_persons,
+            'total_persons' => $total_persons,
             'unit_ht' => $unit_ht,
             'amount_ht' => $amount_ht,
             'amount_ttc' => $amount_ttc,

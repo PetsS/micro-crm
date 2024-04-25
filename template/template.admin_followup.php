@@ -1,5 +1,12 @@
 <?php
 $quote_data = getQuoteDataList(); // load sql method into variable
+
+// Create number formatter instance for currency and decimal formats
+$number_currency = new NumberFormatter("fr_FR", NumberFormatter::CURRENCY);
+$number_decimal = new NumberFormatter("fr_FR", NumberFormatter::DECIMAL);
+
+// Define the number of decimal places
+$number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 ?>
 
 <div class="container mt-5">
@@ -8,51 +15,123 @@ $quote_data = getQuoteDataList(); // load sql method into variable
             <thead class="table-dark">
                 <tr>
                     <th class="fixed-column">Date</th>
-                    <th>Nom ou Raison Social</th>
+                    <th>Nom / RS</th>
+                    <th>No Devis</th>
                     <th>Jour de visite</th>
-                    <th>Type de tarif</th>
-                    <th>Nombre de personne</th>
-                    <th>Numéro Devis</th>
+                    <th>Nb personnes</th>
                     <th>Mode paiement</th>
-                    <th>Montant total TTC</th>
+                    <th>Total TTC</th>
                     <th>Balises</th>
                 </tr>
             </thead>
             <tbody>
+                <!-- Iterate through all the quotes in the database -->
                 <?php foreach ($quote_data as $quote) : ?>
-
                     <?php
                     $person_data = getPersonByQuoteId($quote->id); // Load SQL method into variable to recover person data for the current quote
 
                     $quote_calculator = new QuoteCalculator(); // Instantiate the QuoteCalculator class to use calculated results
 
-                    $results = $quote_calculator->calculateResults($quote, $person_data); // Calculate results: totals, unit prices, references, quantities, etc
+                    $results = $quote_calculator->calculateResults($quote, $person_data); // Call function in calculator class
 
-                    // Extract results from the returned calculated results for the current quote
+                    // Extract results from the returned calculated results
                     $total_tva = $results['total_tva'];
                     $total_ht = $results['total_ht'];
                     $total_ttc = $results['total_ttc'];
+                    $total_paying_persons = $results['total_paying_persons'];
+                    $total_persons = $results['total_persons'];
+                    $unit_ht = $results['unit_ht'];
+                    $amount_ht = $results['amount_ht'];
+                    $amount_ttc = $results['amount_ttc'];
+                    $ref = $results['ref'];
+                    $guided_qty = $results['guided_qty'];
+                    $guided_price_ht = $results['guided_price_ht'];
+                    $guided_amount_ht = $results['guided_amount_ht'];
+                    $guided_amount_ttc = $results['guided_amount_ttc'];
+                    $total_free_persons = $results['total_free_persons'];
+                    $discount_unit_ht = $results['discount_unit_ht'];
+                    $discount_amount_ht = $results['discount_amount_ht'];
+                    $discount_amount_ttc = $results['discount_amount_ttc'];
+
+                    // var_dump($person_data);
                     ?>
 
                     <tr class="main-row" onclick="toggleDetails(this)">
-                        <td class="fixed-column"><?php echo $quote->creation_date; ?></td>
-                        <!-- <td class="fixed-column"><?php echo date('Y-m-d', strtotime($quote->creation_date)); ?></td> -->
-                        <td><?php echo ($quote->companyName ? $quote->companyName  . " - " : "") . $quote->lastname_quot . " " . $quote->firstname_quot; ?></td>
-                        <td><?php echo $quote->datetimeVisit; ?></td>
-                        <td>???</td>
-                        <td>???</td>
+                        <td class="fixed-column"><?php echo date('Y-m-d', strtotime($quote->creation_date)); ?></td>
+                        <td><?php echo ($quote->companyName ? strtoupper($quote->companyName)  :  $quote->firstname_quot . " " . strtoupper($quote->lastname_quot)); ?></td>
                         <td><?php echo $quote->number_quote; ?></td>
+                        <td><?php echo $quote->datetimeVisit; ?></td>
+                        <td><?php echo $total_persons; ?></td>
                         <td><?php echo getPaymentById($quote->payment_id)->category; ?></td>
-                        <td><?php echo $total_ttc; ?></td>
+                        <td><?php echo $number_currency->format($total_ttc); ?></td>
                         <td>???, ???</td>
                     </tr>
                     <tr class="additional-row">
-                        <td colspan="13">Additional details here...
-                            <p>
-                                <span>Type de visite: <?php echo getVisiteTypeById($quote->visitetype_id)->name; ?></span><br>
-                                <span>Adresse: <?php echo $quote->address; ?></span><br>
-                                <span>Téléphone: <?php echo $quote->phone_quot; ?></span><br>
-                            </p>
+                        <td colspan="10">
+                            <div class="p-3 bg-light rounded box-shadow">
+                                <h6 class="border-bottom border-gray pb-2 mb-0">
+                                    <small class="d-block text-right">
+                                        <a class="button-primary" href="#">Envoyer Email</a>
+                                        <a class="button-primary" href="#">Télécharger PDF</a>
+                                    </small>
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="media text-muted pt-3">
+                                            <div class="media-body mb-0 small lh-125">
+                                                <div class="d-flex justify-content-between align-items-center w-100">
+                                                    <strong class="text-gray-dark"><?php echo ($quote->companyName ? strtoupper($quote->companyName)  . " - " : "") . $quote->firstname_quot . " " . strtoupper($quote->lastname_quot); ?></strong>
+                                                </div>
+                                                <span class="d-block"><?php echo $quote->address; ?></span>
+                                                <span class="d-block"><?php echo $quote->phone_quot; ?></span>
+                                                <span class="d-block"><?php echo $quote->email_quot; ?></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="media text-muted pt-3">
+                                            <div class="media-body mb-0 ps-3 small lh-125 border-start border-gray">
+                                                <div class="d-flex justify-content-between align-items-center w-100">
+                                                    <table class="table-sm table-borderless">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Désignation</th>
+                                                                <th class="px-3 text-center">Quantité</th>
+                                                                <th class="px-3">HT</th>
+                                                                <th>TTC</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php if ($quote->visitetype_id === "2") : ?>
+                                                                <tr>
+                                                                    <td class="py-0"><?php echo "Visite " . getVisiteTypeById($quote->visitetype_id)->name; ?></td>
+                                                                    <td class="px-3 py-0 text-center"><span><?php echo "(" . $guided_qty . " guide" . ($guided_qty > 1 ? "s" : "") . ")"; ?></span></td>
+                                                                    <td class="px-3 py-0"><?php echo $number_currency->format($guided_amount_ht); ?></td>
+                                                                    <td class="py-0"><?php echo $number_currency->format($guided_amount_ttc); ?></td>
+                                                                </tr>
+                                                            <?php endif; ?>
+                                                            <?php foreach ($person_data as $index => $person) : ?>
+                                                                <tr>
+                                                                    <td class="py-0"><?php echo getAgeById($person->age_id)->category; ?></td>
+                                                                    <td class="py-0 px-3 text-center"><?php echo $person->nbPersons; ?></td>
+                                                                    <td class="py-0 px-3"><?php echo $number_currency->format($amount_ht[$index]); ?></td>
+                                                                    <td class="py-0"><?php echo $number_currency->format($amount_ttc[$index]); ?></td>
+                                                                <?php endforeach; ?>
+                                                                </tr>
+                                                                <tr class="border-top">
+                                                                    <td></td>
+                                                                    <td class="px-3 fw-bolder text-center"><?php echo $total_persons; ?></td>
+                                                                    <td class="px-3 fw-bolder"><?php echo $number_currency->format($total_ht); ?></td>
+                                                                    <td class="fw-bolder"><?php echo $number_currency->format($total_ttc); ?></td>
+                                                                </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
