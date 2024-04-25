@@ -185,7 +185,7 @@ class FormHandler
                         'quote_id' => $quote_id, // store id to pass it as parameter
                         'isSuccess' => $isSuccess // store variable to retreive it on main template page
                     );
-                    set_transient('form_data_transient', $data_to_store, 600); // Store data for 600 seconds
+                    set_transient('form_data_transient', $data_to_store, 6000); // Store data for 600 seconds
 
                     if (isset($_GET['update'])) {
                         wp_redirect(esc_url(remove_query_arg(array('update', 'form_error'), wp_get_referer())));
@@ -206,7 +206,7 @@ class FormHandler
                         'form_data' => $_POST,  // Store all form data for repopulation the form
                         'quote_id' => $quote_id, // store id to pass it as parameter
                     );
-                    set_transient('form_data_transient', $data_to_store, 600); // Store data for 600 seconds
+                    set_transient('form_data_transient', $data_to_store, 6000); // Store data for 600 seconds
 
                     wp_redirect(add_query_arg(array('form_error' => 'form'), wp_get_referer()));
                     // wp_redirect(esc_url(add_query_arg(array('update' => $quote_id, 'form_error' => 'form'), wp_get_referer())));

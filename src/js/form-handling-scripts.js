@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (pageElement) {
       scrollToTop(pageElement);
     }
-  }, 100);
+  }, 200);
 });
 
 /**
