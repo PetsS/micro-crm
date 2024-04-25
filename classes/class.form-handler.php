@@ -209,7 +209,6 @@ class FormHandler
                     set_transient('form_data_transient', $data_to_store, 6000); // Store data for 600 seconds
 
                     wp_redirect(add_query_arg(array('form_error' => 'form'), wp_get_referer()));
-                    // wp_redirect(esc_url(add_query_arg(array('update' => $quote_id, 'form_error' => 'form'), wp_get_referer())));
 
                     exit; // exit is to prevent further execution of the admin-post.php
                 }

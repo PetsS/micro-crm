@@ -232,6 +232,7 @@ class MicroCrm
 				payment_id INT,
 				comment TEXT,
 				number_quote VARCHAR(255),
+				creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 				FOREIGN KEY (visitetype_id) REFERENCES $visitetype_table(id) ON DELETE CASCADE ON UPDATE CASCADE,
 				FOREIGN KEY (payment_id) REFERENCES $payment_table(id) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";

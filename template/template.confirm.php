@@ -39,10 +39,7 @@ if ($isCancelled) {
                 <!-- redirect back to the confirm page and send email -->
                 <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error'), add_query_arg('confirm', 'true', wp_get_referer()))); ?>" class="btn btn-success">Confirmer et envoyer E-mail</a>
 
-                <!-- <form method="post" action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>">
-                        <input type="hidden" name="confirm" value="true">
-                        <button type="submit" class="btn btn-success">Confirmer et envoyer E-mail</button>
-                    </form> -->
+                <br>
 
                 <!-- download PDF -->
                 <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error'), add_query_arg('pdf', 'true', wp_get_referer()))); ?>" target="_blank" class="btn btn-success">Télécharger PDF</a>

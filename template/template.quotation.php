@@ -21,13 +21,6 @@ $number_decimal = new NumberFormatter("fr_FR", NumberFormatter::DECIMAL);
 // Define the number of decimal places
 $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 
-// Define constants
-// define('TVA', 5.50);
-// define('DISCOUNT', 100.00); // the percentage of discount can be modified here
-
-// Instantiate the QuoteCalculator class to use calculated results
-$quote_calculator = new QuoteCalculator();
-
 // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
 $form_data_transient = get_transient('form_data_transient');
 
@@ -36,6 +29,9 @@ if ($form_data_transient && isset($form_data_transient['quote_id'])) {
     $quote_id = $form_data_transient['quote_id'];
     $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover a single quotation row from database
     $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover a single person row from database
+
+    // Instantiate the QuoteCalculator class to use calculated results
+    $quote_calculator = new QuoteCalculator();
 
     // Calculate results: totals, unit prices, references, quantities, etc
     $results = $quote_calculator->calculateResults($quote_data, $person_data);
@@ -60,13 +56,7 @@ if ($form_data_transient && isset($form_data_transient['quote_id'])) {
 
 } else {
     // Display an error message
-    wp_die('Error: Quote ID not found in transient. This window will close in 10 seconds...');
-    // Introduce a delay before closing the window
-    echo '<script>
-            setTimeout(function() {
-                window.close();
-            }, 10000);
-          </script>';
+    wp_die('Error: Quote ID not found in transient.');
     exit; // Exit the script
 }
 
@@ -163,44 +153,10 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     </tr>
                 </thead>
                 <tbody>
-                    <?php
-
-                    // var_dump($guided_amount_ht);
-
-                    // initialize vaiables
-                    // $total_tva = 0;
-                    // $total_ht = 0;
-                    // $total_ttc = 0;
-                    // $total_paying_persons = 0;
-                    ?>
-                    <?php foreach ($person_data as $person) {
-                        // $age_data = getAgeById($person->age_id);
-                        // $total_paying_persons += $age_data->id === '1' ? 0 : $person->nbPersons; // total number of paying person, excluding the age category 1 (age less than 3 years old)
-                    }
-                    ?>
                     <?php foreach ($person_data as $index => $person) : ?>
                         <?php
-                        $age_data = getAgeById($person->age_id); // ger one row of age data in the current quote
-
-                        // calculate prices
-                        // if ($total_paying_persons < 15) {
-                        //     $unit_ttc = $age_data->price; // one unit price with tax at normal rate
-                        //     $ref = $age_data->ref; // reference for the normal category
-                        // } else {
-                        //     $unit_ttc = $age_data->price_disc; // one unit price with tax at discounted rate
-                        //     $ref = $age_data->ref_disc; // reference for the discounted category
-                        // }
-
-                        // $unit_ht = ($unit_ttc / (1 + (TVA / 100))); // one unit price without tax
-                        // $amount_ht = ($unit_ttc / (1 + (TVA / 100))) * ($person->nbPersons); // full price based on the number of person without tax
-                        // $amount_ttc = $unit_ttc * $person->nbPersons; // full price based on the number of person with tax
-                        // $amount_tva = $amount_ttc - $amount_ht; // full amount of the tax
-                        // $total_tva += $amount_tva; // total tax
-                        // $total_ht += $amount_ht; // total price without tax
-                        // $total_ttc += $amount_ttc; // total price with tax
-
+                        $age_data = getAgeById($person->age_id); // get one row of age data in the current quote
                         ?>
-
                         <!-- details -->
                         <tr class="tr-details">
                             <td class="cell-10"><?php echo $ref; ?></td>
@@ -219,24 +175,6 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                         <?php
                         // run a query in the database to get the guided category row
                         $visitetype_guided = getVisiteTypeById($quote_data->visitetype_id);
-
-
-                        // Calculate the guided price excluding TVA
-                        // $guided_price_ht = $visitetype_guided->price / (1 + (TVA / 100));
-
-                        // if ($total_paying_persons <= 10) {
-                        //     $guided_amount_ttc = $visitetype_guided->price;
-                        //     $guided_qty = 1;
-                        // } else if ($total_paying_persons > 10 && $total_paying_persons <= 20) {
-                        //     $guided_amount_ttc = $visitetype_guided->price * 2;
-                        //     $guided_qty = 2;
-                        // } else if ($total_paying_persons > 20) {
-                        //     $guided_amount_ttc = $visitetype_guided->price * 3;
-                        //     $guided_qty = 3;
-                        // }; // price with tax
-
-                        // $guided_amount_ht = $guided_amount_ttc / (1 + (TVA / 100));
-
                         ?>
                         <tr class="tr-details">
                             <td class="cell-10"><?php echo $visitetype_guided->ref; ?></td>
@@ -251,41 +189,21 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     <?php endif; ?>
 
                     <!-- Calculate and include the person for free -->
-                    <?php if ($total_paying_persons >= 15) : ?>
-                        <?php // if ($total_free_persons > 0) : ?>
-                        
-                            <?php
-                            $age_list = getAgeList(); // run a query in the database to get the category
+                    <?php if ($total_free_persons > 0) : ?>
+                        <?php
+                        $age_list = getAgeList(); // run a query in the database to get the category
 
-
-                            // $unit_ttc = $age_list[2]->price_disc; // discounted unit price with tax
-                            // $unit_ht = ($unit_ttc / (1 + (TVA / 100))); // one unit price without tax
-
-                            // // The initial free person for the first 15 persons.
-                            // $free_person = 1;
-
-                            // // For every additional 10 persons beyond the initial 15, add another free person.
-                            // $add_free_person = floor(($total_paying_persons - 15) / 10); // The floor function rounds down to the nearest whole number.
-
-                            // // Total number of free persons
-                            // $total_free_persons = $free_person + $add_free_person;
-
-                            // // calculate discounted HT and TTC prices
-                            // $discount_amount_ht = ($unit_ht - (($unit_ht * DISCOUNT) / 100)) * $total_free_persons;
-                            // $discount_amount_ttc = ($unit_ttc - (($unit_ttc * DISCOUNT) / 100)) * $total_free_persons;
-
-                            ?>
-                            <tr class="tr-details">
-                                <td class="cell-10"><?php echo $age_list[2]->ref_disc; ?></td>
-                                <td class="cell-30"><?php echo $age_list[2]->category; ?></td>
-                                <td class="cell-10"><?php echo $number_decimal->format($total_free_persons); ?></td>
-                                <td class="cell-10"><?php echo $number_currency->format($discount_unit_ht); ?></td>
-                                <td class="cell-10"><?php echo $number_decimal->format(DISCOUNT); ?></td>
-                                <td class="cell-10"><?php echo $number_decimal->format(TVA); ?> %</td>
-                                <td class="cell-10"><?php echo $number_currency->format($discount_amount_ht); ?></td>
-                                <td class="cell-10"><?php echo $number_currency->format($discount_amount_ttc); ?></td>
-                            </tr>
-                        
+                        ?>
+                        <tr class="tr-details">
+                            <td class="cell-10"><?php echo $age_list[2]->ref_disc; ?></td>
+                            <td class="cell-30"><?php echo $age_list[2]->category; ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format($total_free_persons); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($discount_unit_ht); ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format(DISCOUNT); ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format(TVA); ?> %</td>
+                            <td class="cell-10"><?php echo $number_currency->format($discount_amount_ht); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($discount_amount_ttc); ?></td>
+                        </tr>
                     <?php endif; ?>
 
                 </tbody>
