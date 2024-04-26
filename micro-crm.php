@@ -24,6 +24,7 @@ require_once(plugin_dir_path(__FILE__) . 'classes/class.mail-sender.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.document-converter.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.admin-menu.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.quote-calculator.php');
+require_once(plugin_dir_path(__FILE__) . 'classes/class.document-downloader.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.quote.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.person.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.age.php');

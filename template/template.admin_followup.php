@@ -53,27 +53,15 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                     $discount_amount_ht = $results['discount_amount_ht'];
                     $discount_amount_ttc = $results['discount_amount_ttc'];
 
+                    if (isset($_GET['pdf_quote']) && ($_GET['pdf_quote']) === ($quote->id)) {
 
+                        $documentDownloader = new DocumentDownloader();
 
-                    // Check if the PDF content is retrieved successfully
-                    if (isset($_GET['pdf']) && trim($_GET['pdf']) === trim($quote->id)) {
+                        // Call download_quote_PDF method to download the PDF
+                        $documentDownloader->download_quote_PDF($quote->id);
+                    }
 
-                        // Retrieve the PDF file from the database
-                        $pdfContent = getPdfdocumentByQuoteId($quote->id)->content;
-                        $pdfFilename = getPdfdocumentByQuoteId($quote->id)->filename;
-
-                        if ($pdfContent !== null || $pdfFilename !== null) {
-                            // Send appropriate headers
-                            header('Content-Type: application/pdf');
-                            header('Content-Disposition: attachment; filename="' . $pdfFilename . '"');
-
-                            // Output the PDF content
-                            echo $pdfContent ?? "";
-                            exit;
-                        } else {
-                            echo 'PDF file not found or error occurred.';
-                        }
-                        // var_dump($pdfContent);
+                    if (isset($_GET['error']) && $_GET['error'] === 'pdf') {
                     }
 
                     ?>
@@ -101,8 +89,21 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                             <div class="p-3 bg-light rounded box-shadow">
                                 <h6 class="border-bottom border-gray pb-2 mb-0">
                                     <small class="d-block text-right">
-                                        <a href="mailto:<?php echo $quote->email_quot; ?>" class="btn btn-primary">Envoyer Email</a>
-                                        <a href="<?php echo esc_url(add_query_arg('pdf', $quote->id ?? null, wp_get_referer())); ?>" target="_blank" class="btn btn-primary">Télécharger PDF</a>
+                                        <a href="mailto:<?php echo $quote->email_quot; ?>" class="btn btn-primary">
+                                            <i class="pe-2 bi bi-envelope"></i>Email
+                                        </a>
+                                        <a href="tel:<?php echo $quote->phone_quot; ?>" class="btn btn-primary">
+                                            <i class="pe-2 bi bi-telephone"></i>Appel
+                                        </a>
+                                        <?php if (isset($_GET['error']) && $_GET['error'] === 'pdf') : ?>
+                                            <button type="button" class="btn btn-outline-danger" disabled>
+                                                <i class="pe-2 bi bi-x-circle-fill"></i>Télécharger Devis
+                                            </button>
+                                        <?php else : ?>
+                                            <a href="<?php echo esc_url(add_query_arg('pdf_quote', $quote->id ?? null, wp_get_referer())); ?>" class="btn btn-outline-danger">
+                                                <i class="pe-2 bi bi-file-earmark-pdf"></i>Télécharger Devis
+                                            </a>
+                                        <?php endif; ?>
                                     </small>
                                 </h6>
                                 <div class="row">
