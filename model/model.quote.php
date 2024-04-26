@@ -36,7 +36,6 @@ function getQuoteDataById($quote_id)
     // Check if there was an error in the retrieval operation
     if (!$sql) {
         // Retrieval failed
-        // echo "Error: " . $wpdb->last_error;
         return false;
     } else {
         // Retrieval successful
@@ -93,11 +92,8 @@ function insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyN
     // Check if there was an error in the insert operation
     if (false === $result) {
         // Insertion failed
-        // echo "Error: " . $wpdb->last_error;
     } else {
         // Insertion successful
-        // echo "Inserted " . $result . " rows.";
-        // Return the ID of the inserted row
         return $quote_id;
     }
 }
@@ -145,11 +141,9 @@ function updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot
     // Check if there was an error in the update operation
     if (false === $result) {
         // Update failed
-        // echo "Error: " . $wpdb->last_error;
         return false;
     } else {
         // Update successful
-        // echo "Updated " . $result . " rows.";
         return true;
     }
 }
@@ -171,11 +165,9 @@ function deleteQuoteData($quote_id)
     // Check if there was an error in the delete operation
     if (false === $result) {
         // Deletion failed
-        // echo "Error: " . $wpdb->last_error;
         return false;
     } else {
         // Deletion successful
-        // echo "Deleted " . $result . " rows.";
         return true;
     }
 }
@@ -188,31 +180,32 @@ function generateQuoteNumber()
     // Get the current year and month
     $current_year = date('y');
     $current_month = date('m');
+    $current_day = date('d');
 
     // Check if there are any quotes for the current month of the year
-    $last_quote_in_month = $wpdb->get_var(
+    $last_quote_in_day = $wpdb->get_var(
         $wpdb->prepare(
             "SELECT number_quote 
             FROM $quote_table 
-            WHERE SUBSTRING_INDEX(number_quote, '-', 3) = %s 
+            WHERE SUBSTRING_INDEX(number_quote, '-', 4) = %s 
             ORDER BY number_quote 
             DESC LIMIT 1"
-            , "I-$current_year-$current_month"
+            , "D-$current_year-$current_month-$current_day"
         )
-    ); // This condition checks if the first 3 parts of the number_quote string (ex. I-24-04), separated by -, are equal to the current year and month
+    ); // This condition checks if the first 4 parts of the number_quote string (ex. D-24-04-26), separated by -, are equal to the current year and month and day
 
-    // If there are no quotes for the current month, set the number_quote to '01'
-    if (!$last_quote_in_month) {
-        $number_quote = 'I-' . $current_year . '-' . $current_month . '-01';
+    // If there are no quotes for the current day, set the number_quote to '01'
+    if (!$last_quote_in_day) {
+        $number_quote = 'D-' . $current_year . '-' . $current_month . '-' . $current_day . '-01';
     } else {
         // Extract the ID part from the last quote number
-        $last_id = intval(substr($last_quote_in_month, strrpos($last_quote_in_month, '-') + 1)); // extracts the portion of the string after the last hyphen and converts it into an integer
+        $last_id = intval(substr($last_quote_in_day, strrpos($last_quote_in_day, '-') + 1)); // extracts the portion of the string after the last hyphen and converts it into an integer
 
         // Increment the last ID by 1
         $new_id = str_pad($last_id + 1, 2, '0', STR_PAD_LEFT);
 
         // Generate the new number_quote
-        $number_quote = 'I-' . $current_year . '-' . $current_month . '-' . $new_id;
+        $number_quote = 'D-' . $current_year . '-' . $current_month . '-' . $current_day . '-' . $new_id;
     }
 
     return $number_quote;

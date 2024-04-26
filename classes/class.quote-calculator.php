@@ -95,7 +95,6 @@ class QuoteCalculator
 
         // For every additional 10 persons beyond the initial 15, add another free person.
         $add_free_person = floor(($total_paying_persons - 15) / 10); // The floor function rounds down to the nearest whole number.
-        $add_free_person = floor(-1.4); // The floor function rounds down to the nearest whole number.
 
         $total_free_persons = $free_person + $add_free_person; // Total number of free persons
 

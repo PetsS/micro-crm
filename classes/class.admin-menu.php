@@ -27,11 +27,11 @@ class AdminMenu
         // Add a sub-menu page
         add_submenu_page(
             'micro-crm-admin', // Parent menu slug
-            'Database Commands', // Page title
-            'Database Commands', // Menu title
+            'Sub Page', // Page title
+            'Sub Page', // Menu title
             'manage_options', // Capability required to access the page
-            'micro-crm-database-commands', // Menu slug
-            array($this, 'micro_crm_database_commands_page') // Callback function to display the page
+            'micro-crm-sub-page', // Menu slug
+            array($this, 'micro_crm_sub_page') // Callback function to display the page
         );
 
     }
@@ -44,8 +44,9 @@ class AdminMenu
     }
 
     // Callback function to display Database Commands page
-    public function micro_crm_database_commands_page()
+    public function micro_crm_sub_page()
     {
+        echo "<p>Sub page to be displayed...</p>";
         // Display HTML content for Database Commands page
     }
 

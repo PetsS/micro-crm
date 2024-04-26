@@ -43,7 +43,6 @@ if ($isCancelled) {
 
                 <!-- download PDF -->
                 <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error'), add_query_arg('pdf', 'true', wp_get_referer()))); ?>" target="_blank" class="btn btn-success">Télécharger PDF</a>
-                <!-- <a href="#" class="btn btn-primary">Télécharger PDF</a> -->
 
             </div>
         </div>

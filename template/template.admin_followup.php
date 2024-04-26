@@ -53,7 +53,29 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                     $discount_amount_ht = $results['discount_amount_ht'];
                     $discount_amount_ttc = $results['discount_amount_ttc'];
 
-                    // var_dump($person_data);
+
+
+                    // Check if the PDF content is retrieved successfully
+                    if (isset($_GET['pdf']) && trim($_GET['pdf']) === trim($quote->id)) {
+
+                        // Retrieve the PDF file from the database
+                        $pdfContent = getPdfdocumentByQuoteId($quote->id)->content;
+                        $pdfFilename = getPdfdocumentByQuoteId($quote->id)->filename;
+
+                        if ($pdfContent !== null || $pdfFilename !== null) {
+                            // Send appropriate headers
+                            header('Content-Type: application/pdf');
+                            header('Content-Disposition: attachment; filename="' . $pdfFilename . '"');
+
+                            // Output the PDF content
+                            echo $pdfContent ?? "";
+                            exit;
+                        } else {
+                            echo 'PDF file not found or error occurred.';
+                        }
+                        // var_dump($pdfContent);
+                    }
+
                     ?>
 
                     <tr class="main-row" onclick="toggleDetails(this)">
@@ -64,15 +86,23 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                         <td><?php echo $total_persons; ?></td>
                         <td><?php echo getPaymentById($quote->payment_id)->category; ?></td>
                         <td><?php echo $number_currency->format($total_ttc); ?></td>
-                        <td>???, ???</td>
+                        <td>
+                            <span class="badge rounded-pill bg-primary">Primary</span>
+                            <span class="badge rounded-pill bg-secondary">Secondary</span>
+                            <span class="badge rounded-pill bg-success">Success</span>
+                            <span class="badge rounded-pill bg-danger">Danger</span>
+                            <span class="badge rounded-pill bg-warning text-dark">Warning</span>
+                            <span class="badge rounded-pill bg-info text-dark">Info</span>
+                            <span class="badge rounded-pill bg-dark">Dark</span>
+                        </td>
                     </tr>
                     <tr class="additional-row">
                         <td colspan="10">
                             <div class="p-3 bg-light rounded box-shadow">
                                 <h6 class="border-bottom border-gray pb-2 mb-0">
                                     <small class="d-block text-right">
-                                        <a class="button-primary" href="#">Envoyer Email</a>
-                                        <a class="button-primary" href="#">Télécharger PDF</a>
+                                        <a href="mailto:<?php echo $quote->email_quot; ?>" class="btn btn-primary">Envoyer Email</a>
+                                        <a href="<?php echo esc_url(add_query_arg('pdf', $quote->id ?? null, wp_get_referer())); ?>" target="_blank" class="btn btn-primary">Télécharger PDF</a>
                                     </small>
                                 </h6>
                                 <div class="row">

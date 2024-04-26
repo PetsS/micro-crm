@@ -26,7 +26,7 @@ function getPdfdocumentByQuoteId($quote_id)
         SELECT * FROM $pdfdocument_table WHERE quote_id = %d;
     ", $quote_id);
 
-    return $wpdb->get_results($sql);
+    return $wpdb->get_row($sql);
 }
 
 function insertPdfdocumentData($quote_id, $filename, $content)
