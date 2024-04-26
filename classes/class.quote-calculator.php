@@ -64,8 +64,6 @@ class QuoteCalculator
             $total_ttc += $amount_ttc[count($amount_ttc) - 1]; // Update total price with tax
         }
 
-
-
         // Calculate guided price
         $visitetype_guided = getVisiteTypeById($quote_data->visitetype_id); // run a query in the database to get the guided category row
 
@@ -97,10 +95,11 @@ class QuoteCalculator
 
         // For every additional 10 persons beyond the initial 15, add another free person.
         $add_free_person = floor(($total_paying_persons - 15) / 10); // The floor function rounds down to the nearest whole number.
+        $add_free_person = floor(-1.4); // The floor function rounds down to the nearest whole number.
 
         $total_free_persons = $free_person + $add_free_person; // Total number of free persons
 
-        $total_persons += $total_free_persons;
+        $total_persons += $total_free_persons > 0 ? $total_free_persons : 0; // update total number of persons with the additionam free adult persons if exists
 
         // calculate discounted prices for adult category
         $age_list = getAgeList(); // run a query in the database to get the category

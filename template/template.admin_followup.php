@@ -76,7 +76,7 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                                     </small>
                                 </h6>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-sm">
                                         <div class="media text-muted pt-3">
                                             <div class="media-body mb-0 small lh-125">
                                                 <div class="d-flex justify-content-between align-items-center w-100">
@@ -88,7 +88,7 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-sm">
                                         <div class="media text-muted pt-3">
                                             <div class="media-body mb-0 ps-3 small lh-125 border-start border-gray">
                                                 <div class="d-flex justify-content-between align-items-center w-100">
@@ -105,7 +105,7 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                                                             <?php if ($quote->visitetype_id === "2") : ?>
                                                                 <tr>
                                                                     <td class="py-0"><?php echo "Visite " . getVisiteTypeById($quote->visitetype_id)->name; ?></td>
-                                                                    <td class="px-3 py-0 text-center"><span><?php echo "(" . $guided_qty . " guide" . ($guided_qty > 1 ? "s" : "") . ")"; ?></span></td>
+                                                                    <td class="px-3 py-0 text-center fst-italic"><span><?php echo "(" . $guided_qty . " guide" . ($guided_qty > 1 ? "s" : "") . ")"; ?></span></td>
                                                                     <td class="px-3 py-0"><?php echo $number_currency->format($guided_amount_ht); ?></td>
                                                                     <td class="py-0"><?php echo $number_currency->format($guided_amount_ttc); ?></td>
                                                                 </tr>
@@ -116,17 +116,39 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                                                                     <td class="py-0 px-3 text-center"><?php echo $person->nbPersons; ?></td>
                                                                     <td class="py-0 px-3"><?php echo $number_currency->format($amount_ht[$index]); ?></td>
                                                                     <td class="py-0"><?php echo $number_currency->format($amount_ttc[$index]); ?></td>
-                                                                <?php endforeach; ?>
                                                                 </tr>
-                                                                <tr class="border-top">
-                                                                    <td></td>
-                                                                    <td class="px-3 fw-bolder text-center"><?php echo $total_persons; ?></td>
-                                                                    <td class="px-3 fw-bolder"><?php echo $number_currency->format($total_ht); ?></td>
-                                                                    <td class="fw-bolder"><?php echo $number_currency->format($total_ttc); ?></td>
+                                                            <?php endforeach; ?>
+                                                            <?php if ($total_free_persons > 0) : ?>
+                                                                <tr>
+                                                                    <td class="py-0">Adulte gratuit</td>
+                                                                    <td class="py-0 px-3 text-center"><?php echo $total_free_persons; ?></td>
+                                                                    <td class="py-0 px-3"><?php echo $number_currency->format($discount_amount_ht); ?></td>
+                                                                    <td class="py-0"><?php echo $number_currency->format($discount_amount_ttc); ?></td>
                                                                 </tr>
+                                                            <?php endif; ?>
+                                                            <tr class="border-top">
+                                                                <td></td>
+                                                                <td class="px-3 fw-bolder text-center"><?php echo $total_persons; ?></td>
+                                                                <td class="px-3 fw-bolder"><?php echo $number_currency->format($total_ht); ?></td>
+                                                                <td class="fw-bolder"><?php echo $number_currency->format($total_ttc); ?></td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm">
+                                        <div class="media text-muted pt-3">
+                                            <div class="media-body mb-0 ps-3 small lh-125 border-start border-gray">
+                                                <div class="d-flex justify-content-between align-items-center w-100">
+                                                    <strong class="text-gray-dark">Commentaires:</strong>
+                                                </div>
+                                                <?php if (!$quote->comment) : ?>
+                                                    <span class="d-block fst-italic">Aucun commentaire</span>
+                                                <?php else : ?>
+                                                    <span class="d-block"><?php echo $quote->comment; ?></span>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
