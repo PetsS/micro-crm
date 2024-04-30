@@ -5,43 +5,75 @@
  * 
  */
 
-// Method to get all quotation data from the database
-function getQuoteDataList()
+// Method to get all quotation data from the database with optional search query
+function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_order = 'desc', $start_date = '', $end_date = '')
 {
     global $wpdb;
     $quote_table = $wpdb->prefix . 'quote';
 
-    // Retrieve all rows from the quote table
-    $sql = $wpdb->get_results("SELECT * FROM $quote_table");
+    // Construct the SQL query
+    $sql = "SELECT * FROM $quote_table";
 
-    // Check if there was an error in the retrieval operation
-    if (!$sql) {
-        // Retrieval failed
-        return false;
-    } else {
-        // Retrieval successful
-        return $sql;
+    // Append the WHERE clause if any of the filters are provided
+    $where_conditions = array();
+
+    // Search query condition
+    if (!empty($search_query)) {
+        $search_conditions = array();
+        $columns = array('email_quot', 'lastname_quot', 'firstname_quot', 'companyName', 'address', 'phone_quot', 'visitetype_id', 'datetimeVisit', 'payment_id', 'comment', 'number_quote');
+        foreach ($columns as $column) {
+            $search_conditions[] = "$column LIKE '%$search_query%'";
+        }
+        $where_conditions[] = "(" . implode(" OR ", $search_conditions) . ")";
     }
+
+    // Start date condition
+    if (!empty($start_date)) {
+        $start_date_formatted = date("Y-m-d", strtotime($start_date));
+        $where_conditions[] = "creation_date >= STR_TO_DATE('$start_date_formatted', '%Y-%m-%d')";
+    }
+
+    // End date condition
+    if (!empty($end_date)) {
+        $end_date_formatted = date("Y-m-d", strtotime($end_date));
+        $where_conditions[] = "creation_date <= DATE_ADD(STR_TO_DATE('$end_date_formatted', '%Y-%m-%d'), INTERVAL 1 DAY)";
+    }
+
+    // Combine all WHERE conditions
+    if (!empty($where_conditions)) {
+        $sql .= " WHERE " . implode(" AND ", $where_conditions);
+    }
+
+    // Append sorting criteria
+    $sql .= " ORDER BY $sort_by $sort_order";
+
+    // Retrieve data from the database
+    $results = $wpdb->get_results($sql);
+
+    // Return the results
+    return $results ? $results : [];
 }
+
+
 
 // Method to get all quotation data from the database sorted by the specified column
-function getQuoteDataListSortedByColumn($sort_by, $sort_order)
-{
-    global $wpdb;
-    $quote_table = $wpdb->prefix . 'quote';
+// function getQuoteDataListSortedByColumn($sort_by, $sort_order)
+// {
+//     global $wpdb;
+//     $quote_table = $wpdb->prefix . 'quote';
 
-    // Retrieve all rows from the quote table sorted by the specified column and order
-    $sql = $wpdb->get_results("SELECT * FROM $quote_table ORDER BY $sort_by $sort_order");
+//     // Retrieve all rows from the quote table sorted by the specified column and order
+//     $sql = $wpdb->get_results("SELECT * FROM $quote_table ORDER BY $sort_by $sort_order");
 
-    // Check if there was an error in the retrieval operation
-    if (!$sql) {
-        // Retrieval failed
-        return false;
-    } else {
-        // Retrieval successful
-        return $sql;
-    }
-}
+//     // Check if there was an error in the retrieval operation
+//     if (!$sql) {
+//         // Retrieval failed
+//         return false;
+//     } else {
+//         // Retrieval successful
+//         return $sql;
+//     }
+// }
 
 // Method to get quotation data by quote_id from the database
 function getQuoteDataById($quote_id)

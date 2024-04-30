@@ -2,13 +2,16 @@
 // Check if sorting parameter is provided in the URL
 $sort_by = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'creation_date'; // Default to sorting by date
 $sort_order = isset($_GET['sort_order']) ? $_GET['sort_order'] : 'desc'; // Default to descending order
+$search_query = isset($_GET['search_query']) ? $_GET['search_query'] : ''; // Define search_query variable
+$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : ''; // Define start_date variable
+$end_date = isset($_GET['end_date']) ? $_GET['end_date'] : ''; // Define end_date variable
 
 // Function to generate sorting URL with parameters
-function getSortURL($sort_by, $sort_order)
+function getSortURL($sort_by, $sort_order, $search_query, $start_date, $end_date)
 {
     // Toggle sort order
     $sort_order = $sort_order === 'asc' ? 'desc' : 'asc';
-    return add_query_arg(array('sort_by' => $sort_by, 'sort_order' => $sort_order));
+    return esc_url(add_query_arg(array('sort_by' => $sort_by, 'sort_order' => $sort_order, 'search_query' => $search_query, 'start_date' => $start_date, 'end_date' => $end_date)));
 }
 
 // Function to generate sorting class based on current sorting state and add a bootstrap icon to the link
@@ -22,10 +25,16 @@ function getSortClass($sort_by, $column_name, $sort_order)
 
 // Choose the appropriate function based on the sorting column
 if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
-    $quote_data = getQuoteDataListSortedByColumn($sort_by, $sort_order);
+    $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date);
 } else {
-    $quote_data = getQuoteDataList();
-    foreach ($quote_data as $quote) {
+    // Run the SQL method to retrieve all quote data with search query
+    $quote_data_unsorted = getQuoteDataList($search_query);
+
+    // Create a temporary array to store the sorted data
+    $temporary_quote_data = $quote_data_unsorted;
+
+    // Get the calculated data
+    foreach ($temporary_quote_data as $quote) {
         $person_data = getPersonByQuoteId($quote->id);
         $quote_calculator = new QuoteCalculator();
         $results = $quote_calculator->calculateResults($quote, $person_data);
@@ -33,14 +42,17 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
         $quote->total_ttc = $results['total_ttc'];
     }
 
-    // Define a custom sorting function based on the total_persons or total_ttc property
-    usort($quote_data, function ($a, $b) use ($sort_order, $sort_by) {
+    // Define a custom sorting function based on the total_persons or total_ttc property using temporaty array
+    usort($temporary_quote_data, function ($a, $b) use ($sort_order, $sort_by) {
         if ($sort_order === 'asc') {
             return $a->$sort_by - $b->$sort_by;
         } else {
             return $b->$sort_by - $a->$sort_by;
         }
     });
+
+    // assign th temporary and now sorted data to the quote_data
+    $quote_data = $temporary_quote_data;
 }
 
 // Create number formatter instance for currency and decimal formats
@@ -49,27 +61,77 @@ $number_decimal = new NumberFormatter("fr_FR", NumberFormatter::DECIMAL);
 
 // Define the number of decimal places
 $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
-?>
 
+
+if (isset($_POST['search_query'])) {
+    // Get the search query from the form submission
+    $search_query = isset($_POST['search_query']) ? $_POST['search_query'] : '';
+
+    // Get the start and end dates from the form submission
+    $start_date = isset($_POST['start_date']) ? $_POST['start_date'] : '';
+    $end_date = isset($_POST['end_date']) ? $_POST['end_date'] : '';
+
+    // Call the function to get quote data with the search query and date range
+    if (!empty($search_query) || (!empty($start_date) && !empty($end_date))) {
+        $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date);
+    } else {
+        // If search query and date range are empty or invalid, return all quote data
+        $quote_data = getQuoteDataList('', $sort_by, $sort_order, '', '');
+    }
+    var_dump($quote_data);
+}
+
+if (isset($_POST['btn-reset'])) {
+    esc_url(remove_query_arg(array('sort_by', 'sort_order', 'search_query', 'start_date', 'end_date')));
+    $search_query = '';
+    $start_date = '';
+    $end_date = '';
+    $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date);
+}
+
+
+
+?>
 <div class="container mt-5">
+    <form action="" method="post">
+        <div class="row">
+            <div class="col">
+                <input type="text" name="search_query" class="form-control" placeholder="Rechercher..." value="<?php echo $search_query ? $search_query : ''; ?>">
+            </div>
+            <div class="col">
+                <input type="date" name="start_date" class="form-control" placeholder="Date de début" value="<?php echo $start_date ? $start_date : ''; ?>">
+            </div>
+            <div class="col">
+                <input type="date" name="end_date" class="form-control" placeholder="Date de fin" value="<?php echo $end_date ? $end_date : ''; ?>">
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Recherche</button>
+                <button type="submit" name="btn-reset" class="btn btn-secondary">Réinitialiser</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div class="container mt-3">
     <div class="table-responsive">
         <table class="table table-hover">
             <thead class="table-dark">
                 <tr>
                     <th>
-                        <a href="<?php echo getSortURL('lastname_quot', $sort_order); ?>">Nom <i class="<?php echo getSortClass('lastname_quot', $sort_by, $sort_order); ?>"></i></a>
+                        <a href="<?php echo getSortURL('lastname_quot', $sort_order, $search_query, $start_date, $end_date); ?>">Nom <i class="<?php echo getSortClass('lastname_quot', $sort_by, $sort_order); ?>"></i></a>
                         <span>ou </span>
-                        <a href="<?php echo getSortURL('companyName', $sort_order); ?>">RS <i class="<?php echo getSortClass('companyName', $sort_by, $sort_order); ?>"></i></a>
+                        <a href="<?php echo getSortURL('companyName', $sort_order, $search_query, $start_date, $end_date); ?>">RS <i class="<?php echo getSortClass('companyName', $sort_by, $sort_order); ?>"></i></a>
                     </th>
-                    <th class="fixed-column"><a href="<?php echo getSortURL('creation_date', $sort_order); ?>">Date <i class="<?php echo getSortClass('creation_date', $sort_by, $sort_order); ?>"></i></a></th>
-                    <th><a href="<?php echo getSortURL('number_quote', $sort_order); ?>">No Devis <i class="<?php echo getSortClass('number_quote', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th class="fixed-column"><a href="<?php echo getSortURL('creation_date', $sort_order, $search_query, $start_date, $end_date); ?>">Date <i class="<?php echo getSortClass('creation_date', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('number_quote', $sort_order, $search_query, $start_date, $end_date); ?>">No Devis <i class="<?php echo getSortClass('number_quote', $sort_by, $sort_order); ?>"></i></a></th>
                     <th>No Facture </th>
                     <th>No Avoir </th>
-                    <th><a href="<?php echo getSortURL('datetimeVisit', $sort_order); ?>">Jour de visite <i class="<?php echo getSortClass('datetimeVisit', $sort_by, $sort_order); ?>"></i></a></th>
-                    <th><a href="<?php echo getSortURL('visitetype_id', $sort_order); ?>">Type de visite <i class="<?php echo getSortClass('visitetype_id', $sort_by, $sort_order); ?>"></i></a></th>
-                    <th><a href="<?php echo getSortURL('total_persons', $sort_order); ?>">Nb personnes <i class="<?php echo getSortClass('total_persons', $sort_by, $sort_order); ?>"></i></a></th>
-                    <th><a href="<?php echo getSortURL('payment_id', $sort_order); ?>">Mode paiement <i class="<?php echo getSortClass('payment_id', $sort_by, $sort_order); ?>"></i></a></th>
-                    <th><a href="<?php echo getSortURL('total_ttc', $sort_order); ?>">Total TTC <i class="<?php echo getSortClass('total_ttc', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('datetimeVisit', $sort_order, $search_query, $start_date, $end_date); ?>">Jour de visite <i class="<?php echo getSortClass('datetimeVisit', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('visitetype_id', $sort_order, $search_query, $start_date, $end_date); ?>">Type de visite <i class="<?php echo getSortClass('visitetype_id', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('total_persons', $sort_order, $search_query, $start_date, $end_date); ?>">Nb personnes <i class="<?php echo getSortClass('total_persons', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('payment_id', $sort_order, $search_query, $start_date, $end_date); ?>">Mode paiement <i class="<?php echo getSortClass('payment_id', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('total_ttc', $sort_order, $search_query, $start_date, $end_date); ?>">Total TTC <i class="<?php echo getSortClass('total_ttc', $sort_by, $sort_order); ?>"></i></a></th>
                     <th>Balises</th>
                 </tr>
             </thead>
@@ -277,5 +339,9 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <!-- Display alert message if the table has no search results -->
+        <?php if (empty($quote_data)) : ?>
+            <div class="alert alert-danger" role="alert">Aucun résultat de recherche!</div>
+        <?php endif; ?>
     </div>
 </div>
