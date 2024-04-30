@@ -132,10 +132,10 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                                 ?>
 
                                 <!-- A mini form to handle tag display and deletion -->
-                                <form class="delete-tag-form" method="post">
-                                    <span class="<?php echo $add_tag_bg; ?>">
+                                <form class="pb-1 delete-tag-form" method="post">
+                                    <span class="py-0 <?php echo $add_tag_bg; ?> fw-normal">
                                         <?php echo getTagnameById($tag->tagname_id)->category; ?>
-                                        <button type="submit" name="delete-btn-tag" value="<?php echo $tag->id; ?>">
+                                        <button class="p-0 ps-1 btn align-baseline" type="submit" name="delete-btn-tag" value="<?php echo $tag->id; ?>">
                                             <i class="bi bi-x-circle"></i>
                                         </button>
                                     </span>
