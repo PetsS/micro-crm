@@ -20,6 +20,17 @@
   cursor: pointer;
 }
 
+/* Set link style in table header */
+.table-dark a {
+  color: #fff; /* Set default color for links */
+    text-decoration: none; /* Remove underline from links */
+}
+
+.table-dark a:hover {
+    color: #f1e840; /* Change color on hover */
+    cursor: pointer; /* Change cursor on hover */
+}
+
 /* Media query for mobile responsiveness */
 @media screen and (max-width: 768px) {
   .fixed-column::after {

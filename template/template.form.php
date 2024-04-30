@@ -110,7 +110,6 @@
             <span class="error"><?php echo $form_errors['phone_quot']; ?><br></span>
         <?php endif; ?><br>
 
-        <!-- TODO create table for visiteType in database -->
         <label for="visitetype">Type de visite:</label>
         <select id="visitetype" name="visitetype">
             <option value="default">Choisir...</option>
@@ -123,7 +122,6 @@
         <?php endif; ?>
 
         <div id="info-visiteType" class="hidden">
-            <!-- TODO replace price with database data -->
             <p>
                 Option supplémentaire visite guidée avec nourrissages commentés (2h) :
             <ul>

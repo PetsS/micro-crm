@@ -24,6 +24,25 @@ function getQuoteDataList()
     }
 }
 
+// Method to get all quotation data from the database sorted by the specified column
+function getQuoteDataListSortedByColumn($sort_by, $sort_order)
+{
+    global $wpdb;
+    $quote_table = $wpdb->prefix . 'quote';
+
+    // Retrieve all rows from the quote table sorted by the specified column and order
+    $sql = $wpdb->get_results("SELECT * FROM $quote_table ORDER BY $sort_by $sort_order");
+
+    // Check if there was an error in the retrieval operation
+    if (!$sql) {
+        // Retrieval failed
+        return false;
+    } else {
+        // Retrieval successful
+        return $sql;
+    }
+}
+
 // Method to get quotation data by quote_id from the database
 function getQuoteDataById($quote_id)
 {

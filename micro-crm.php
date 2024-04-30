@@ -27,9 +27,11 @@ require_once(plugin_dir_path(__FILE__) . 'classes/class.quote-calculator.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.document-downloader.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.quote.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.person.php');
+require_once(plugin_dir_path(__FILE__) . 'model/model.tag.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.age.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.visitetype.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.payment.php');
+require_once(plugin_dir_path(__FILE__) . 'model/model.tagname.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.pdfdocument.php');
 
 // As a security precaution, it’s a good practice to disallow access if the ABSPATH global is not defined.
@@ -162,8 +164,10 @@ class MicroCrm
 		$age_table = $wpdb->prefix . 'age';
 		$visitetype_table = $wpdb->prefix . 'visitetype';
 		$payment_table = $wpdb->prefix . 'payment';
+		$tagname_table = $wpdb->prefix . 'tagname';
 		$quote_table = $wpdb->prefix . 'quote';
 		$person_table = $wpdb->prefix . 'person';
+		$tag_table = $wpdb->prefix . 'tag';
 		$pdfdocument_table = $wpdb->prefix . 'pdfdocument';
 
 		// Create age table
@@ -217,6 +221,21 @@ class MicroCrm
 			insertPaymentData($wpdb, $payment_table);
 		}
 
+		// Create tagname table
+		if ($wpdb->get_var("SHOW TABLES LIKE '$tagname_table'") != $tagname_table) {
+			$sql = "
+            CREATE TABLE IF NOT EXISTS $tagname_table (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+				category VARCHAR(255)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			// Function dbDelta is in the file upgrade.php
+			dbDelta($sql);
+
+			// Insert fixed data into table
+			insertTagnameData($wpdb, $tagname_table);
+		}
+
 		// Create quote table
 		if ($wpdb->get_var("SHOW TABLES LIKE '$quote_table'") != $quote_table) {
 			$sql = "
@@ -258,6 +277,21 @@ class MicroCrm
 			dbDelta($sql);
 		}
 
+		// Create tag table
+		if ($wpdb->get_var("SHOW TABLES LIKE '$tag_table'") != $tag_table) {
+			$sql = "
+            CREATE TABLE IF NOT EXISTS $tag_table (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+				quote_id INT,
+				tagname_id INT,
+				FOREIGN KEY (quote_id) REFERENCES $quote_table(id) ON DELETE CASCADE ON UPDATE CASCADE,
+				FOREIGN KEY (quote_id) REFERENCES $tagname_table(id) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			// Function dbDelta is in the file upgrade.php
+			dbDelta($sql);
+		}
+
 		// Create pdfdocument table
 		if ($wpdb->get_var("SHOW TABLES LIKE '$pdfdocument_table'") != $pdfdocument_table) {
 			$sql = "
@@ -280,9 +314,11 @@ class MicroCrm
 		// Declare global $wpdb object and table names
 		global $wpdb;
 		$pdfdocument_table = $wpdb->prefix . 'pdfdocument';
+		$tag_table = $wpdb->prefix . 'tag';
 		$person_table = $wpdb->prefix . 'person';
 		$quote_table = $wpdb->prefix . 'quote';
 		$payment_table = $wpdb->prefix . 'payment';
+		$tagname_table = $wpdb->prefix . 'tagname';
 		$visitetype_table = $wpdb->prefix . 'visitetype';
 		$age_table = $wpdb->prefix . 'age';
 
@@ -292,6 +328,9 @@ class MicroCrm
 			if ($wpdb->get_var("SHOW TABLES LIKE '$pdfdocument_table'") == $pdfdocument_table) {
 				$wpdb->query("DROP TABLE IF EXISTS $pdfdocument_table");
 			}
+			if ($wpdb->get_var("SHOW TABLES LIKE '$tag_table'") == $tag_table) {
+				$wpdb->query("DROP TABLE IF EXISTS $tag_table");
+			}
 			if ($wpdb->get_var("SHOW TABLES LIKE '$person_table'") == $person_table) {
 				$wpdb->query("DROP TABLE IF EXISTS $person_table");
 			}
@@ -300,6 +339,9 @@ class MicroCrm
 			}
 			if ($wpdb->get_var("SHOW TABLES LIKE '$payment_table'") == $payment_table) {
 				$wpdb->query("DROP TABLE IF EXISTS $payment_table");
+			}
+			if ($wpdb->get_var("SHOW TABLES LIKE '$tagname_table'") == $tagname_table) {
+				$wpdb->query("DROP TABLE IF EXISTS $tagname_table");
 			}
 			if ($wpdb->get_var("SHOW TABLES LIKE '$visitetype_table'") == $visitetype_table) {
 				$wpdb->query("DROP TABLE IF EXISTS $visitetype_table");

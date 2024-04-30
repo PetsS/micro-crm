@@ -1,5 +1,47 @@
 <?php
-$quote_data = getQuoteDataList(); // load sql method into variable
+// Check if sorting parameter is provided in the URL
+$sort_by = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'creation_date'; // Default to sorting by date
+$sort_order = isset($_GET['sort_order']) ? $_GET['sort_order'] : 'desc'; // Default to descending order
+
+// Function to generate sorting URL with parameters
+function getSortURL($sort_by, $sort_order)
+{
+    // Toggle sort order
+    $sort_order = $sort_order === 'asc' ? 'desc' : 'asc';
+    return add_query_arg(array('sort_by' => $sort_by, 'sort_order' => $sort_order));
+}
+
+// Function to generate sorting class based on current sorting state and add a bootstrap icon to the link
+function getSortClass($sort_by, $column_name, $sort_order)
+{
+    if ($sort_by === $column_name) {
+        return $sort_order === 'asc' ? 'bi bi-caret-up-fill' : 'bi bi-caret-down-fill';
+    }
+    return '';
+}
+
+// Choose the appropriate function based on the sorting column
+if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
+    $quote_data = getQuoteDataListSortedByColumn($sort_by, $sort_order);
+} else {
+    $quote_data = getQuoteDataList();
+    foreach ($quote_data as $quote) {
+        $person_data = getPersonByQuoteId($quote->id);
+        $quote_calculator = new QuoteCalculator();
+        $results = $quote_calculator->calculateResults($quote, $person_data);
+        $quote->total_persons = $results['total_persons'];
+        $quote->total_ttc = $results['total_ttc'];
+    }
+
+    // Define a custom sorting function based on the total_persons or total_ttc property
+    usort($quote_data, function ($a, $b) use ($sort_order, $sort_by) {
+        if ($sort_order === 'asc') {
+            return $a->$sort_by - $b->$sort_by;
+        } else {
+            return $b->$sort_by - $a->$sort_by;
+        }
+    });
+}
 
 // Create number formatter instance for currency and decimal formats
 $number_currency = new NumberFormatter("fr_FR", NumberFormatter::CURRENCY);
@@ -14,13 +56,20 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
         <table class="table table-hover">
             <thead class="table-dark">
                 <tr>
-                    <th class="fixed-column">Date</th>
-                    <th>Nom / RS</th>
-                    <th>No Devis</th>
-                    <th>Jour de visite</th>
-                    <th>Nb personnes</th>
-                    <th>Mode paiement</th>
-                    <th>Total TTC</th>
+                    <th>
+                        <a href="<?php echo getSortURL('lastname_quot', $sort_order); ?>">Nom <i class="<?php echo getSortClass('lastname_quot', $sort_by, $sort_order); ?>"></i></a>
+                        <span>ou </span>
+                        <a href="<?php echo getSortURL('companyName', $sort_order); ?>">RS <i class="<?php echo getSortClass('companyName', $sort_by, $sort_order); ?>"></i></a>
+                    </th>
+                    <th class="fixed-column"><a href="<?php echo getSortURL('creation_date', $sort_order); ?>">Date <i class="<?php echo getSortClass('creation_date', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('number_quote', $sort_order); ?>">No Devis <i class="<?php echo getSortClass('number_quote', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th>No Facture </th>
+                    <th>No Avoir </th>
+                    <th><a href="<?php echo getSortURL('datetimeVisit', $sort_order); ?>">Jour de visite <i class="<?php echo getSortClass('datetimeVisit', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('visitetype_id', $sort_order); ?>">Type de visite <i class="<?php echo getSortClass('visitetype_id', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('total_persons', $sort_order); ?>">Nb personnes <i class="<?php echo getSortClass('total_persons', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('payment_id', $sort_order); ?>">Mode paiement <i class="<?php echo getSortClass('payment_id', $sort_by, $sort_order); ?>"></i></a></th>
+                    <th><a href="<?php echo getSortURL('total_ttc', $sort_order); ?>">Total TTC <i class="<?php echo getSortClass('total_ttc', $sort_by, $sort_order); ?>"></i></a></th>
                     <th>Balises</th>
                 </tr>
             </thead>
@@ -61,51 +110,77 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                         $documentDownloader->download_quote_PDF($quote->id);
                     }
 
-                    if (isset($_GET['error']) && $_GET['error'] === 'pdf') {
-                    }
-
                     ?>
 
                     <tr class="main-row" onclick="toggleDetails(this)">
-                        <td class="fixed-column"><?php echo date('Y-m-d', strtotime($quote->creation_date)); ?></td>
-                        <td><?php echo ($quote->companyName ? strtoupper($quote->companyName)  :  $quote->firstname_quot . " " . strtoupper($quote->lastname_quot)); ?></td>
-                        <td><?php echo $quote->number_quote; ?></td>
-                        <td><?php echo $quote->datetimeVisit; ?></td>
-                        <td><?php echo $total_persons; ?></td>
-                        <td><?php echo getPaymentById($quote->payment_id)->category; ?></td>
-                        <td><?php echo $number_currency->format($total_ttc); ?></td>
-                        <td>
-                            <span class="badge rounded-pill bg-primary">Primary</span>
-                            <span class="badge rounded-pill bg-secondary">Secondary</span>
-                            <span class="badge rounded-pill bg-success">Success</span>
-                            <span class="badge rounded-pill bg-danger">Danger</span>
-                            <span class="badge rounded-pill bg-warning text-dark">Warning</span>
-                            <span class="badge rounded-pill bg-info text-dark">Info</span>
-                            <span class="badge rounded-pill bg-dark">Dark</span>
-                        </td>
+                        <td class="<?php echo $sort_by === 'companyName' || $sort_by === 'lastname_quot' ? 'table-light' : ''; ?>"><?php echo ($quote->companyName ? strtoupper($quote->companyName)  :  $quote->firstname_quot . " " . strtoupper($quote->lastname_quot)); ?></td>
+                        <td class="fixed-column <?php echo $sort_by === 'creation_date' ? 'table-light' : ''; ?>"><?php echo date('Y-m-d', strtotime($quote->creation_date)); ?></td>
+                        <td class="<?php echo $sort_by === 'number_quote' ? 'table-light' : ''; ?>"><?php echo $quote->number_quote; ?></td>
+                        <td><?php echo "???"; ?></td>
+                        <td><?php echo "???"; ?></td>
+                        <td class="<?php echo $sort_by === 'datetimeVisit' ? 'table-light' : ''; ?>"><?php echo $quote->datetimeVisit; ?></td>
+                        <td class="<?php echo $sort_by === 'visitetype_id' ? 'table-light' : ''; ?>"><?php echo getVisiteTypeById($quote->visitetype_id)->name; ?></td>
+                        <td class="<?php echo $sort_by === 'total_persons' ? 'table-light' : ''; ?>"><?php echo $total_persons; ?></td>
+                        <td class="<?php echo $sort_by === 'payment_id' ? 'table-light' : ''; ?>"><?php echo getPaymentById($quote->payment_id)->category; ?></td>
+                        <td class="<?php echo $sort_by === 'total_ttc' ? 'table-light' : ''; ?>"><?php echo $number_currency->format($total_ttc); ?></td>
+                        <?php foreach (getTagByQuoteId($quote->id) as $tag) : ?>
+                            <td>
+                                <span><?php echo $tag->name ?></span>
+                                <!-- <span class="badge rounded-pill bg-primary">Primary</span>
+                                <span class="badge rounded-pill bg-secondary">Secondary</span>
+                                <span class="badge rounded-pill bg-success">Success</span>
+                                <span class="badge rounded-pill bg-danger">Danger</span>
+                                <span class="badge rounded-pill bg-warning text-dark">Warning</span>
+                                <span class="badge rounded-pill bg-info text-dark">Info</span>
+                                <span class="badge rounded-pill bg-dark">Dark</span> -->
+                            </td>
+                        <?php endforeach; ?>
                     </tr>
                     <tr class="additional-row">
-                        <td colspan="10">
+                        <td colspan="11">
                             <div class="p-3 bg-light rounded box-shadow">
+
                                 <h6 class="border-bottom border-gray pb-2 mb-0">
-                                    <small class="d-block text-right">
-                                        <a href="mailto:<?php echo $quote->email_quot; ?>" class="btn btn-primary">
-                                            <i class="pe-2 bi bi-envelope"></i>Email
-                                        </a>
-                                        <a href="tel:<?php echo $quote->phone_quot; ?>" class="btn btn-primary">
-                                            <i class="pe-2 bi bi-telephone"></i>Appel
-                                        </a>
-                                        <?php if (isset($_GET['error']) && $_GET['error'] === 'pdf') : ?>
-                                            <button type="button" class="btn btn-outline-danger" disabled>
-                                                <i class="pe-2 bi bi-x-circle-fill"></i>Télécharger Devis
-                                            </button>
-                                        <?php else : ?>
-                                            <a href="<?php echo esc_url(add_query_arg('pdf_quote', $quote->id ?? null, wp_get_referer())); ?>" class="btn btn-outline-danger">
-                                                <i class="pe-2 bi bi-file-earmark-pdf"></i>Télécharger Devis
+                                    <div class="row row-cols-lg-auto g-2 align-items-center">
+                                        <!-- Send email -->
+                                        <div class="col-12">
+                                            <a href="mailto:<?php echo $quote->email_quot; ?>" class="btn btn-primary">
+                                                <i class="bi bi-envelope"></i> Email
                                             </a>
-                                        <?php endif; ?>
-                                    </small>
+                                        </div>
+                                        <!-- Call the phone -->
+                                        <div class="col-12">
+                                            <a href="tel:<?php echo $quote->phone_quot; ?>" class="btn btn-primary">
+                                                <i class="bi bi-telephone"></i> Appel
+                                            </a>
+                                        </div>
+                                        <!-- Download quotation in PDF -->
+                                        <div class="col-12">
+                                            <?php if (isset($_GET['error']) && $_GET['error'] === $quote->id) : ?>
+                                                <button type="button" class="btn btn-outline-danger" disabled>
+                                                    <i class="bi bi-x-circle-fill"></i> Devis non accessible
+                                                </button>
+                                            <?php else : ?>
+                                                <a href="<?php echo esc_url(add_query_arg('pdf_quote', $quote->id ?? null)); ?>" class="btn btn-outline-danger">
+                                                    <i class="bi bi-file-earmark-pdf"></i> Télécharger Devis
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                        <!-- Select and add a Tag -->
+                                        <div class="col-4">
+                                            <form action="" class="input-group">
+                                                <select class="form-select" id="tagselect" name="tagselect">
+                                                    <option value="default">Ajouter des balises</option>
+                                                    <?php foreach (getTagnameList() as $tagname) : ?>
+                                                        <option value="<?php echo $tagname->id ?>"><?php echo $tagname->category ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <button class="btn btn-primary" type="submit">OK</button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </h6>
+
                                 <div class="row">
                                     <div class="col-sm">
                                         <div class="media text-muted pt-3">

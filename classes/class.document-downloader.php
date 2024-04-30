@@ -24,7 +24,7 @@ class DocumentDownloader
             exit;
         } else {
             // If PDF file doesn't exist, redirect to the same page
-            wp_redirect(add_query_arg(array('error' => 'pdf'), wp_get_referer()));
+            wp_redirect(add_query_arg(array('error' => $quote_id), wp_get_referer()));
             exit;
         }
     }
