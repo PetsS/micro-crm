@@ -46,15 +46,14 @@ function insertTagData($quote_id, $tagname_id)
         )
     );
 
-    // Get the ID of the inserted row
-    $tag_id = $wpdb->insert_id;
-
     // Check if there was an error in the insert operation
     if (false === $result) {
         // Insertion failed
+        return false;
     } else {
         // Insertion successful
-        return $tag_id;
+        // Get the ID of the inserted row
+        return $wpdb->insert_id;
     }
 }
 

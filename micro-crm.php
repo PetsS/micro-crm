@@ -20,6 +20,7 @@ require_once(plugin_dir_path(__FILE__) . 'vendor/PHPMailer/src/Exception.php');
 require_once(plugin_dir_path(__FILE__) . 'vendor/PHPMailer/src/PHPMailer.php');
 require_once(plugin_dir_path(__FILE__) . 'vendor/PHPMailer/src/SMTP.php'); // Include the PHPMailer libraries
 require_once(plugin_dir_path(__FILE__) . 'classes/class.form-handler.php');
+require_once(plugin_dir_path(__FILE__) . 'classes/class.tag-handler.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.mail-sender.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.document-converter.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.admin-menu.php');
@@ -53,6 +54,9 @@ class MicroCrm
 
 		// hook action for PDF conversion
 		add_action('init', array($this, 'document_conversion'));
+
+		// hook action for handling tag requests
+		add_action('init', array($this, 'tag_handler'));
 		
 		// Enqueue front assets
 		add_action('wp_enqueue_scripts', array($this, 'load_front_assets'));
@@ -69,7 +73,6 @@ class MicroCrm
 		// hook actions, which WordPress will call when processing form submissions for logged-in and non-logged-in users, respectively.
 		add_action('admin_post_form_submission', array($this, 'form_submission'));
 		add_action('admin_post_nopriv_form_submission', array($this, 'form_submission')); // For non-logged-in users
-
 	}
 
 	// creating a custom post type using register_post_type() function
@@ -154,6 +157,13 @@ class MicroCrm
 	{
 		$document_converter = new DocumentConverter;
 		$document_converter->convert_pdf_save_redirect();
+	}
+
+	public function tag_handler()
+	{
+		$tag_handler = new TagHandler();
+		$tag_handler->handle_tag_submission();
+		$tag_handler->delete_tag();
 	}
 
 	// Function to create tables
@@ -285,7 +295,7 @@ class MicroCrm
 				quote_id INT,
 				tagname_id INT,
 				FOREIGN KEY (quote_id) REFERENCES $quote_table(id) ON DELETE CASCADE ON UPDATE CASCADE,
-				FOREIGN KEY (quote_id) REFERENCES $tagname_table(id) ON DELETE CASCADE ON UPDATE CASCADE
+				FOREIGN KEY (tagname_id) REFERENCES $tagname_table(id) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			// Function dbDelta is in the file upgrade.php

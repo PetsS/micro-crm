@@ -123,18 +123,28 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                         <td class="<?php echo $sort_by === 'total_persons' ? 'table-light' : ''; ?>"><?php echo $total_persons; ?></td>
                         <td class="<?php echo $sort_by === 'payment_id' ? 'table-light' : ''; ?>"><?php echo getPaymentById($quote->payment_id)->category; ?></td>
                         <td class="<?php echo $sort_by === 'total_ttc' ? 'table-light' : ''; ?>"><?php echo $number_currency->format($total_ttc); ?></td>
-                        <?php foreach (getTagByQuoteId($quote->id) as $tag) : ?>
-                            <td>
-                                <span><?php echo $tag->name ?></span>
-                                <!-- <span class="badge rounded-pill bg-primary">Primary</span>
-                                <span class="badge rounded-pill bg-secondary">Secondary</span>
-                                <span class="badge rounded-pill bg-success">Success</span>
-                                <span class="badge rounded-pill bg-danger">Danger</span>
-                                <span class="badge rounded-pill bg-warning text-dark">Warning</span>
-                                <span class="badge rounded-pill bg-info text-dark">Info</span>
-                                <span class="badge rounded-pill bg-dark">Dark</span> -->
-                            </td>
-                        <?php endforeach; ?>
+                        <td>
+
+                            <?php foreach (getTagByQuoteId($quote->id) as $tag) : ?>
+                                <?php
+                                $tag_handler = new TagHandler();
+                                $add_tag_bg = $tag_handler->add_tag_class_bg($tag->tagname_id);
+                                ?>
+
+                                <!-- A mini form to handle tag display and deletion -->
+                                <form class="delete-tag-form" method="post">
+                                    <span class="<?php echo $add_tag_bg; ?>">
+                                        <?php echo getTagnameById($tag->tagname_id)->category; ?>
+                                        <button type="submit" name="delete-btn-tag" value="<?php echo $tag->id; ?>">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </span>
+                                    <!-- Hidden input field to pass the tag_id to the form handling-->
+                                    <input type="hidden" name="tag_id" value="<?php echo $tag->id; ?>">
+                                </form>
+
+                            <?php endforeach; ?>
+                        </td>
                     </tr>
                     <tr class="additional-row">
                         <td colspan="11">
@@ -168,14 +178,16 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
                                         </div>
                                         <!-- Select and add a Tag -->
                                         <div class="col-4">
-                                            <form action="" class="input-group">
+                                            <form class="input-group" action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" method="post">
                                                 <select class="form-select" id="tagselect" name="tagselect">
                                                     <option value="default">Ajouter des balises</option>
-                                                    <?php foreach (getTagnameList() as $tagname) : ?>
+                                                    <?php foreach (getAvailableTagnameList($quote->id) as $tagname) : ?>
                                                         <option value="<?php echo $tagname->id ?>"><?php echo $tagname->category ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
-                                                <button class="btn btn-primary" type="submit">OK</button>
+                                                <!-- Hidden input field to store the quote_id -->
+                                                <input type="hidden" name="quote_id" value="<?php echo $quote->id; ?>">
+                                                <button class="btn btn-primary" type="submit" name="submit-btn-tag">OK</button>
                                             </form>
                                         </div>
                                     </div>
