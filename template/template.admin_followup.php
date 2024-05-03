@@ -23,38 +23,6 @@ function getSortClass($sort_by, $column_name, $sort_order)
     return '';
 }
 
-// Choose the appropriate function based on the sorting column
-if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
-    $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date);
-} else {
-    // Run the SQL method to retrieve all quote data with search query
-    $quote_data_unsorted = getQuoteDataList($search_query);
-
-    // Create a temporary array to store the sorted data
-    $temporary_quote_data = $quote_data_unsorted;
-
-    // Get the calculated data
-    foreach ($temporary_quote_data as $quote) {
-        $person_data = getPersonByQuoteId($quote->id);
-        $quote_calculator = new QuoteCalculator();
-        $results = $quote_calculator->calculateResults($quote, $person_data);
-        $quote->total_persons = $results['total_persons'];
-        $quote->total_ttc = $results['total_ttc'];
-    }
-
-    // Define a custom sorting function based on the total_persons or total_ttc property using temporaty array
-    usort($temporary_quote_data, function ($a, $b) use ($sort_order, $sort_by) {
-        if ($sort_order === 'asc') {
-            return $a->$sort_by - $b->$sort_by;
-        } else {
-            return $b->$sort_by - $a->$sort_by;
-        }
-    });
-
-    // assign th temporary and now sorted data to the quote_data
-    $quote_data = $temporary_quote_data;
-}
-
 // Create number formatter instance for currency and decimal formats
 $number_currency = new NumberFormatter("fr_FR", NumberFormatter::CURRENCY);
 $number_decimal = new NumberFormatter("fr_FR", NumberFormatter::DECIMAL);
@@ -63,7 +31,7 @@ $number_decimal = new NumberFormatter("fr_FR", NumberFormatter::DECIMAL);
 $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 
 
-if (isset($_POST['search_query'])) {
+if (isset($_POST['btn-search'])) {
     // Get the search query from the form submission
     $search_query = isset($_POST['search_query']) ? $_POST['search_query'] : '';
 
@@ -71,25 +39,48 @@ if (isset($_POST['search_query'])) {
     $start_date = isset($_POST['start_date']) ? $_POST['start_date'] : '';
     $end_date = isset($_POST['end_date']) ? $_POST['end_date'] : '';
 
-    // Call the function to get quote data with the search query and date range
-    if (!empty($search_query) || (!empty($start_date) && !empty($end_date))) {
-        $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date);
-    } else {
-        // If search query and date range are empty or invalid, return all quote data
-        $quote_data = getQuoteDataList('', $sort_by, $sort_order, '', '');
-    }
-    var_dump($quote_data);
+    $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date);
 }
 
 if (isset($_POST['btn-reset'])) {
     esc_url(remove_query_arg(array('sort_by', 'sort_order', 'search_query', 'start_date', 'end_date')));
+    $sort_by = 'creation_date';
+    $sort_order = 'desc';
     $search_query = '';
     $start_date = '';
     $end_date = '';
     $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date);
 }
 
+// Choose the appropriate function based on the sorting column
+if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
+    // If sorting by other columns, directly call getQuoteDataList with search query and date range
+    $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date);
+} else {
+    // Get query from database by default parameters which will be overwritten by custom function
+    $quote_data_unsorted = getQuoteDataList($search_query, 'creation_date', 'desc', $start_date, $end_date);
 
+    foreach ($quote_data_unsorted as $quote) {
+        $person_data = getPersonByQuoteId($quote->id);
+        $quote_calculator = new QuoteCalculator();
+        $results = $quote_calculator->calculateResults($quote, $person_data);
+        $quote->total_persons = $results['total_persons'];
+        $quote->total_ttc = $results['total_ttc'];
+    }
+
+    // Define a custom sorting function based on the total_persons or total_ttc property using temporaty array
+    usort($quote_data_unsorted, function ($a, $b) use ($sort_order, $sort_by) {
+        if ($sort_order === 'asc') {
+            return $a->$sort_by - $b->$sort_by;
+        } else {
+            return $b->$sort_by - $a->$sort_by;
+        }
+    });
+
+    // assign th temporary and now sorted data to the quote_data
+    $quote_data = $quote_data_unsorted;
+
+}
 
 ?>
 <div class="container mt-5">
@@ -105,7 +96,7 @@ if (isset($_POST['btn-reset'])) {
                 <input type="date" name="end_date" class="form-control" placeholder="Date de fin" value="<?php echo $end_date ? $end_date : ''; ?>">
             </div>
             <div class="col">
-                <button type="submit" class="btn btn-primary">Recherche</button>
+                <button type="submit" name="btn-search" class="btn btn-primary">Recherche</button>
                 <button type="submit" name="btn-reset" class="btn btn-secondary">Réinitialiser</button>
             </div>
         </div>

@@ -22,7 +22,7 @@ function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_
         $search_conditions = array();
         $columns = array('email_quot', 'lastname_quot', 'firstname_quot', 'companyName', 'address', 'phone_quot', 'visitetype_id', 'datetimeVisit', 'payment_id', 'comment', 'number_quote');
         foreach ($columns as $column) {
-            $search_conditions[] = "$column LIKE '%$search_query%'";
+            $search_conditions[] = "$column LIKE '%{$search_query}%'";
         }
         $where_conditions[] = "(" . implode(" OR ", $search_conditions) . ")";
     }
@@ -31,6 +31,7 @@ function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_
     if (!empty($start_date)) {
         $start_date_formatted = date("Y-m-d", strtotime($start_date));
         $where_conditions[] = "creation_date >= STR_TO_DATE('$start_date_formatted', '%Y-%m-%d')";
+
     }
 
     // End date condition
@@ -52,6 +53,7 @@ function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_
 
     // Return the results
     return $results ? $results : [];
+
 }
 
 
