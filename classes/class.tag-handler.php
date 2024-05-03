@@ -18,9 +18,6 @@ class TagHandler
             // Insert the tag into the database
             insertTagData($quote_id, $tagname_id);
 
-            // Redirect back to the same page
-            wp_safe_redirect(wp_get_referer());
-            exit;
         }
     }
 
@@ -83,9 +80,6 @@ class TagHandler
                 deleteTagDataById($tag_id);
             }
 
-            // Redirect back to the same page
-            wp_safe_redirect(wp_get_referer());
-            exit;
         }
 
     }

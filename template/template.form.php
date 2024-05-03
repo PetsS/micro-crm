@@ -189,9 +189,11 @@
                     Avantages d'un groupe de 15 personnes ou plus :<br>
                     (les enfants de moins de 3 ans ne comptent pas)
                 <ul>
-                    <li>1 accompagnement gratuit.</li>
-                    <li>chaque dixième personne est gratuite.</li>
-                    <li>réduction / personne.</li>
+                    <li>15 entrées payantes = 1 accompagnant offert</li>
+                    <li>25 entrées payantes = 2 accompagnants offerts</li>
+                    <li>35 entrées payantes = 3 accompagnants offerts</li>
+                    <li>etc...</li>
+                    <li>Réduction sur le prix d'entrée par personne.</li>
                     </p>
                 </ul>
             </div>

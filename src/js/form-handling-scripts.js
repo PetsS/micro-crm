@@ -9,8 +9,10 @@ var pageElement = document.getElementById("scroll_here");
 
 // Using window.onload event to ensure the entire page is loaded
 window.onload = function () {
-  // Call scrollToTop function after the page is fully loaded
-  scrollToTop(pageElement);
+  if (pageElement) {
+    // Call scrollToTop function after the page is fully loaded
+    scrollToTop(pageElement);
+  }
 };
 
 // Using DOMContentLoaded event to ensure DOM is fully loaded while executing the scripts
@@ -271,7 +273,6 @@ function showDisplayInfo() {
       if (selectedAge !== "1" && selectedAge < "5") {
         totalNbPersons += parseInt(nbPersonsInput.value) || 0; // if the selected category is true, it sets the total of nbPersons to 0
       }
-
     });
 
     // Check if the total number of persons is greater than 14 and there have been changes
@@ -289,8 +290,8 @@ function showDisplayInfo() {
         infoPersons.classList.remove("hidden");
         infoPersons.style.animationName = "fadeIn";
       }
-      
-      if (totalNbPersons === 0 ) {
+
+      if (totalNbPersons === 0) {
         infoPersons.classList.add("hidden");
         infoPersons.style.animationName = "fadeOut";
       }
@@ -318,4 +319,3 @@ function showDisplayInfo() {
     }
   });
 }
-
