@@ -29,6 +29,21 @@ function getTagByQuoteId($quote_id)
     return $wpdb->get_results($sql);
 }
 
+// This function retrieves the IDs of tags based on a search query provided by the user.
+function getTagIdsBySearchQuery($tag_search_query)
+{
+    global $wpdb;
+    $tagname_table = $wpdb->prefix . 'tagname';
+
+    $sql = $wpdb->prepare("
+        SELECT id FROM $tagname_table WHERE category LIKE %s
+    ", '%' . $wpdb->esc_like($tag_search_query) . '%');
+
+    $tagname_ids = $wpdb->get_col($sql);
+
+    return $tagname_ids;
+}
+
 function insertTagData($quote_id, $tagname_id)
 {
     global $wpdb;

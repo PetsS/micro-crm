@@ -6,7 +6,7 @@
  */
 
 // Method to get all quotation data from the database with optional search query
-function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_order = 'desc', $start_date = '', $end_date = '')
+function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_order = 'desc', $start_date = '', $end_date = '', $tag_search_query = '')
 {
     global $wpdb;
     $quote_table = $wpdb->prefix . 'quote';
@@ -40,6 +40,23 @@ function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_
         $where_conditions[] = "creation_date <= DATE_ADD(STR_TO_DATE('$end_date_formatted', '%Y-%m-%d'), INTERVAL 1 DAY)";
     }
 
+    // Tag search condition
+    if (!empty($tag_search_query)) {
+        // Get tag IDs based on the tag search query
+        $tag_ids = getTagIdsBySearchQuery($tag_search_query);
+        $tag_table = $wpdb->prefix . 'tag';
+
+        // If tag IDs are found, filter quotes based on these tag IDs
+        if (!empty($tag_ids)) {
+            // Construct WHERE conditions for tag IDs
+            $tag_conditions = array();
+            foreach ($tag_ids as $tag_id) {
+                $tag_conditions[] = "id IN (SELECT quote_id FROM $tag_table WHERE tagname_id = $tag_id)";
+            }
+            $where_conditions[] = "(" . implode(" OR ", $tag_conditions) . ")";
+        }
+    }
+
     // Combine all WHERE conditions
     if (!empty($where_conditions)) {
         $sql .= " WHERE " . implode(" AND ", $where_conditions);
@@ -55,27 +72,6 @@ function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_
     return $results ? $results : [];
 
 }
-
-
-
-// Method to get all quotation data from the database sorted by the specified column
-// function getQuoteDataListSortedByColumn($sort_by, $sort_order)
-// {
-//     global $wpdb;
-//     $quote_table = $wpdb->prefix . 'quote';
-
-//     // Retrieve all rows from the quote table sorted by the specified column and order
-//     $sql = $wpdb->get_results("SELECT * FROM $quote_table ORDER BY $sort_by $sort_order");
-
-//     // Check if there was an error in the retrieval operation
-//     if (!$sql) {
-//         // Retrieval failed
-//         return false;
-//     } else {
-//         // Retrieval successful
-//         return $sql;
-//     }
-// }
 
 // Method to get quotation data by quote_id from the database
 function getQuoteDataById($quote_id)
