@@ -92,6 +92,21 @@ function getQuoteDataById($quote_id)
     }
 }
 
+function getLastQuoteId()
+{
+    global $wpdb;
+    $quote_table = $wpdb->prefix . 'quote';
+
+    // Get the last inserted quote ID
+    $last_inserted_id = $wpdb->get_var("SELECT MAX(id) FROM $quote_table");
+
+    // If there are no existing quotes, set the ID to 1
+    $new_id = $last_inserted_id ? $last_inserted_id + 1 : 1;
+
+    return $new_id;
+}
+
+
 // Method to insert all quotation data to the database and return the ID of the inserted row
 function insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype_id, $datetimeVisit, $payment_id, $comment)
 {

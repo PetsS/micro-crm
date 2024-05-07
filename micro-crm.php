@@ -53,7 +53,10 @@ class MicroCrm
 		register_deactivation_hook(__FILE__, array($this, 'drop_tables'));
 
 		// hook action for PDF conversion
-		add_action('init', array($this, 'document_conversion'));
+		// add_action('init', array($this, 'document_conversion'));
+
+		// hook initial action for PDF download
+		add_action('init', array($this, 'document_download'));
 
 		// hook action for handling tag requests
 		add_action('init', array($this, 'tag_handler'));
@@ -149,14 +152,21 @@ class MicroCrm
 
 	public function form_submission()
 	{
-		$form_handler = new FormHandler();
+		$form_handler = new FormHandler;
 		$form_handler->handle_form_submission();
 	}
 
-	public function document_conversion()
+	// public function document_conversion()
+	// {
+	// 	$document_converter = new DocumentConverter;
+	// 	// $document_converter->convert_pdf_save_redirect();
+	// 	// $document_converter->convert_html_to_pdf();
+	// }
+
+	public function document_download()
 	{
-		$document_converter = new DocumentConverter;
-		$document_converter->convert_pdf_save_redirect();
+		$document_downloader = new DocumentDownloader;
+		$document_downloader->download_confirmed_PDF();		
 	}
 
 	public function tag_handler()

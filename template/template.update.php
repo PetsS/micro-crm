@@ -6,7 +6,8 @@
 
 <div id="formQuotationUpdate">
 
-    <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>?update=<?php echo $quote_id; ?>" method="post">
+    <!-- <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>?update=<?php echo $quote_id; ?>" method="post"> -->
+    <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>?update=<?php echo "false"; ?>" method="post">
 
         <label for="email_quot_upd">Email:</label>
         <input type="text" id="email_quot_upd" name="email_quot" placeholder="Votre email" value="<?php echo isset($form_data['email_quot']) ? esc_attr(stripslashes($form_data['email_quot'])) : ''; ?>" />

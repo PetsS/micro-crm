@@ -1,18 +1,24 @@
 <?php
 // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
-$form_data_transient = get_transient('form_data_transient');
+
+$quote_id_transient = get_transient('quote_id_transient');
 
 // Retrieve quote ID from transient if available
-if ($form_data_transient && isset($form_data_transient['quote_id'])) {
-    $quote_id = $form_data_transient['quote_id'];
+if ($quote_id_transient && isset($quote_id_transient)) {
+    $quote_id = $quote_id_transient;
     $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover quotation data from database
 }
+
+// var_dump($quote_id);
+// var_dump($quote_data);
+// die();
 
 // Read CSS file content and inline it because PHPMailer does not directly handle external CSS styling for email templates.
 $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/email_style.css');
 
 // include logo from src
 $logo_header = file_get_contents(plugin_dir_url(__FILE__) . '../src/images/logo_email.png');
+
 ?>
 
 <!-- Include inline custom css library -->

@@ -9,7 +9,7 @@ class DocumentDownloader
     // Download Quote in PDF Document by quote ID
     public function download_quote_PDF($quote_id)
     {
-        // Retrieve the PDF content based on the quote ID
+        // Retrieve the PDF content form database based on the quote ID
         $pdfContent = getPdfdocumentByQuoteId($quote_id)->content;
         $pdfFilename = getPdfdocumentByQuoteId($quote_id)->filename;
 
@@ -25,6 +25,22 @@ class DocumentDownloader
         } else {
             // If PDF file doesn't exist, redirect to the same page
             wp_redirect(add_query_arg(array('error' => $quote_id), wp_get_referer()));
+            exit;
+        }
+    }
+
+    public function download_confirmed_PDF() {
+        
+        if (isset($_GET['pdf']) && $_GET['pdf'] === 'true') {
+            
+            // Load transient for quote id
+            $quote_id_transient = get_transient('quote_id_transient');
+
+            if ($quote_id_transient && isset($quote_id_transient)) {
+                $quote_id = $quote_id_transient;
+
+                $this->download_quote_PDF($quote_id);
+            }
             exit;
         }
     }

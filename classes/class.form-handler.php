@@ -8,7 +8,6 @@
 
 class FormHandler
 {
-
     public function handle_form_submission()
     {
         // Define $errors to store error messages
@@ -82,7 +81,7 @@ class FormHandler
                 }
             } else if (isset($_POST['submit-btn-quotation'])) {
 
-                // Sanitize inputs
+                // Sanitize inputs and store them in an array for later use
                 $email_quot = sanitize_email($_POST['email_quot']);
                 $lastname_quot = sanitize_text_field(ucwords($_POST['lastname_quot']));
                 $firstname_quot = sanitize_text_field(ucwords($_POST['firstname_quot']));
@@ -90,8 +89,6 @@ class FormHandler
                 $address = sanitize_text_field($_POST['address']);
                 $phone_quot = sanitize_text_field($_POST['phone_quot']);
                 $visitetype = sanitize_text_field($_POST['visitetype']);
-                $nbPersons = sanitize_text_field($_POST['nbPersons']);
-                $ages = sanitize_text_field($_POST['ages']);
                 $datetimeVisit = sanitize_text_field($_POST['datetimeVisit']);
                 $payment = sanitize_text_field($_POST['payment']);
                 $comment = sanitize_textarea_field($_POST['comment']);
@@ -157,36 +154,40 @@ class FormHandler
                 // If there are no errors, process the form data
                 if (empty($errors)) {
 
-                    // Retrieve the quote_id from the URL parameter for updating
-                    $quote_id = isset($_GET['update']) ? intval($_GET['update']) : 0;
+                    // Retrieve the quote_id from the URL parameter for updating, otherwise get the last quote id from database
+                    // $quote_id = isset($_GET['update']) ? intval($_GET['update']) : 0;
+                    
+                    // call function from quote model if update param is not set
+                    // $quote_id = getLastQuoteId();
 
                     // If the update URL parameter exist and maching with the id, it proceed to the function that updates the database at id
-                    if (isset($_GET['update']) && trim($_GET['update']) === trim($quote_id)) {
-                        // Update quotation data in the database
-                        updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
+                    // if (isset($_GET['update']) && trim($_GET['update']) === trim($quote_id)) {
+                    //     // Update quotation data in the database
+                    //     updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
 
-                        // Call method which updates person data in the database
-                        $this->updatePersons($quote_id);
-                    } else {
-                        // Insert quotation data and capture the ID
-                        $quote_id = insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
+                    //     // Call method which updates person data in the database
+                    //     $this->updatePersons($quote_id);
+                    // }
+                    // else {
+                    //     // Insert quotation data and capture the ID
+                    //     $quote_id = insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
 
-                        // Call method which inserts data into the person table
-                        $this->insertPersons($quote_id);
-                    }
+                    //     // Call method which inserts data into the person table
+                    //     $this->insertPersons($quote_id);
+                    // }
 
                     // set the variable true so it can be used in conditional in the main template file
                     $isSuccess = true;
-
+                    
                     // Store data in the transient
                     $data_to_store = array(
                         'form_data' => $_POST, // store data to display and repopulate update form
                         'form_errors' => $errors, // Store errors in transient
-                        'quote_id' => $quote_id, // store id to pass it as parameter
+                        // 'quote_id' => $quote_id, // store id to pass it as parameter
                         'isSuccess' => $isSuccess // store variable to retreive it on main template page
                     );
-                    set_transient('form_data_transient', $data_to_store, 6000); // Store data for 600 seconds
-
+                    set_transient('form_data_transient', $data_to_store, 3600); // Store data for 3600 seconds (1h)
+                    
                     if (isset($_GET['update'])) {
                         wp_redirect(esc_url(remove_query_arg(array('update', 'form_error'), wp_get_referer())));
                     } else {
@@ -204,9 +205,9 @@ class FormHandler
                     $data_to_store = array(
                         'form_errors' => $errors, // Return errors array and load it into transient
                         'form_data' => $_POST,  // Store all form data for repopulation the form
-                        'quote_id' => $quote_id, // store id to pass it as parameter
+                        // 'quote_id' => $quote_id, // store id to pass it as parameter
                     );
-                    set_transient('form_data_transient', $data_to_store, 6000); // Store data for 600 seconds
+                    set_transient('form_data_transient', $data_to_store, 3600); // Store data for 3600 seconds (1h)
 
                     wp_redirect(add_query_arg(array('form_error' => 'form'), wp_get_referer()));
 
@@ -219,13 +220,59 @@ class FormHandler
         }
     }
 
-    public function insertPersons($quote_id)
+    public function handle_confirmation()
+    {
+
+        // If the confirm URL parameter is true, proceed to database query
+        if (isset($_POST['submit-btn-confirm'])) {
+
+            // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
+            $form_data_transient = get_transient('form_data_transient');
+
+            // Recover $_POST data from transient and load it into a $form_data variable
+            if ($form_data_transient && isset($form_data_transient['form_data'])) {
+                $form_data = $form_data_transient['form_data'];
+            }
+
+            // Sanitize POST inputs recovered from transient $form_data before sending to database
+            $email_quot = sanitize_email($form_data['email_quot']);
+            $lastname_quot = sanitize_text_field(ucwords($form_data['lastname_quot']));
+            $firstname_quot = sanitize_text_field(ucwords($form_data['firstname_quot']));
+            $companyName = sanitize_text_field(stripslashes($form_data['companyName']));
+            $address = sanitize_text_field($form_data['address']);
+            $phone_quot = sanitize_text_field($form_data['phone_quot']);
+            $visitetype = sanitize_text_field($form_data['visitetype']);
+            $datetimeVisit = sanitize_text_field($form_data['datetimeVisit']);
+            $payment = sanitize_text_field($form_data['payment']);
+            $comment = sanitize_textarea_field($form_data['comment']);
+
+            $nbPersons = $form_data['nbPersons'];
+            $ages = $form_data['ages'];
+
+            // Retrieve the quote_id from the URL parameter for updating
+            // $quote_id = isset($_GET['quote_id']) ? intval($_GET['quote_id']) : 0;
+
+            // Insert quotation data and capture the ID
+            $quote_id = insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
+
+            // Write quote id data in the transient again to store the correct data
+            set_transient('quote_id_transient', $quote_id, 3600); // Store data for 3600 seconds (1h)
+
+            // Call method which inserts data into the person table
+            $this->insertPersons($quote_id, $nbPersons, $ages);
+
+            // Call method confirm
+            $this->confirm($quote_id);
+        }
+    }
+
+    public function insertPersons($quote_id, $nbPersons, $ages)
     {
         if ($quote_id) {
             // Loop through each person
-            foreach ($_POST['nbPersons'] as $index => $nbPerson) {
+            foreach ($nbPersons as $index => $nbPerson) {
                 // Get age ID from selected age category
-                $age_id = $_POST['ages'][$index];
+                $age_id = $ages[$index];
                 // Insert person data and add its id(s) into the array
                 insertPersonData($quote_id, $age_id, $nbPerson);
             }
@@ -280,25 +327,39 @@ class FormHandler
 
     public function confirm($quote_id)
     {
-        // run query method to get the lates data by id
-        $quote_data = getQuoteDataById($quote_id);
+        // If the confirm URL parameter is true, proceed to database query
+        // if (isset($_GET['confirm']) && $_GET['confirm'] === 'true') {
+        //     // Insert quotation data and capture the ID
+        //     $this->quote_id = insertQuoteData($this->email_quot, $this->lastname_quot, $this->firstname_quot, $this->companyName, $this->address, $this->phone_quot, $this->visitetype, $this->datetimeVisit, $this->payment, $this->comment);
+
+        //     var_dump($this->email_quot);
+        //     die();
+
+        //     // Call method which inserts data into the person table
+        //     $this->insertPersons($this->quote_id);
+        // }
+
+        // run query method to get the latest data by id
+        // $quote_data = getQuoteDataById($quote_id);
 
         // Get the path to the folder
         $saveFolderPath = plugin_dir_path(__FILE__) . '../src/save/';
         // Get a list of PDF files
         $pdfFiles = glob($saveFolderPath . '*.pdf');
 
+        $documentConverter = new DocumentConverter; // Instantiate converter class
+
         // determine pdf file name
-        $actualPdfFileName = 'devis_microzoo_' . $quote_data->number_quote . '.pdf';
+        // $actualPdfFileName = 'devis_microzoo_' . $quote_data->number_quote . '.pdf';
+        $actualPdfFileName = $documentConverter->generatePdfFileName();
 
         // Check if the save folder is empty or if the actual file name does not exist in the folder
         if (empty($pdfFiles) || !in_array($actualPdfFileName, $pdfFiles)) {
-            $documentConverter = new DocumentConverter; // Instantiate converter class
             $documentConverter->convert_html_to_pdf(); // Call the converting method to create PDF file
         }
 
         $mailSender = new MailSender(); // instantiate mailer class
-        $mailSender->send_email_quote($quote_data); // call the quote mailer method passing the quote id to send email
+        $mailSender->send_email_quote($quote_id, $actualPdfFileName); // call the quote mailer method passing the quote id and file name to send email
 
         // Redirect back to the same page with a success message
         wp_redirect(esc_url(add_query_arg('confirm', 'true', wp_get_referer())));
@@ -306,21 +367,11 @@ class FormHandler
         $this->eraseMemory();
 
         exit;
-
-    }
-
-    public function deleteData($quote_id)
-    {
-        // Call model queries to dele data from tables
-        deleteQuoteData($quote_id);
-        deletePersonDataByQuoteId($quote_id);
-
-        $this->eraseMemory();
     }
 
     public function eraseMemory()
     {
-        // Delete transient
+        // Delete form data transient
         delete_transient('form_data_transient');
     }
 }

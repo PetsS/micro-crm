@@ -11,8 +11,13 @@ use PHPMailer\PHPMailer\SMTP;
 class MailSender
 {
 
-    public function send_email_quote($quote_data)
+    public function send_email_quote($quote_id, $pdfFileName)
     {
+        // run query method to get the latest data by id
+        $quote_data = getQuoteDataById($quote_id);
+
+        
+
         try {
             // Instantiate PHPMailer
             $mail = new PHPMailer();
@@ -46,7 +51,7 @@ class MailSender
             $mail->addReplyTo('mz@example.com', 'Information');
 
             // Attachments
-            $pdfFileName = 'devis_microzoo_' . $quote_data->number_quote . '.pdf'; // Custom PDF file name
+            // $pdfFileName = 'devis_microzoo_' . $quote_data->number_quote . '.pdf'; // Custom PDF file name
             $pdfFilePath = plugin_dir_path(__FILE__) . '../src/save/' . $pdfFileName; // Full path to the PDF file
             if (file_exists($pdfFilePath)) {
                 $mail->addAttachment($pdfFilePath, $pdfFileName); // Add attachment
@@ -58,6 +63,9 @@ class MailSender
             $mail->isHTML(true);
             $client = (!empty($quote_data->companyName) ? (strtoupper($quote_data->companyName)) : ($quote_data->firstname_quot . ' ' . strtoupper($quote_data->lastname_quot)));
             $mail->Subject = 'MicroZoo devis pour ' . $client;
+
+            // var_dump($quote_id);
+            // die();
 
             ob_start(); // Start output buffering
             // Email body from a separate html file

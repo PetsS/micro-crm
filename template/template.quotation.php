@@ -24,18 +24,25 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 
 // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
 $form_data_transient = get_transient('form_data_transient');
+$quote_id_transient = get_transient('quote_id_transient');
+
+// Populate form fields with transient data if available
+if ($form_data_transient && isset($form_data_transient['form_data'])) {
+    $form_data = $form_data_transient['form_data'];
+}
 
 // Retrieve quote ID from transient if available
-if ($form_data_transient && isset($form_data_transient['quote_id'])) {
-    $quote_id = $form_data_transient['quote_id'];
-    $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover a single quotation row from database
-    $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover a single person row from database
+if ($form_data_transient && isset($form_data_transient['form_data'])) {
+    $form_data = $form_data_transient['form_data'];
+    // $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover a single quotation row from database
+    // $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover a single person row from database
 
     // Instantiate the QuoteCalculator class to use calculated results
     $quote_calculator = new QuoteCalculator();
 
     // Calculate results: totals, unit prices, references, quantities, etc
-    $results = $quote_calculator->calculateResults($quote_data, $person_data);
+    // $results = $quote_calculator->calculateResults($quote_data, $person_data);
+    $results = $quote_calculator->calculateResultsFromTransient($form_data);
 
     // Extract results from the returned calculated results
     $total_tva = $results['total_tva'];
@@ -55,7 +62,6 @@ if ($form_data_transient && isset($form_data_transient['quote_id'])) {
     $discount_unit_ht = $results['discount_unit_ht'];
     $discount_amount_ht = $results['discount_amount_ht'];
     $discount_amount_ttc = $results['discount_amount_ttc'];
-
 } else {
     // Display an error message
     wp_die('Error: Quote ID not found in transient.');
@@ -87,8 +93,9 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                 <th><!-- Title -->
                     <div class="quote-title">
                         <span class="span-head-title">DEVIS :
-                            <?php echo (!empty($quote_data->companyName) ?
-                                (strtoupper($quote_data->companyName)) : ($quote_data->firstname_quot . ' ' . strtoupper($quote_data->lastname_quot))); ?>
+                            <?php echo (!empty($form_data['companyName']) ?
+                                (strtoupper($form_data['companyName'])) : ($form_data['firstname_quot'] . ' ' . strtoupper($form_data['lastname_quot'])));
+                            ?>
                         </span>
                     </div>
                 </th>
@@ -116,18 +123,18 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     <!-- Client Information -->
                     <div class="quote-client">
                         <span class="span-head-header">
-                            <?php echo (!empty($quote_data->companyName) ?
-                                (strtoupper($quote_data->companyName)) : ($quote_data->firstname_quot . ' ' . strtoupper($quote_data->lastname_quot)));
+                            <?php echo (!empty($form_data['companyName']) ?
+                                (strtoupper($form_data['companyName'])) : ($form_data['firstname_quot'] . ' ' . strtoupper($form_data['lastname_quot'])));
                             ?>
                         </span><br>
-                        <?php if (!empty($quote_data->companyName)) : ?>
-                            <span><?php echo $quote_data->firstname_quot ?> <?php echo strtoupper($quote_data->lastname_quot) ?></span><br>
+                        <?php if (!empty($form_data['companyName'])) : ?>
+                            <span><?php echo $form_data['firstname_quot'] ?> <?php echo strtoupper($form_data['lastname_quot']) ?></span><br>
                         <?php endif; ?>
-                        <span><?php echo $quote_data->address ?></span><br>
+                        <span><?php echo $form_data['address'] ?></span><br>
                         <!-- <span>Adresse : 123 Rue du Client</span><br>
                         <span>Code Postal, Ville</span><br> -->
-                        <span>Tel : <?php echo $quote_data->phone_quot ?></span><br>
-                        <span>Email : <?php echo $quote_data->email_quot ?></span><br>
+                        <span>Tel : <?php echo $form_data['phone_quot'] ?></span><br>
+                        <span>Email : <?php echo $form_data['email_quot'] ?></span><br>
                     </div>
                 </td>
             </tr>
@@ -137,7 +144,8 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
 
         <!-- Details -->
         <div class="quote-ID">
-            <span class="span-details-quote-id">DEVIS N° <?php echo $quote_data->number_quote; ?></span><br>
+            <!-- Generate quote number with function in the quote model -->
+            <span class="span-details-quote-id">DEVIS N° <?php echo generateQuoteNumber(); ?></span><br> 
             <span><?php echo $formatted_date ?></span>
         </div>
         <div class="quote-details">
@@ -155,28 +163,28 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($person_data as $index => $person) : ?>
+                    <?php for ($i = 0; $i < count($form_data['nbPersons']); $i++) : ?>
                         <?php
-                        $age_data = getAgeById($person->age_id); // get one row of age data in the current quote
+                        $age_data = getAgeById($form_data['ages'][$i]); // get one row of age data in the current quote
                         ?>
                         <!-- details -->
                         <tr class="tr-details">
                             <td class="cell-10"><?php echo $ref; ?></td>
                             <td class="cell-30"><?php echo $age_data->category; ?></td>
-                            <td class="cell-10"><?php echo $number_decimal->format($person->nbPersons); ?></td>
-                            <td class="cell-10"><?php echo $number_currency->format($unit_ht[$index]); ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format($form_data['nbPersons'][$i]); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($unit_ht[$i]); ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format(0); ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format(TVA); ?> %</td>
-                            <td class="cell-10"><?php echo $number_currency->format($amount_ht[$index]); ?></td>
-                            <td class="cell-10"><?php echo $number_currency->format($amount_ttc[$index]); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($amount_ht[$i]); ?></td>
+                            <td class="cell-10"><?php echo $number_currency->format($amount_ttc[$i]); ?></td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php endfor; ?>
 
                     <!-- Add guided option if exists -->
-                    <?php if ($quote_data->visitetype_id === "2") : ?>
+                    <?php if ($form_data['visitetype'] === "2") : ?>
                         <?php
                         // run a query in the database to get the guided category row
-                        $visitetype_guided = getVisiteTypeById($quote_data->visitetype_id);
+                        $visitetype_guided = getVisiteTypeById($form_data['visitetype']);
                         ?>
                         <tr class="tr-details">
                             <td class="cell-10"><?php echo $visitetype_guided->ref; ?></td>

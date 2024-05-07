@@ -1,18 +1,19 @@
 <?php
 
 // Instatniate class
-$formHandler = new FormHandler();
+$formHandler = new FormHandler;
+$formHandler->handle_confirmation(); // Call function to execute confirmed mini form submission
 
 // Check if the confirmation action has been made
-$isConfirmed = isset($_GET['confirm']) && $_GET['confirm'] === 'true';
+// $isConfirmed = isset($_GET['confirm']) && $_GET['confirm'] === 'true';
 
 // If the confirmation is made, call the method to handle data process
-if ($isConfirmed) {
-    // Call confirm function using the retrieved quote ID
-    if (!empty($quote_id)) {
-        $formHandler->confirm($quote_id);
-    }
-}
+// if ($isConfirmed) {
+//     // Call confirm function using the retrieved quote ID
+//     if (!empty($quote_id)) {
+//         $formHandler->confirm($quote_id);
+//     }
+// }
 
 ?>
 
@@ -25,6 +26,9 @@ if ($isConfirmed) {
             <br>
             <p>Votre devis a été envoyé par e-mail avec succès</p>
             <br>
+
+            <!-- download PDF -->
+            <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error', 'confirm'), add_query_arg('pdf', 'true', wp_get_referer()))); ?>" target="_blank" class="btn btn-success">Télécharger PDF</a>
 
             <!-- navigate back to the home-page, remove all URL params -->
             <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error', 'confirm'), wp_get_referer())); ?>" class="btn btn-primary">OK</a>

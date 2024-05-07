@@ -13,6 +13,7 @@ window.onload = function () {
     // Call scrollToTop function after the page is fully loaded
     scrollToTop(pageElement);
   }
+  scrollToTop(pageElement); // call again to ensure it is loaded
 };
 
 // Using DOMContentLoaded event to ensure DOM is fully loaded while executing the scripts
@@ -30,6 +31,12 @@ document.addEventListener("DOMContentLoaded", function () {
   restoreElements();
   showVisitetypeOptions();
   showDisplayInfo();
+
+  // Call scrollToTop function again in DOMContentLoaded event
+  if (pageElement) {
+    // Call scrollToTop function after the DOM is fully loaded
+    scrollToTop(pageElement);
+  }
 });
 
 /**

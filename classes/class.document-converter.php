@@ -40,60 +40,61 @@ class DocumentConverter
 {
     // Define a class properties
     private $quote_data;
+    private $form_data;
     private $pdfFileName;
+    private $quote_id;
 
     public function __construct()
     {
         // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
         $form_data_transient = get_transient('form_data_transient');
+        $quote_id_transient = get_transient('quote_id_transient');
+
+        // Populate form fields with transient data if available
+        if ($form_data_transient && isset($form_data_transient['form_data'])) {
+            $this->form_data = $form_data_transient['form_data'];
+            $this->pdfFileName = $this->generatePdfFileName();
+        }
 
         // Retrieve quote ID from transient if available
-        if ($form_data_transient && isset($form_data_transient['quote_id'])) {
-            $quote_id = $form_data_transient['quote_id'];
-            $quote_data = getQuoteDataById($quote_id); // Retrieve quote data by ID
-            // Verify that quote data is valid
-            if ($quote_data) {
-                // Set properties
-                $this->quote_data = $quote_data;
-                $this->pdfFileName = 'devis_microzoo_' . $quote_data->number_quote . '.pdf';
-            }
+        if ($quote_id_transient && isset($quote_id_transient)) {
+            $this->quote_id = $quote_id_transient;
         }
+
+        // Retreive one row of quote data from database
+        $this->quote_data = getQuoteDataById($this->quote_id);
+
+        // Retrieve quote ID from transient if available
+        // if ($form_data_transient && isset($form_data_transient['quote_id'])) {
+        //     $quote_id = $form_data_transient['quote_id'];
+        //     $quote_data = getQuoteDataById($quote_id);
+        //     // Verify that quote data is valid
+        //     if ($quote_id) {
+        //         // Generate dynamic PDF file name
+        //         $this->pdfFileName = $this->generatePdfFileName($quote_data);
+        //     }
+        // }
+
     }
 
     // convert html to pdf using TCPDF
     public function convert_html_to_pdf()
     {
-
+        $quote_id = $this->quote_id;
         $quote_data = $this->quote_data;
         $pdfFileName = $this->pdfFileName;
 
         // Create a new PDF document
         $pdf = new CustomTCPDF('P', 'mm', 'A4', true, 'UTF-8', false, false);
 
+        
+
         // Set document information
         $pdf->SetCreator('MicroZoo');
         $pdf->SetAuthor('MicroZoo');
-        $pdf->SetTitle('Devis : ' . $quote_data->companyName);
-        $pdf->SetSubject($quote_data->number_quote);
+        $pdf->SetTitle('Devis : ' . (!empty($quote_data->companyName) ? ($quote_data->companyName) : ($quote_data->firstname_quot . '_' . $quote_data->lastname_quot)));
+        $pdf->SetSubject($quote_data->number_quote); // generate the quote number by calling function from quote model
         $pdf->SetKeywords('Devis, MicroZoo');
-
-        // Logo path
-        // $logoPath = plugin_dir_path(__FILE__) . '../src/images/logo.png';
-
-        // Set custom header content
-        // $pdf->SetHeaderData(
-        //     $logoPath, // Logo image path
-        //     30, // Logo width
-        //     'MicroZoo', // Title (left side)
-        //     'Saint Malo' // Title (right side)
-        // );
-
-        // Set header and footer fonts
-        // $pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        // $pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-
-        // Set default monospaced font
-        // $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
         // Set margins
         $pdf->SetMargins(10, 10, 10);
@@ -103,33 +104,20 @@ class DocumentConverter
         // Set auto page breaks
         $pdf->SetAutoPageBreak(TRUE, 30);
 
-        // Set image scale factor
-        // $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-
         // Add a page
         $pdf->AddPage();
 
-        // Set font
-        // $pdf->SetFont('helvetica', '', 10);
-
-        // Set cell paddings (top, right, bottom, left)
-        // $pdf->setCellPaddings(0, 0, 0, 0); // Adjust the bottom padding (5mm) to set the margin between paragraphs
-        
         ob_start();
         // Read HTML content from the template file
         include(plugin_dir_path(__FILE__) . '../template/template.quotation.php');
         $html = ob_get_clean(); // Get the contents of the output buffer and clean it
-        
 
         // Convert HTML to PDF
         $pdf->writeHTML($html, true, false, true, false, '');
-        
-        // Save the PDF to the desired path with a custom name
-        $pdfFileName = 'devis_microzoo_' . $quote_data->number_quote . '.pdf'; // Custom PDF file name
-        
+
         // Path to save the PDF
         $pdfPath = plugin_dir_path(__FILE__) . '../src/save/' . $pdfFileName;
-        
+
         // Empty the save folder before saving the PDF
         $this->deletePdfFilesInSaveFolder();
 
@@ -140,29 +128,29 @@ class DocumentConverter
         file_put_contents($pdfPath, $content);
 
         // Save the PDF content to the database
-        insertPdfdocumentData($this->quote_data->id, $pdfFileName, $content);
+        insertPdfdocumentData($quote_id, $pdfFileName, $content); // call insert function in model
 
     }
 
-    public function convert_pdf_save_redirect()
-    {
-        $pdfFileName = $this->pdfFileName;
+    // public function convert_pdf_save_redirect()
+    // {
+    //     $pdfFileName = $this->pdfFileName;
 
-        if (isset($_GET['pdf']) && $_GET['pdf'] === 'true') {
+    //     if (isset($_GET['pdf']) && $_GET['pdf'] === 'true') {
 
-            $this->convert_html_to_pdf();
+    //         $this->convert_html_to_pdf();
 
-            // Redirect the user to a new page where the PDF is displayed in a new tab
-            $pdfUrl = plugin_dir_url(__FILE__) . '../src/save/' . $pdfFileName; // Get the URL of the PDF file
+    //         // Redirect the user to a new page where the PDF is displayed in a new tab
+    //         $pdfUrl = plugin_dir_url(__FILE__) . '../src/save/' . $pdfFileName; // Get the URL of the PDF file
 
-            // Redirection
-            wp_redirect(esc_url($pdfUrl));
-            exit;
-        }
-    }
+    //         // Redirection
+    //         wp_redirect(esc_url($pdfUrl));
+    //         exit;
+    //     }
+    // }
 
     // Function to empty the save folder
-    private function deletePdfFilesInSaveFolder()
+    public function deletePdfFilesInSaveFolder()
     {
         $saveFolderPath = plugin_dir_path(__FILE__) . '../src/save/';
         $files = glob($saveFolderPath . '*.pdf'); // Get all PDF files in the folder
@@ -174,5 +162,60 @@ class DocumentConverter
             }
         }
     }
+
+    // Generate dynamic PDF file name
+    public function generatePdfFileName()
+    {
+        // $quote_data = getQuoteDataById($quote_id); // Retrieve quote data by ID
+
+        // Get creation date in the format: YEAR_MONTH_DAY
+        $date = date('Y_m_d');
+
+        // If company name exists, use it in the file name, otherwise use last name and first name
+        $customer_name = !empty($this->form_data['companyName']) ? ($this->form_data['companyName']) : ($this->form_data['firstname_quot'] . '_' . $this->form_data['lastname_quot']);
+
+        // Instantiate the QuoteCalculator class to use calculated results
+        $quote_calculator = new QuoteCalculator();
+
+        // Call function in calculator class
+        $results = $quote_calculator->calculateResultsFromTransient($this->form_data);
+
+        // Extract results from the returned calculated results
+        $total_ttc = $results['total_ttc'];
+
+        // Construct the file name
+        $pdfFileName = $date . '_' . strtoupper($customer_name) . '_DEVIS_' . $total_ttc . '_EUROS_TTC' . '.pdf';
+
+        return $pdfFileName;
+    }
+
+    // Generate dynamic PDF file name
+    // public function generatePdfFileName($quote_data)
+    // {
+    //     // $quote_data = getQuoteDataById($quote_id); // Retrieve quote data by ID
+
+    //     // Get creation date in the format: YEAR_MONTH_DAY
+    //     $date = date('Y_m_d', strtotime($quote_data->creation_date));
+
+    //     // If company name exists, use it in the file name, otherwise use last name and first name
+    //     $customer_name = !empty($quote_data->companyName) ? ($quote_data->companyName) : ($quote_data->firstname_quot . '_' . $quote_data->lastname_quot);
+
+    //     // Load SQL method into variable to recover person data for the current quote
+    //     $person_data = getPersonByQuoteId($quote_data->id);
+
+    //     // Instantiate the QuoteCalculator class to use calculated results
+    //     $quote_calculator = new QuoteCalculator();
+
+    //     // Call function in calculator class
+    //     $results = $quote_calculator->calculateResults($quote_data, $person_data);
+
+    //     // Extract results from the returned calculated results
+    //     $total_ttc = $results['total_ttc'];
+
+    //     // Construct the file name
+    //     $pdfFileName = $date . '_' . strtoupper($customer_name) . '_DEVIS_' . $total_ttc . '_EUROS_TTC' . '.pdf';
+
+    //     return $pdfFileName;
+    // }
 
 }

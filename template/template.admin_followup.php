@@ -162,6 +162,7 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                     $discount_amount_ht = $results['discount_amount_ht'];
                     $discount_amount_ttc = $results['discount_amount_ttc'];
 
+                    // Function to download PDF document
                     if (isset($_GET['pdf_quote']) && ($_GET['pdf_quote']) === ($quote->id)) {
 
                         $documentDownloader = new DocumentDownloader();
