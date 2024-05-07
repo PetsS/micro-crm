@@ -6,13 +6,16 @@
  */
 
 // Method to get all quotation data from the database with optional search query
-function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_order = 'desc', $start_date = '', $end_date = '', $tag_search_query = '')
+function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_order = 'desc', $start_date = '', $end_date = '', $tag_search_query = '', $rows_per_page = 10, $page_number = 1) // Define default values directly to the passing parameters
 {
     global $wpdb;
     $quote_table = $wpdb->prefix . 'quote';
 
     // Construct the SQL query
     $sql = "SELECT * FROM $quote_table";
+
+    // Calculate the offset based on the page number and rows per page
+    $offset = ($page_number - 1) * $rows_per_page; // offset is used to specify the number of rows to skip before starting to return rows from the query result set
 
     // Append the WHERE clause if any of the filters are provided
     $where_conditions = array();
@@ -65,10 +68,33 @@ function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_
     // Append sorting criteria
     $sql .= " ORDER BY $sort_by $sort_order";
 
+    // Add LIMIT for row number per page
+    $sql .= " LIMIT $rows_per_page"; // LIMIT specifies the maximum number of rows to return.
+
+    // Add OFFSET clause for pagination
+    $sql .= " OFFSET $offset"; // OFFSET determines where to start retrieving rows from the result set. It skips a certain number of rows before beginning to return rows.
+
     // Retrieve data from the database
     $results = $wpdb->get_results($sql);
 
-    // Return the results
+    // Return the results, or empty array
+    return $results ? $results : [];
+
+}
+
+// Method to get all quotation data from the database
+function getAllQuoteDataList()
+{
+    global $wpdb;
+    $quote_table = $wpdb->prefix . 'quote';
+
+    // Construct the SQL query
+    $sql = "SELECT * FROM $quote_table";
+
+    // Retrieve data from the database
+    $results = $wpdb->get_results($sql);
+
+    // Return the results, or empty array
     return $results ? $results : [];
 
 }
