@@ -190,7 +190,7 @@ class DocumentConverter
     }
 
     // Generate dynamic PDF file name
-    // public function generatePdfFileName($quote_data)
+    // public function generatePdfFileNameById($quote_id)
     // {
     //     // $quote_data = getQuoteDataById($quote_id); // Retrieve quote data by ID
 
@@ -201,7 +201,7 @@ class DocumentConverter
     //     $customer_name = !empty($quote_data->companyName) ? ($quote_data->companyName) : ($quote_data->firstname_quot . '_' . $quote_data->lastname_quot);
 
     //     // Load SQL method into variable to recover person data for the current quote
-    //     $person_data = getPersonByQuoteId($quote_data->id);
+    //     $person_data = getPersonByQuoteId($quote_id);
 
     //     // Instantiate the QuoteCalculator class to use calculated results
     //     $quote_calculator = new QuoteCalculator();

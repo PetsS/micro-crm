@@ -228,7 +228,7 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                     </tr>
                     <tr class="additional-row">
                         <td colspan="11">
-                            
+
                             <!-- button menu in the details part -->
                             <div class="container">
                                 <div class="row justify-content-start">
@@ -255,6 +255,13 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                                                 <i class="bi bi-file-earmark-pdf"></i> Télécharger Devis
                                             </a>
                                         <?php endif; ?>
+                                    </div>
+                                    <!-- Modify Quotation -->
+                                    <div class="pb-2 col-md-auto">
+                                        <!-- <a href="modify_pdf.php?quote_id=<?php echo $quote->id; ?>" class="btn btn-outline-warning"> -->
+                                        <a href="admin.php?page=micro-crm-modify-quote-page&quote_id=<?php echo $quote->id; ?>" class="btn btn-outline-warning">
+                                            <i class="bi bi-file-earmark-pdf"></i> Modifier Devis
+                                        </a>
                                     </div>
                                     <!-- Select and add a Tag -->
                                     <div class="pb-2 col-md-auto">

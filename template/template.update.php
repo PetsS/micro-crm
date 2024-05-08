@@ -2,11 +2,8 @@
 
 <h2>Mettre à jour</h2>
 
-<!-- <div id="scrollHereIfErrorsInUpdate"></div> -->
-
 <div id="formQuotationUpdate">
 
-    <!-- <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>?update=<?php echo $quote_id; ?>" method="post"> -->
     <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>?update=<?php echo "false"; ?>" method="post">
 
         <label for="email_quot_upd">Email:</label>

@@ -26,6 +26,16 @@ class AdminMenu
 
         // Add a sub-menu page
         add_submenu_page(
+            null, // Parent menu slug
+            'Sub Page', // Page title
+            'Sub Page', // Menu title
+            'manage_options', // Capability required to access the page
+            'micro-crm-modify-quote-page', // Menu slug
+            array($this, 'modify_quote_page') // Callback function to display the page
+        );
+
+        // Add a sub-menu page
+        add_submenu_page(
             'micro-crm-admin', // Parent menu slug
             'Sub Page', // Page title
             'Sub Page', // Menu title
@@ -43,7 +53,14 @@ class AdminMenu
         include_once(plugin_dir_path(__FILE__) . '../template/template.admin_followup.php');
     }
 
-    // Callback function to display Database Commands page
+    // Callback function for modify quote page
+    public function modify_quote_page()
+    {
+        // Include the template file
+        include_once(plugin_dir_path(__FILE__) . '../template/template.modify_quotation.php');
+    }
+
+    // Callback function to display sub-menu page
     public function micro_crm_sub_page()
     {
         echo "<p>Sub page to be displayed...</p>";

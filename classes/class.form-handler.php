@@ -154,31 +154,12 @@ class FormHandler
                 // If there are no errors, process the form data
                 if (empty($errors)) {
 
-                    // Retrieve the quote_id from the URL parameter for updating, otherwise get the last quote id from database
-                    // $quote_id = isset($_GET['update']) ? intval($_GET['update']) : 0;
-                    
-                    // call function from quote model if update param is not set
-                    // $quote_id = getLastQuoteId();
+                    // Retrieve the quote_id from the URL parameter for updating/modifying
+                    $quote_id = isset($_GET['update']) ? intval($_GET['update']) : 0;
 
-                    // If the update URL parameter exist and maching with the id, it proceed to the function that updates the database at id
-                    // if (isset($_GET['update']) && trim($_GET['update']) === trim($quote_id)) {
-                    //     // Update quotation data in the database
-                    //     updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
-
-                    //     // Call method which updates person data in the database
-                    //     $this->updatePersons($quote_id);
-                    // }
-                    // else {
-                    //     // Insert quotation data and capture the ID
-                    //     $quote_id = insertQuoteData($email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
-
-                    //     // Call method which inserts data into the person table
-                    //     $this->insertPersons($quote_id);
-                    // }
-
-                    // set the variable true so it can be used in conditional in the main template file
+                    // Set the variable true so it can be used in conditional in the main template file
                     $isSuccess = true;
-                    
+
                     // Store data in the transient
                     $data_to_store = array(
                         'form_data' => $_POST, // store data to display and repopulate update form
@@ -187,9 +168,21 @@ class FormHandler
                         'isSuccess' => $isSuccess // store variable to retreive it on main template page
                     );
                     set_transient('form_data_transient', $data_to_store, 3600); // Store data for 3600 seconds (1h)
-                    
-                    if (isset($_GET['update'])) {
+
+                    // If Update has been submitted from the form, redirect back to the confirm page
+                    if (isset($_GET['update']) && $_GET['update'] === 'true') {
                         wp_redirect(esc_url(remove_query_arg(array('update', 'form_error'), wp_get_referer())));
+                    } else if (isset($_GET['update']) && trim($_GET['update']) === trim($quote_id)) { // If the update URL parameter exist and maching with the id, it proceed to the function that updates the corresponding data in db
+
+                        // Update quotation data in the database
+                        updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot, $companyName, $address, $phone_quot, $visitetype, $datetimeVisit, $payment, $comment);
+
+                        // Call method which updates person data in the database
+                        $this->updatePersons($quote_id);
+
+                        // call function in class to proceed update
+                        $this->handle_update($quote_id);
+
                     } else {
                         // Redirect to referer page, clear all URL parameters
                         wp_redirect(esc_url(remove_query_arg('form_error', wp_get_referer())));
@@ -199,7 +192,7 @@ class FormHandler
                 } else {
 
                     // Retrieve the quote_id from the URL parameter for updating
-                    $quote_id = isset($_GET['update']) ? intval($_GET['update']) : 0;
+                    // $quote_id = isset($_GET['update']) ? intval($_GET['update']) : 0;
 
                     // Store errors and form data in the transient
                     $data_to_store = array(
@@ -277,6 +270,30 @@ class FormHandler
                 insertPersonData($quote_id, $age_id, $nbPerson);
             }
         }
+    }
+
+    public function handle_update($quote_id)
+    {
+
+        // Get the path to the save folder
+        $saveFolderPath = plugin_dir_path(__FILE__) . '../src/save/';
+        // Get a list of PDF files in folder
+        $pdfFiles = glob($saveFolderPath . '*.pdf');
+
+        $documentConverter = new DocumentConverter; // Instantiate converter class
+
+        // determine pdf file name
+        // $actualPdfFileName = $documentConverter->generatePdfFileName();
+
+        // Check if the save folder is empty or if the actual file name does not exist in the folder
+        // if (empty($pdfFiles) || !in_array($actualPdfFileName, $pdfFiles)) {
+        //     $documentConverter->convert_html_to_pdf($quote_id); // Call the converting method to create PDF file
+        // }
+
+        // Redirect back to the admin page in back office
+        wp_redirect(esc_url(remove_query_arg(array('update', 'quote_id'), "admin.php?page=micro-crm-admin")));
+
+        exit;
     }
 
     public function updatePersons($quote_id)
