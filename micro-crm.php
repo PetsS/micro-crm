@@ -318,6 +318,7 @@ class MicroCrm
             CREATE TABLE IF NOT EXISTS $pdfdocument_table (
                 id INT AUTO_INCREMENT PRIMARY KEY,
 				quote_id INT,
+				document_number VARCHAR (255),
 				filename VARCHAR (255),
                 content MEDIUMBLOB,
 				FOREIGN KEY (quote_id) REFERENCES $quote_table(id) ON DELETE CASCADE ON UPDATE CASCADE

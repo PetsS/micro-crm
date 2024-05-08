@@ -10,7 +10,7 @@
             <h1>Révisez votre devis!</h1>
 
             <!-- Insert the QUOTATION HTML file here -->
-            <?php include_once(plugin_dir_path(__FILE__) . 'template.quotation.php'); ?>
+            <?php // include_once(plugin_dir_path(__FILE__) . 'template.quotation.php'); ?>
 
             <br>
             <p>Que voulez-vous faire ensuite?</p>

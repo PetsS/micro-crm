@@ -22,20 +22,36 @@ $number_decimal = new NumberFormatter("fr_FR", NumberFormatter::DECIMAL);
 // Define the number of decimal places
 $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 
+// Retrieve quote ID from URL parameter
+// $quote_id = isset($_GET['quote_id']) ? intval($_GET['quote_id']) : 0;
+
+$quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover a single quotation row from database
+// $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover a single person row from database
+
+// var_dump($quote_id == 0 ? generateQuoteNumber() : $quote_data->number_quote);
+// die();
+
 // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
 $form_data_transient = get_transient('form_data_transient');
-$quote_id_transient = get_transient('quote_id_transient');
 
-// Populate form fields with transient data if available
+// Populate document with transient data if available
 if ($form_data_transient && isset($form_data_transient['form_data'])) {
     $form_data = $form_data_transient['form_data'];
-}
 
-// Retrieve quote ID from transient if available
-if ($form_data_transient && isset($form_data_transient['form_data'])) {
-    $form_data = $form_data_transient['form_data'];
-    // $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover a single quotation row from database
-    // $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover a single person row from database
+    // Sanitize POST inputs recovered from transient $form_data before sending to database
+    $email_quot = sanitize_email($form_data['email_quot']);
+    $lastname_quot = sanitize_text_field(ucwords($form_data['lastname_quot']));
+    $firstname_quot = sanitize_text_field(ucwords($form_data['firstname_quot']));
+    $companyName = sanitize_text_field(stripslashes($form_data['companyName']));
+    $address = sanitize_text_field($form_data['address']);
+    $phone_quot = sanitize_text_field($form_data['phone_quot']);
+    $visitetype = sanitize_text_field($form_data['visitetype']);
+    $datetimeVisit = sanitize_text_field($form_data['datetimeVisit']);
+    $payment = sanitize_text_field($form_data['payment']);
+    $comment = sanitize_textarea_field($form_data['comment']);
+
+    $nbPersons = $form_data['nbPersons'];
+    $ages = $form_data['ages'];
 
     // Instantiate the QuoteCalculator class to use calculated results
     $quote_calculator = new QuoteCalculator();
@@ -93,8 +109,8 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                 <th><!-- Title -->
                     <div class="quote-title">
                         <span class="span-head-title">DEVIS :
-                            <?php echo (!empty($form_data['companyName']) ?
-                                (strtoupper($form_data['companyName'])) : ($form_data['firstname_quot'] . ' ' . strtoupper($form_data['lastname_quot'])));
+                            <?php echo (!empty($companyName) ?
+                                (strtoupper($companyName)) : ($firstname_quot . ' ' . strtoupper($lastname_quot)));
                             ?>
                         </span>
                     </div>
@@ -123,18 +139,18 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     <!-- Client Information -->
                     <div class="quote-client">
                         <span class="span-head-header">
-                            <?php echo (!empty($form_data['companyName']) ?
-                                (strtoupper($form_data['companyName'])) : ($form_data['firstname_quot'] . ' ' . strtoupper($form_data['lastname_quot'])));
+                            <?php echo (!empty($companyName)) ?
+                                (strtoupper($companyName)) : ($firstname_quot . ' ' . strtoupper($lastname_quot));
                             ?>
                         </span><br>
-                        <?php if (!empty($form_data['companyName'])) : ?>
-                            <span><?php echo $form_data['firstname_quot'] ?> <?php echo strtoupper($form_data['lastname_quot']) ?></span><br>
+                        <?php if (!empty($companyName)) : ?>
+                            <span><?php echo $firstname_quot ?> <?php echo strtoupper($lastname_quot) ?></span><br>
                         <?php endif; ?>
-                        <span><?php echo $form_data['address'] ?></span><br>
+                        <span><?php echo $address ?></span><br>
                         <!-- <span>Adresse : 123 Rue du Client</span><br>
                         <span>Code Postal, Ville</span><br> -->
-                        <span>Tel : <?php echo $form_data['phone_quot'] ?></span><br>
-                        <span>Email : <?php echo $form_data['email_quot'] ?></span><br>
+                        <span>Tel : <?php echo $phone_quot ?></span><br>
+                        <span>Email : <?php echo $email_quot ?></span><br>
                     </div>
                 </td>
             </tr>
@@ -145,7 +161,8 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
         <!-- Details -->
         <div class="quote-ID">
             <!-- Generate quote number with function in the quote model -->
-            <span class="span-details-quote-id">DEVIS N° <?php echo generateQuoteNumber(); ?></span><br> 
+            <!-- <span class="span-details-quote-id">DEVIS N° <?php echo generateQuoteNumber(); ?></span><br> -->
+            <span class="span-details-quote-id">DEVIS N° <?php echo $quote_data->number_quote; ?></span><br>
             <span><?php echo $formatted_date ?></span>
         </div>
         <div class="quote-details">
@@ -163,15 +180,15 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     </tr>
                 </thead>
                 <tbody>
-                    <?php for ($i = 0; $i < count($form_data['nbPersons']); $i++) : ?>
+                    <?php for ($i = 0; $i < count($nbPersons); $i++) : ?>
                         <?php
-                        $age_data = getAgeById($form_data['ages'][$i]); // get one row of age data in the current quote
+                        $age_data = getAgeById($ages[$i]); // get one row of age data in the current quote
                         ?>
                         <!-- details -->
                         <tr class="tr-details">
                             <td class="cell-10"><?php echo $ref; ?></td>
                             <td class="cell-30"><?php echo $age_data->category; ?></td>
-                            <td class="cell-10"><?php echo $number_decimal->format($form_data['nbPersons'][$i]); ?></td>
+                            <td class="cell-10"><?php echo $number_decimal->format($nbPersons[$i]); ?></td>
                             <td class="cell-10"><?php echo $number_currency->format($unit_ht[$i]); ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format(0); ?></td>
                             <td class="cell-10"><?php echo $number_decimal->format(TVA); ?> %</td>
@@ -181,10 +198,10 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
                     <?php endfor; ?>
 
                     <!-- Add guided option if exists -->
-                    <?php if ($form_data['visitetype'] === "2") : ?>
+                    <?php if ($visitetype === "2") : ?>
                         <?php
                         // run a query in the database to get the guided category row
-                        $visitetype_guided = getVisiteTypeById($form_data['visitetype']);
+                        $visitetype_guided = getVisiteTypeById($visitetype);
                         ?>
                         <tr class="tr-details">
                             <td class="cell-10"><?php echo $visitetype_guided->ref; ?></td>

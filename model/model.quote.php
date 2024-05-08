@@ -34,7 +34,6 @@ function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_
     if (!empty($start_date)) {
         $start_date_formatted = date("Y-m-d", strtotime($start_date));
         $where_conditions[] = "creation_date >= STR_TO_DATE('$start_date_formatted', '%Y-%m-%d')";
-
     }
 
     // End date condition
@@ -79,7 +78,6 @@ function getQuoteDataList($search_query = '', $sort_by = 'creation_date', $sort_
 
     // Return the results, or empty array
     return $results ? $results : [];
-
 }
 
 // Method to get all quotation data from the database
@@ -96,7 +94,6 @@ function getAllQuoteDataList()
 
     // Return the results, or empty array
     return $results ? $results : [];
-
 }
 
 // Method to get quotation data by quote_id from the database
@@ -197,6 +194,12 @@ function updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot
     // Format datetimeVisit into the MySQL datetime format
     $formattedDateTimeVisit = date('Y-m-d H:i:s', strtotime($datetimeVisit));
 
+    // Generate a dynamic formatted number
+    $new_number_quote = updateQuoteNumber($quote_id);
+
+    // Get today's date
+    $today_date = date('Y-m-d H:m:s');
+
     // Update quotation data in the database
     $result = $wpdb->update(
         $quote_table, // What table
@@ -211,6 +214,8 @@ function updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot
             'datetimeVisit' => $formattedDateTimeVisit,
             'payment_id' => $payment_id,
             'comment' => $comment,
+            'number_quote' => $new_number_quote,
+            'creation_date' => $today_date
         ),
         array('id' => $quote_id), // Array defining the WHERE clause to identify which rows to update.
         array(
@@ -223,6 +228,8 @@ function updateQuoteData($quote_id, $email_quot, $lastname_quot, $firstname_quot
             '%d',
             '%s',
             '%d',
+            '%s',
+            '%s',
             '%s'
         ),
         array('%d') // Array defining the format of the data in the WHERE clause.
@@ -279,8 +286,8 @@ function generateQuoteNumber()
             FROM $quote_table 
             WHERE SUBSTRING_INDEX(number_quote, '-', 4) = %s 
             ORDER BY number_quote 
-            DESC LIMIT 1"
-            , "D-$current_year-$current_month-$current_day"
+            DESC LIMIT 1",
+            "D-$current_year-$current_month-$current_day"
         )
     ); // This condition checks if the first 4 parts of the number_quote string (ex. D-24-04-26), separated by -, are equal to the current year and month and day
 
@@ -299,4 +306,39 @@ function generateQuoteNumber()
     }
 
     return $number_quote;
+}
+
+function updateQuoteNumber($quote_id)
+{
+    // Get the corresponding quote
+    $quote_data = getQuoteDataById($quote_id);
+
+    // Get the quote number what needs to be updated
+    $last_number_quote = $quote_data->number_quote;
+
+    // Define an array of alphabetic characters
+    $alphabets = range('A', 'Z');
+
+    // Check if the last character of the quote number is an alphabetic character
+    $last_char = substr($last_number_quote, -1);
+
+    if (ctype_alpha($last_char)) { // If it's an alphabetic character, calculate the next alphabetic character
+        // Get the index of the last alphabetic character in the quote number
+        // substr() extracts the last character of a string.
+        // ord() returns the ASCII value of a string.
+        $last_alphabetic_index = ord(substr($last_number_quote, -1)) - ord('A');
+
+        // Calculate the index of the next alphabetic character
+        $next_alphabetic_index = ($last_alphabetic_index + 1) % count($alphabets);
+
+        // Generate the new alphabetic character
+        $new_alphabetic_char = $alphabets[$next_alphabetic_index];
+
+        // Replace the last character of the quote number with the new alphabetic character
+        $new_number_quote = substr($last_number_quote, 0, -1) . $new_alphabetic_char;
+    } else { // if it isn't an alphabetic char, add the first to it
+        $new_number_quote = $last_number_quote .  '-' . $alphabets[0];
+    }
+
+    return $new_number_quote;
 }

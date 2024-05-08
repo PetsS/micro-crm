@@ -29,13 +29,8 @@ if ($form_data_transient && isset($form_data_transient['isSuccess'])) {
 // Retrieve quote ID from transient if available
 // if ($quote_id_transient && isset($quote_id_transient)) {
 //     $quote_id = $quote_id_transient;
-//     $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover database data in quotation
-//     $isUpdated = isset($_GET['update']) && trim($_GET['update']) === trim($quote_id);
-// } else {
-//     $isUpdated = false;
-//     $isSuccess = false;
-//     $isConfirmed = false;
-//     $isCanceled = false;
+    // $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover database data in quotation
+    // $isUpdated = isset($_GET['update']) && trim($_GET['update']) === trim($quote_id);
 // }
 
 $isUpdated = isset($_GET['update']) && $_GET['update'] === 'true'; // If the confirm URL parameter is set and true, it shows the confirmed template.

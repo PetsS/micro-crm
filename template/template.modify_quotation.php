@@ -1,4 +1,15 @@
 <?php
+// Retrieve data from wordpress transient which is used to store data for a limited time to pass it
+$form_data_transient = get_transient('form_data_transient');
+// $quote_id_transient = get_transient('quote_id_transient');
+
+// Retrieve errors stored in transient and add it to $form_errors variable
+if (isset($_GET['form_error']) && $_GET['form_error'] === 'form') {
+    if ($form_data_transient && isset($form_data_transient['form_errors'])) {
+        $form_errors = $form_data_transient['form_errors'];
+    }
+}
+
 // Create a date formatter instance with locale to French for proper month names
 $formatter = new IntlDateFormatter(
     'fr_FR',
@@ -22,10 +33,8 @@ $number_decimal = new NumberFormatter("fr_FR", NumberFormatter::DECIMAL);
 // Define the number of decimal places
 $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 
-
 // Retrieve quote ID from URL parameter
 $quote_id = isset($_GET['quote_id']) ? intval($_GET['quote_id']) : 0;
-
 
 $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover a single quotation row from database
 $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover a single person row from database
@@ -56,12 +65,14 @@ $discount_amount_ht = $results['discount_amount_ht'];
 $discount_amount_ttc = $results['discount_amount_ttc'];
 
 // Read CSS file content and inline it because PHPMailer does not directly handle external CSS styling for email templates.
-$css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_style.css');
+$css_content_pdf = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_style.css');
+$css_content_general = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/style.css');
 ?>
 
 <!-- TCPDF only support inline CSS styles -->
 <style>
-    <?php echo $css_content; ?>
+    <?php echo $css_content_pdf; ?>
+    <?php echo $css_content_general; ?>
 </style>
 
 
@@ -372,7 +383,7 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
         <input type="hidden" name="form_nonce" value="<?php echo wp_create_nonce('form_submit'); ?>">
         <?php wp_nonce_field('form_submit', 'form_nonce'); ?>
 
-        <a href="<?php echo esc_url(remove_query_arg(array('update', 'quote_id'), wp_get_referer())); ?>" class="btn btn-danger">Annuler</a>
+        <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error', 'quote_id'), "admin.php?page=micro-crm-admin")); ?>" class="btn btn-danger">Annuler</a>
         <button type="submit" name="submit-btn-quotation">Modifier</button>
     </form>
 </div>

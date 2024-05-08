@@ -17,6 +17,19 @@ function getPdfdocumentList()
     return $wpdb->get_results($sql);
 }
 
+// Function to get all the rows where quote id is defined
+function getPdfdocumentListByQuoteId($quote_id)
+{
+    global $wpdb;
+    $pdfdocument_table = $wpdb->prefix . 'pdfdocument';
+
+    $sql = $wpdb->prepare("
+        SELECT * FROM $pdfdocument_table WHERE quote_id = %d;
+    ", $quote_id);
+
+    return $wpdb->get_results($sql);
+}
+
 function getPdfdocumentByQuoteId($quote_id)
 {
     global $wpdb;
@@ -29,7 +42,19 @@ function getPdfdocumentByQuoteId($quote_id)
     return $wpdb->get_row($sql);
 }
 
-function insertPdfdocumentData($quote_id, $filename, $content)
+function getPdfdocumentByQuoteIdAndDocNumber($quote_id, $document_number)
+{
+    global $wpdb;
+    $pdfdocument_table = $wpdb->prefix . 'pdfdocument';
+
+    $sql = $wpdb->prepare("
+        SELECT * FROM $pdfdocument_table WHERE quote_id = %d AND document_number = %s;
+    ", $quote_id, $document_number);
+
+    return $wpdb->get_row($sql);
+}
+
+function insertPdfdocumentData($quote_id, $document_number, $filename, $content)
 {
     global $wpdb;
     $pdfdocument_table = $wpdb->prefix . 'pdfdocument';
@@ -38,11 +63,13 @@ function insertPdfdocumentData($quote_id, $filename, $content)
         $pdfdocument_table,
         array(
             'quote_id' => $quote_id,
+            'document_number' => $document_number,
             'filename' => $filename,
             'content' => $content,
         ),
         array(
             '%d', // %d for decimal (integer)
+            '%s',
             '%s',
             '%s',
         )
@@ -60,7 +87,7 @@ function insertPdfdocumentData($quote_id, $filename, $content)
     }
 }
 
-function updatePdfdocumentDataByQuoteId($pdfdocument_id, $quote_id, $filename, $content)
+function updatePdfdocumentDataByQuoteId($pdfdocument_id, $document_number, $quote_id, $filename, $content)
 {
     global $wpdb;
     $pdfdocument_table = $wpdb->prefix . 'pdfdocument';
@@ -69,12 +96,14 @@ function updatePdfdocumentDataByQuoteId($pdfdocument_id, $quote_id, $filename, $
         $pdfdocument_table,
         array(
             'quote_id' => $quote_id,
+            'document_number' => $document_number,
             'filename' => $filename,
             'content' => $content,
         ),
         array('id' => $pdfdocument_id), // Array defining the WHERE clause to identify which rows to update.
         array(
             '%d',
+            '%s',
             '%s',
             '%s',
         ),

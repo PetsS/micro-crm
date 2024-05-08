@@ -168,9 +168,9 @@ class FormHandler
                         'isSuccess' => $isSuccess // store variable to retreive it on main template page
                     );
                     set_transient('form_data_transient', $data_to_store, 3600); // Store data for 3600 seconds (1h)
-
+                    
                     // If Update has been submitted from the form, redirect back to the confirm page
-                    if (isset($_GET['update']) && $_GET['update'] === 'true') {
+                    if (isset($_GET['update']) && $_GET['update'] === 'false') {                        
                         wp_redirect(esc_url(remove_query_arg(array('update', 'form_error'), wp_get_referer())));
                     } else if (isset($_GET['update']) && trim($_GET['update']) === trim($quote_id)) { // If the update URL parameter exist and maching with the id, it proceed to the function that updates the corresponding data in db
 
@@ -283,15 +283,17 @@ class FormHandler
         $documentConverter = new DocumentConverter; // Instantiate converter class
 
         // determine pdf file name
-        // $actualPdfFileName = $documentConverter->generatePdfFileName();
+        $actualPdfFileName = $documentConverter->generatePdfFileName();
 
         // Check if the save folder is empty or if the actual file name does not exist in the folder
-        // if (empty($pdfFiles) || !in_array($actualPdfFileName, $pdfFiles)) {
-        //     $documentConverter->convert_html_to_pdf($quote_id); // Call the converting method to create PDF file
-        // }
+        if (empty($pdfFiles) || !in_array($actualPdfFileName, $pdfFiles)) {
+            $documentConverter->convert_html_to_pdf($quote_id); // Call the converting method to create PDF file
+        }
 
         // Redirect back to the admin page in back office
         wp_redirect(esc_url(remove_query_arg(array('update', 'quote_id'), "admin.php?page=micro-crm-admin")));
+        
+        $this->eraseMemory();
 
         exit;
     }
@@ -372,7 +374,7 @@ class FormHandler
 
         // Check if the save folder is empty or if the actual file name does not exist in the folder
         if (empty($pdfFiles) || !in_array($actualPdfFileName, $pdfFiles)) {
-            $documentConverter->convert_html_to_pdf(); // Call the converting method to create PDF file
+            $documentConverter->convert_html_to_pdf($quote_id); // Call the converting method to create PDF file
         }
 
         $mailSender = new MailSender(); // instantiate mailer class

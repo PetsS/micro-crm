@@ -7,11 +7,15 @@
 class DocumentDownloader
 {
     // Download Quote in PDF Document by quote ID
-    public function download_quote_PDF($quote_id)
+    public function download_quote_PDF($quote_id, $document_number)
     {
         // Retrieve the PDF content form database based on the quote ID
-        $pdfContent = getPdfdocumentByQuoteId($quote_id)->content;
-        $pdfFilename = getPdfdocumentByQuoteId($quote_id)->filename;
+        // $pdfContent = getPdfdocumentByQuoteId($quote_id)->content;
+        // $pdfFilename = getPdfdocumentByQuoteId($quote_id)->filename;
+
+        // Retrieve the PDF content form database based on quote ID and document number
+        $pdfContent = getPdfdocumentByQuoteIdAndDocNumber($quote_id, $document_number)->content;
+        $pdfFilename = getPdfdocumentByQuoteIdAndDocNumber($quote_id, $document_number)->filename;
 
         if ($pdfContent !== null || $pdfFilename !== null) {
 
@@ -29,17 +33,20 @@ class DocumentDownloader
         }
     }
 
-    public function download_confirmed_PDF() {
-        
+    public function download_confirmed_PDF()
+    {
+
         if (isset($_GET['pdf']) && $_GET['pdf'] === 'true') {
-            
+
             // Load transient for quote id
             $quote_id_transient = get_transient('quote_id_transient');
 
             if ($quote_id_transient && isset($quote_id_transient)) {
                 $quote_id = $quote_id_transient;
+                $quote_data = getQuoteDataById($quote_id);
+                $document_number = $quote_data->number_quote;
 
-                $this->download_quote_PDF($quote_id);
+                $this->download_quote_PDF($quote_id, $document_number);
             }
             exit;
         }

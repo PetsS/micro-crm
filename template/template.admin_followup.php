@@ -157,6 +157,7 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                 <?php foreach ($quote_data as $quote) : ?>
                     <?php
                     $person_data = getPersonByQuoteId($quote->id); // Load SQL method into variable to recover person data for the current quote
+                    $pdfdocuments = getPdfdocumentListByQuoteId($quote->id); // get a list of pdf docs with the same quote id
 
                     $quote_calculator = new QuoteCalculator(); // Instantiate the QuoteCalculator class to use calculated results
 
@@ -182,13 +183,30 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                     $discount_amount_ttc = $results['discount_amount_ttc'];
 
                     // Function to download PDF document
-                    if (isset($_GET['pdf_quote']) && ($_GET['pdf_quote']) === ($quote->id)) {
+                    // if (isset($_GET['pdf_quote']) && ($_GET['pdf_quote']) === ($quote->id)) {
 
+                    //     $documentDownloader = new DocumentDownloader();
+
+                    //     // Call download_quote_PDF method to download the PDF
+                    //     $documentDownloader->download_quote_PDF($quote->id, $quote->number_quote);
+                    // }
+
+                    if (isset($_POST['submit-btn-pdfdocument-select'])) {
+
+                        if (isset($_POST['pdfdocument_select'])) {
+                            $document_number = $_POST['pdfdocument_select'];
+                        } else {
+                            $document_number = $quote->number_quote;
+                        }
+
+                        $quote_id = $_POST['quote_id'];
                         $documentDownloader = new DocumentDownloader();
 
                         // Call download_quote_PDF method to download the PDF
-                        $documentDownloader->download_quote_PDF($quote->id);
+                        $documentDownloader->download_quote_PDF($quote_id, $document_number);
                     }
+
+
 
                     ?>
 
@@ -251,9 +269,31 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                                                 <i class="bi bi-x-circle-fill"></i> Devis non accessible
                                             </button>
                                         <?php else : ?>
-                                            <a href="<?php echo esc_url(add_query_arg('pdf_quote', $quote->id ?? null)); ?>" class="btn btn-outline-danger">
-                                                <i class="bi bi-file-earmark-pdf"></i> Télécharger Devis
-                                            </a>
+
+                                            <?php if (count($pdfdocuments) > 1) : ?> <!-- if there are more that 1 row in db with the same quote id -->
+                                                <form class="input-group" action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" method="post">
+
+                                                    <select class="form-select" id="pdfdocument_select" name="pdfdocument_select">
+                                                        <?php foreach ($pdfdocuments as $pdfdocument) : ?>
+                                                            <option value="<?php echo $pdfdocument->document_number ?>" <?php echo $pdfdocument->document_number == $quote->number_quote ? 'selected' : ''; ?>><?php echo $pdfdocument->document_number ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+
+                                                    <input type="hidden" name="quote_id" value="<?php echo $quote->id; ?>">
+                                                    <button class="btn btn-outline-danger" type="submit" name="submit-btn-pdfdocument-select">
+                                                        <i class="bi bi-file-earmark-pdf"></i> Télécharger Devis
+                                                    </button>
+                                                </form>
+                                            <?php else : ?>
+                                                <!-- TODO display button if there is only one PDF -->
+                                                <form action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" method="post">
+                                                    <input type="hidden" name="quote_id" value="<?php echo $quote->id; ?>">
+                                                    <button class="btn btn-outline-danger" type="submit" name="submit-btn-pdfdocument-select">
+                                                        <i class="bi bi-file-earmark-pdf"></i> Télécharger Devis
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+
                                         <?php endif; ?>
                                     </div>
                                     <!-- Modify Quotation -->

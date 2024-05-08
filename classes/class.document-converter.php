@@ -39,16 +39,16 @@ class CustomTCPDF extends TCPDF
 class DocumentConverter
 {
     // Define a class properties
-    private $quote_data;
+    // private $quote_data;
     private $form_data;
     private $pdfFileName;
-    private $quote_id;
+    // private $quote_id;
 
     public function __construct()
     {
         // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
         $form_data_transient = get_transient('form_data_transient');
-        $quote_id_transient = get_transient('quote_id_transient');
+        // $quote_id_transient = get_transient('quote_id_transient');
 
         // Populate form fields with transient data if available
         if ($form_data_transient && isset($form_data_transient['form_data'])) {
@@ -57,12 +57,12 @@ class DocumentConverter
         }
 
         // Retrieve quote ID from transient if available
-        if ($quote_id_transient && isset($quote_id_transient)) {
-            $this->quote_id = $quote_id_transient;
-        }
+        // if ($quote_id_transient && isset($quote_id_transient)) {
+        //     $this->quote_id = $quote_id_transient;
+        // }
 
         // Retreive one row of quote data from database
-        $this->quote_data = getQuoteDataById($this->quote_id);
+        // $this->quote_data = getQuoteDataById($this->quote_id);
 
         // Retrieve quote ID from transient if available
         // if ($form_data_transient && isset($form_data_transient['quote_id'])) {
@@ -78,16 +78,14 @@ class DocumentConverter
     }
 
     // convert html to pdf using TCPDF
-    public function convert_html_to_pdf()
+    public function convert_html_to_pdf($quote_id)
     {
-        $quote_id = $this->quote_id;
-        $quote_data = $this->quote_data;
+        $quote_data = getQuoteDataById($quote_id); // Retrieve quote data by ID
+        $document_number = $quote_data->number_quote; // Retreive the actual quote number
         $pdfFileName = $this->pdfFileName;
 
         // Create a new PDF document
         $pdf = new CustomTCPDF('P', 'mm', 'A4', true, 'UTF-8', false, false);
-
-        
 
         // Set document information
         $pdf->SetCreator('MicroZoo');
@@ -128,7 +126,7 @@ class DocumentConverter
         file_put_contents($pdfPath, $content);
 
         // Save the PDF content to the database
-        insertPdfdocumentData($quote_id, $pdfFileName, $content); // call insert function in model
+        insertPdfdocumentData($quote_id, $document_number, $pdfFileName, $content); // call insert function in model
 
     }
 
