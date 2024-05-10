@@ -103,7 +103,7 @@ $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/pdf_styl
             <tr>
                 <th>
                     <div>
-                        <img class="logo" src="<?php echo plugin_dir_url(__FILE__) . '../src/images/logo.png'; ?>" />
+                        <img class="logo" src="<?php echo plugin_dir_url(__FILE__) . '../src/images/logo_square.png'; ?>" />
                     </div>
                 </th>
                 <th><!-- Title -->

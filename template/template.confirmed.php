@@ -4,35 +4,34 @@
 $formHandler = new FormHandler;
 $formHandler->handle_confirmation(); // Call function to execute confirmed mini form submission
 
-// Check if the confirmation action has been made
-// $isConfirmed = isset($_GET['confirm']) && $_GET['confirm'] === 'true';
-
-// If the confirmation is made, call the method to handle data process
-// if ($isConfirmed) {
-//     // Call confirm function using the retrieved quote ID
-//     if (!empty($quote_id)) {
-//         $formHandler->confirm($quote_id);
-//     }
-// }
-
 ?>
 
 <div id="scroll_here"></div>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>E-mail a été envoyé!</h1>
-            <br>
-            <p>Votre devis a été envoyé par e-mail avec succès</p>
-            <br>
+<div class="container-fluid py-3">
+    <header class="text-center">
+        <div class="d-flex align-items-center justify-content-center">
+            <span class="fs-2 p-3 text-body-emphasis" style="color: white !important;">E-mail a été envoyé!</span>
+        </div>
+    </header>
+    <main>
+        <!-- Message -->
+        <p class="fs-6 text-center mb-3 text-body-emphasis" style="color: white !important;">Vous recevrez un email avec le devis en pdf en pièce jointe. (N'oubliez pas de vérifier le dossier spam)</p>
+    </main>
+
+    <footer class="pt-3">
+        <div class="row justify-content-center d-flex align-items-center">
 
             <!-- download PDF -->
-            <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error', 'confirm'), add_query_arg('pdf', 'true', wp_get_referer()))); ?>" target="_blank" class="btn btn-success">Télécharger PDF</a>
+            <div class="p-2 col-md-auto">
+                <a class="btn btn-success" href="<?php echo esc_url(remove_query_arg(array('update', 'form_error', 'confirm'), add_query_arg('pdf', 'true', wp_get_referer()))); ?>" target="_blank">Télécharger PDF</a>
+            </div>
 
             <!-- navigate back to the home-page, remove all URL params -->
-            <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error', 'confirm'), wp_get_referer())); ?>" class="btn btn-primary">OK</a>
+            <div class="p-2 col-md-auto">
+                <a class="btn btn-warning" href="<?php echo esc_url(remove_query_arg(array('update', 'form_error', 'confirm'), wp_get_referer())); ?>">OK</a>
+            </div>
 
         </div>
-    </div>
+    </footer>
 </div>

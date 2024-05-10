@@ -95,7 +95,9 @@ function handleFormdata() {
 }
 
 function scrollToTop(element) {
-  element.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the tag if found with delay
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the tag if found with delay
+  }
 }
 
 // Function to clone container with persons and ages
@@ -173,10 +175,8 @@ function clonePersons(buttonElement) {
       lastClonedContainer.nextSibling
     );
 
-    // Add dynamic display info for the cloned container
-    // addDynamicDisplayInfo(clonedContainer);
 
-    // // add a delete button the each cloned container
+    // add a delete button the each cloned container
     addDeleteButton(clonedContainer);
   });
 }
@@ -185,14 +185,20 @@ function clonePersons(buttonElement) {
 function addDeleteButton(clonedContainer) {
   var deleteButton = document.createElement("button");
   deleteButton.innerHTML = '<i class="fas fa-minus"></i>';
-  deleteButton.classList.add("btn-delete");
+  deleteButton.classList.add("btn", "btn-danger");
   deleteButton.addEventListener("click", () => {
     // Remove the cloned container when delete button is clicked
     clonedContainer.parentNode.removeChild(clonedContainer);
   });
 
+  // Find the tab element inside the cloned container
+  var tarifGroup = clonedContainer.querySelector("#tarif-group");
+
+  // Insert the delete button inside the tab element
+  tarifGroup.appendChild(deleteButton);
+
   // Append the buttonas a child of the cloned container
-  clonedContainer.appendChild(deleteButton);
+  // clonedContainer.appendChild(deleteButton);
 }
 
 // Function to restore delete buttons for cloned containers and reassign field attributes

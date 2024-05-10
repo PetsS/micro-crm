@@ -96,7 +96,7 @@ class FormHandler
                 // Validate inputs
                 // After sanitizing the input, it checks if the field is not empty and if it's a valid email address.
                 if (!filter_var($email_quot, FILTER_VALIDATE_EMAIL)) {
-                    $errors['email_quot'] = 'Veuillez saisir une adresse e-mail valide (email@example.fr).';
+                    $errors['email_quot'] = 'Veuillez saisir une adresse e-mail valide.';
                 }
                 // Last name validation
                 if (empty($lastname_quot)) {
@@ -346,22 +346,7 @@ class FormHandler
 
     public function confirm($quote_id)
     {
-        // If the confirm URL parameter is true, proceed to database query
-        // if (isset($_GET['confirm']) && $_GET['confirm'] === 'true') {
-        //     // Insert quotation data and capture the ID
-        //     $this->quote_id = insertQuoteData($this->email_quot, $this->lastname_quot, $this->firstname_quot, $this->companyName, $this->address, $this->phone_quot, $this->visitetype, $this->datetimeVisit, $this->payment, $this->comment);
-
-        //     var_dump($this->email_quot);
-        //     die();
-
-        //     // Call method which inserts data into the person table
-        //     $this->insertPersons($this->quote_id);
-        // }
-
-        // run query method to get the latest data by id
-        // $quote_data = getQuoteDataById($quote_id);
-
-        // Get the path to the folder
+                // Get the path to the folder
         $saveFolderPath = plugin_dir_path(__FILE__) . '../src/save/';
         // Get a list of PDF files
         $pdfFiles = glob($saveFolderPath . '*.pdf');

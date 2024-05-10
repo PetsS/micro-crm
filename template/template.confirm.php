@@ -4,29 +4,45 @@
 
 <div id="scroll_here"></div>
 
-<div class="container" style="max-width: 500px;">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>Révisez votre devis!</h1>
+<!-- Insert the QUOTATION review HTML file here -->
+<?php include_once(plugin_dir_path(__FILE__) . 'template.review_quotation.php'); ?>
 
-            <!-- Insert the QUOTATION HTML file here -->
-            <?php // include_once(plugin_dir_path(__FILE__) . 'template.quotation.php'); ?>
-
-            <br>
-            <p>Que voulez-vous faire ensuite?</p>
+<footer class="border-top">
+    <div class="container-fluid">
+        <div class="mt-3 row justify-content-center">
 
             <!-- Cancellation, erase memory and navigate back to the home-page -->
-            <a href="<?php echo esc_url(remove_query_arg(array('update', 'form_error'), add_query_arg('cancel', 'true', wp_get_referer()))); ?>" class="btn btn-danger">Annuler</a>
+            <div class="p-2 col-md-auto">
+                <a class="btn btn-danger" href="<?php echo esc_url(remove_query_arg(array('update', 'form_error'), add_query_arg('cancel', 'true', wp_get_referer()))); ?>">Annuler</a>
+            </div>
 
             <!-- Update the form -->
-            <a href="<?php echo esc_url(add_query_arg('update', 'true', wp_get_referer())); ?>" class="btn btn-success">Corriger le formulaire</a>
+            <div class="p-2 col-md-auto">
+                <a class="btn btn-secondary" href="<?php echo esc_url(add_query_arg('update', 'true', wp_get_referer())); ?>">Corriger le formulaire</a>
+            </div>
 
-            <!-- Confirm quote by submiting miniform -->
-            <form method="post" action="<?php echo esc_url(remove_query_arg(array('update', 'form_error'), add_query_arg('confirm', 'true', wp_get_referer()))); ?>">
-                <!-- <input type="hidden" name="quote_id" value="<?php echo esc_attr($quote_id); ?>"> -->
-                <button type="submit" class="btn btn-success" name="submit-btn-confirm">Confirmer et envoyer E-mail</button>
-            </form>
+            <!-- Confirm quote by submitting mini-form -->
+            <div class="p-2 col-md-auto">
+                <form id="confirmForm" method="post" action="<?php echo esc_url(remove_query_arg(array('update', 'form_error'), add_query_arg('confirm', 'true', wp_get_referer()))); ?>">
+                    <button id="submit-btn-confirm" class="btn btn-success" type="submit" name="submit-btn-confirm">
+                        <span class="spinner-border spinner-border-sm d-none"></span>
+                        Confirmer
+                    </button>
+                </form>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var button = document.getElementById('submit-btn-confirm');
+                        button.addEventListener('click', function() {
+                            var spinner = button.querySelector('.spinner-border');
+                            spinner.classList.remove('d-none'); // Show spinner
+                            button.classList.add('disabled'); // Add disabled class to visually disable the button
+                        });
+                    });
+                </script>
+            </div>
+
+
 
         </div>
     </div>
-</div>
+</footer>

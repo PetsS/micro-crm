@@ -23,6 +23,7 @@ class QuoteCalculator
         $total_paying_persons = 0;
         $total_persons = 0;
         $unit_ht = [];
+        $unit_ttc = [];
         $amount_ht = [];
         $amount_ttc = [];
         $ref = "";
@@ -121,6 +122,7 @@ class QuoteCalculator
             'total_paying_persons' => $total_paying_persons,
             'total_persons' => $total_persons,
             'unit_ht' => $unit_ht,
+            'unit_ttc' => $unit_ttc,
             'amount_ht' => $amount_ht,
             'amount_ttc' => $amount_ttc,
             'ref' => $ref,
@@ -144,6 +146,7 @@ class QuoteCalculator
         $total_paying_persons = 0;
         $total_persons = 0;
         $unit_ht = [];
+        $unit_ttc = [];
         $amount_ht = [];
         $amount_ttc = [];
         $ref = "";
@@ -243,6 +246,7 @@ class QuoteCalculator
             'total_paying_persons' => $total_paying_persons,
             'total_persons' => $total_persons,
             'unit_ht' => $unit_ht,
+            'unit_ttc' => $unit_ttc,
             'amount_ht' => $amount_ht,
             'amount_ttc' => $amount_ttc,
             'ref' => $ref,

@@ -17,7 +17,7 @@ if ($quote_id_transient && isset($quote_id_transient)) {
 $css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/email_style.css');
 
 // include logo from src
-$logo_header = file_get_contents(plugin_dir_url(__FILE__) . '../src/images/logo_email.png');
+$logo_header = file_get_contents(plugin_dir_url(__FILE__) . '../src/images/logo_banner.png');
 
 ?>
 
