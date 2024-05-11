@@ -4,7 +4,8 @@
 
 var buttonDiv = document.getElementById("formButtons");
 var addButton = document.getElementById("btn-add-persons");
-var addButtonUpd = document.getElementById("btn-add-persons-update");
+// var addButtonUpd = document.getElementById("btn-add-persons-update");
+// var addButtonMod = document.getElementById("btn-add-persons-modify");
 var pageElement = document.getElementById("scroll_here");
 
 // Using window.onload event to ensure the entire page is loaded
@@ -25,9 +26,12 @@ document.addEventListener("DOMContentLoaded", function () {
   handleFormdata();
   if (addButton) {
     clonePersons(addButton); // call the function if the button with the id exists
-  } else if (addButtonUpd) {
-    clonePersons(addButtonUpd); // call the function if the button with the id exists in the update form
-  }
+  } 
+  // else if (addButtonUpd) {
+  //   clonePersons(addButtonUpd); // call the function if the button with the id exists in the update form
+  // } else if (addButtonMod) {
+  //   clonePersons(addButtonMod); // call the function if the button with the id exists in the modify quote
+  // }
   restoreElements();
   showVisitetypeOptions();
   showDisplayInfo();
@@ -230,9 +234,6 @@ function restoreElements() {
           }
         }
       });
-
-      // Restore display info
-      // addDynamicDisplayInfo(container);
 
       // Restore delete button
       addDeleteButton(container);

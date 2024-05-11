@@ -93,6 +93,9 @@ class MicroCrm
 
 		// Enqueue js file
 		wp_enqueue_script('admin-pages-scripts', plugin_dir_url(__FILE__) . '/src/js/admin-pages-scripts.js', array(), 1, true);
+
+		// Enqueue another js file
+		wp_enqueue_script('form-handling-scripts-admin', plugin_dir_url(__FILE__) . 'src/js/form-handling-scripts.js', array('jquery'), 1, true);
 		
 		// load Font Awesome cdn
 		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4');
@@ -132,10 +135,10 @@ class MicroCrm
 		wp_enqueue_style('pdf-style', plugin_dir_url(__FILE__) . 'src/css/pdf_style.css', array(), 1, 'all');
 		
 		// load the js file
-		wp_enqueue_script('script', plugin_dir_url(__FILE__) . 'src/js/form-handling-scripts.js', array('jquery'), 1, true);
+		wp_enqueue_script('form-handling-scripts', plugin_dir_url(__FILE__) . 'src/js/form-handling-scripts.js', array('jquery'), 1, true);
 
 		// Localize the script with the AJAX URL
-		wp_localize_script('script', 'ajax_object', array('ajaxurl' => admin_url('admin-ajax.php')));
+		wp_localize_script('form-handling-scripts', 'ajax_object', array('ajaxurl' => admin_url('admin-ajax.php')));
 	}
 
 	// shortcode callback function
