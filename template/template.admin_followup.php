@@ -68,7 +68,7 @@ if (isset($_POST['btn-rows'])) {
     $rows_per_page = isset($_POST['rows_per_page']) ? intval($_POST['rows_per_page']) : 10; // intval() functiopn servs to sanitize the input before use
 
     // Run query to pass the rows per page value to query function
-    $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date, $tag_search_query, $rows_per_page, $page_number);
+    // $quote_data = getQuoteDataList($search_query, $sort_by, $sort_order, $start_date, $end_date, $tag_search_query, $rows_per_page, $page_number);
 
     // Redirect to the modified URL with the updated rows_per_page parameter
     wp_safe_redirect(add_query_arg('rows_per_page', $rows_per_page));
@@ -110,7 +110,7 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
     <form action="" method="post">
         <div class="row justify-content-start">
             <div class="pb-2 col-md-auto">
-                <input type="text" name="search_query" class="form-control" placeholder="Rechercher..." value="<?php echo $search_query ? $search_query : ''; ?>">
+                <input type="text" name="search_query" class="form-control" placeholder="Rechercher par nom..." value="<?php echo $search_query ? $search_query : ''; ?>">
             </div>
             <div class="pb-2 col-md-auto">
                 <input type="date" name="start_date" class="form-control" placeholder="Date de début" value="<?php echo $start_date ? $start_date : ''; ?>">
@@ -206,14 +206,12 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                         $documentDownloader->download_quote_PDF($quote_id, $document_number);
                     }
 
-
-
                     ?>
 
                     <tr class="main-row" onclick="toggleDetails(this)">
                         <td class="<?php echo $sort_by === 'companyName' || $sort_by === 'lastname_quot' ? 'table-light' : ''; ?>"><?php echo ($quote->companyName ? strtoupper($quote->companyName)  :  $quote->firstname_quot . " " . strtoupper($quote->lastname_quot)); ?></td>
                         <td class="fixed-column <?php echo $sort_by === 'creation_date' ? 'table-light' : ''; ?>"><?php echo date('Y-m-d', strtotime($quote->creation_date)); ?></td>
-                        <td class="<?php echo $sort_by === 'number_quote' ? 'table-light' : ''; ?>"><?php echo $quote->number_quote; ?></td>
+                        <td class="<?php echo $sort_by === 'number_quote' ? 'table-light' : ''; ?>" style="<?php echo (count($pdfdocuments) > 1) ? 'color: #DAA520' : ''; ?>"><?php echo $quote->number_quote; ?></td>
                         <td><?php echo "???"; ?></td>
                         <td><?php echo "???"; ?></td>
                         <td class="<?php echo $sort_by === 'datetimeVisit' ? 'table-light' : ''; ?>"><?php echo $quote->datetimeVisit; ?></td>

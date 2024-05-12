@@ -263,7 +263,7 @@
                                 <div id="tarif-group" class="input-group">
                                     <label class="input-group-text" for="ages"><i class="pe-2 bi bi-currency-euro"></i>Tarif</label>
                                     <select class="form-select" id="ages" name="ages[]">
-                                        <option value="default" <?php echo (isset($form_data['ages']) && $form_data['ages'] == 'default') ? ' selected' : ''; ?>>Choisissez...</option>
+                                        <option value="default" <?php echo (isset($form_data['ages']) && $form_data['ages'] == 'default') ? ' selected' : ''; ?>>Choisir...</option>
                                         <?php foreach (getAgeList() as $age) : ?>
                                             <option value="<?php echo $age->id ?>" <?php echo (isset($form_data['ages']) && $form_data['ages'] == $age->id) ? ' selected' : ''; ?>><?php echo $age->category ?></option>
                                         <?php endforeach; ?>
