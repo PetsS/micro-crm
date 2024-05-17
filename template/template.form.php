@@ -89,7 +89,24 @@
                 <!-- It's another layer of security against CSRF attacks. -->
                 <?php wp_nonce_field('form_submit', 'form_nonce'); ?>
 
-                <button class="w-100 btn btn-success btn-lg" type="submit" name="submit-btn-question">Envoyer</button>
+                <div class="p-2 col-md-auto">
+                    <button id="submit-btn-question" class="w-100 btn btn-success btn-lg" type="submit" name="submit-btn-question">
+                        <span class="spinner-border spinner-border-sm d-none"></span>
+                        Envoyer</button>
+                    <script>
+                        // this script adds a spinner while the page is loading after submission
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var button = document.getElementById('submit-btn-question');
+                            if (button) {
+                                button.addEventListener('click', function() {
+                                    var spinner = button.querySelector('.spinner-border');
+                                    spinner.classList.remove('d-none'); // Show spinner
+                                    button.classList.add('disabled'); // Add disabled class to visually disable the button
+                                });
+                            };
+                        });
+                    </script>
+                </div>
 
             </form>
         </div>

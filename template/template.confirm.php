@@ -30,6 +30,7 @@
                     </button>
                 </form>
                 <script>
+                    // this script adds a spinner while the page is loading after submission
                     document.addEventListener('DOMContentLoaded', function() {
                         var button = document.getElementById('submit-btn-confirm');
                         button.addEventListener('click', function() {

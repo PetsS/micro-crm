@@ -29,8 +29,8 @@ if ($form_data_transient && isset($form_data_transient['isSuccess'])) {
 // Retrieve quote ID from transient if available
 // if ($quote_id_transient && isset($quote_id_transient)) {
 //     $quote_id = $quote_id_transient;
-    // $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover database data in quotation
-    // $isUpdated = isset($_GET['update']) && trim($_GET['update']) === trim($quote_id);
+// $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover database data in quotation
+// $isUpdated = isset($_GET['update']) && trim($_GET['update']) === trim($quote_id);
 // }
 
 $isUpdated = isset($_GET['update']) && $_GET['update'] === 'true'; // If the confirm URL parameter is set and true, it shows the confirmed template.
@@ -39,19 +39,25 @@ $isConfirmed = isset($_GET['confirm']) && $_GET['confirm'] === 'true'; // If the
 
 $isCanceled = isset($_GET['cancel']) && $_GET['cancel'] === 'true'; // If the cancel URL parameter is set and true, it shows the canceled template.
 
+$isQuestionSent = isset($_GET['question']) && $_GET['question'] === 'true'; // If the question URL parameter is set and true, it shows the question_sent template.
+
 if (!$isCanceled) {
-    if (!$isConfirmed) {
-        if (!$isUpdated) { // Condition for the if the update action is set
-            if (!$isSuccess) {
-                include_once(plugin_dir_path(__FILE__) . 'template.form.php');
+    if (!$isQuestionSent) {
+        if (!$isConfirmed) {
+            if (!$isUpdated) { // Condition for the if the update action is set
+                if (!$isSuccess) {
+                    include_once(plugin_dir_path(__FILE__) . 'template.form.php');
+                } else {
+                    include_once(plugin_dir_path(__FILE__) . 'template.confirm.php');
+                }
             } else {
-                include_once(plugin_dir_path(__FILE__) . 'template.confirm.php');
+                include_once(plugin_dir_path(__FILE__) . 'template.update.php');
             }
         } else {
-            include_once(plugin_dir_path(__FILE__) . 'template.update.php');
+            include_once(plugin_dir_path(__FILE__) . 'template.confirmed.php');
         }
     } else {
-        include_once(plugin_dir_path(__FILE__) . 'template.confirmed.php');
+        include_once(plugin_dir_path(__FILE__) . 'template.question_sent.php');
     }
 } else {
     include_once(plugin_dir_path(__FILE__) . 'template.canceled.php');

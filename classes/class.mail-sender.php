@@ -142,13 +142,21 @@ class MailSender
             // Set mailer to use SMTP
             $mail->isSMTP();
 
-            // Configure SMTP settings (MailHog or any other SMTP server)
-            $mail->Host = 'localhost';
-            $mail->SMTPAuth = false;
-            $mail->Username = '';
-            $mail->Password = '';
-            $mail->Port = 1025;
+            // Configure SMTP settings (MailHog)
+            // $mail->Host = 'localhost';
+            // $mail->SMTPAuth = false;
+            // $mail->Username = '';
+            // $mail->Password = '';
+            // $mail->Port = 1025;
 
+            // SMTP configuration
+            $mail->Host       = 'smtp.hotmail.com';  // SMTP host
+            $mail->SMTPAuth   = true;                 // Enable SMTP authentication
+            $mail->Username   = SMTP_USERNAME;   // SMTP username from environment variable
+            $mail->Password   = SMTP_PASSWORD;   // SMTP password from environment variable
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
+            $mail->Port       = 587;                  // TCP port to connect to
+            
             // Set noreply email sender
             $mail->setFrom('noreply@microzoo.fr', 'MicroZoo');
 
