@@ -224,7 +224,8 @@ $discount_amount_ttc = $results['discount_amount_ttc'];
 
         <div class="col-md-auto">
 
-            <h2>Mettre à jour DEVIS N° <?php echo $quote_data->number_quote; ?></h2>
+            <h2>Mettre à jour</h2>
+            <h3 class="mb-4 fs-3"> DEVIS N° <?php echo $quote_data->number_quote; ?></h3>
 
             <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>?update=<?php echo $quote_id; ?>" method="post">
 
@@ -320,7 +321,7 @@ $discount_amount_ttc = $results['discount_amount_ttc'];
                     </div>
 
                     <!-- Info displayed for visit type -->
-                    <div id="info-visiteType_mod" class="hidden">
+                    <!-- <div id="info-visiteType_mod" class="hidden">
                         <div class="col-12">
                             <hr class="mb-3">
                             <div class="mx-3 card bg-light">
@@ -334,7 +335,7 @@ $discount_amount_ttc = $results['discount_amount_ttc'];
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Dynamic container -->
                     <?php if (!empty($person_data)) :
@@ -403,7 +404,7 @@ $discount_amount_ttc = $results['discount_amount_ttc'];
                     </button>
 
                     <!-- Info displayed for number of persons -->
-                    <div id="info-persons" class="hidden">
+                    <!-- <div id="info-persons" class="hidden">
                         <div class="col-12">
                             <hr class="mb-3">
                             <div class="mx-3 card bg-light">
@@ -422,10 +423,10 @@ $discount_amount_ttc = $results['discount_amount_ttc'];
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Info displayed for discount -->
-                    <div id="info-persons-discount" class="hidden">
+                    <!-- <div id="info-persons-discount" class="hidden">
                         <div class="col-12">
                             <hr class="mb-3">
                             <div class="mx-3 card bg-light">
@@ -443,7 +444,7 @@ $discount_amount_ttc = $results['discount_amount_ttc'];
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div class="col-12">
                         <label for="comment_mod" class="form-label">Commentaire</label>

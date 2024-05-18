@@ -147,8 +147,8 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                     </th>
                     <th class="fixed-column"><a href="<?php echo getSortURL('creation_date', $sort_order, $search_query, $start_date, $end_date, $tag_search_query); ?>">Date <i class="<?php echo getSortClass('creation_date', $sort_by, $sort_order); ?>"></i></a></th>
                     <th><a href="<?php echo getSortURL('number_quote', $sort_order, $search_query, $start_date, $end_date, $tag_search_query); ?>">No Devis <i class="<?php echo getSortClass('number_quote', $sort_by, $sort_order); ?>"></i></a></th>
-                    <th>No Facture </th>
-                    <th>No Avoir </th>
+                    <!-- <th>No Facture </th>
+                    <th>No Avoir </th> -->
                     <th><a href="<?php echo getSortURL('datetimeVisit', $sort_order, $search_query, $start_date, $end_date, $tag_search_query); ?>">Jour de visite <i class="<?php echo getSortClass('datetimeVisit', $sort_by, $sort_order); ?>"></i></a></th>
                     <th><a href="<?php echo getSortURL('visitetype_id', $sort_order, $search_query, $start_date, $end_date, $tag_search_query); ?>">Type de visite <i class="<?php echo getSortClass('visitetype_id', $sort_by, $sort_order); ?>"></i></a></th>
                     <th><a href="<?php echo getSortURL('total_persons', $sort_order, $search_query, $start_date, $end_date, $tag_search_query); ?>">Nb personnes <i class="<?php echo getSortClass('total_persons', $sort_by, $sort_order); ?>"></i></a></th>
@@ -217,8 +217,8 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                         <td class="<?php echo $sort_by === 'companyName' || $sort_by === 'lastname_quot' ? 'table-light' : ''; ?>"><?php echo ($quote->companyName ? strtoupper($quote->companyName)  :  $quote->firstname_quot . " " . strtoupper($quote->lastname_quot)); ?></td>
                         <td class="fixed-column <?php echo $sort_by === 'creation_date' ? 'table-light' : ''; ?>"><?php echo date('Y-m-d', strtotime($quote->creation_date)); ?></td>
                         <td class="<?php echo $sort_by === 'number_quote' ? 'table-light' : ''; ?>" style="<?php echo (count($pdfdocuments) > 1) ? 'color: #DAA520' : ''; ?>"><?php echo $quote->number_quote; ?></td>
-                        <td><?php echo "???"; ?></td>
-                        <td><?php echo "???"; ?></td>
+                        <!-- <td><?php echo "???"; ?></td>
+                        <td><?php echo "???"; ?></td> -->
                         <td class="<?php echo $sort_by === 'datetimeVisit' ? 'table-light' : ''; ?>"><?php echo $quote->datetimeVisit; ?></td>
                         <td class="<?php echo $sort_by === 'visitetype_id' ? 'table-light' : ''; ?>"><?php echo getVisiteTypeById($quote->visitetype_id)->name; ?></td>
                         <td class="<?php echo $sort_by === 'total_persons' ? 'table-light' : ''; ?>"><?php echo $total_persons; ?></td>
