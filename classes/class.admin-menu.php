@@ -15,18 +15,28 @@ class AdminMenu
     {
         // Add a top-level menu page
         add_menu_page(
-            'Micro CRM Suivi', // Page title
-            'Micro CRM Suivi', // Menu title
+            'Micro CRM', // Page title
+            'Micro CRM', // Menu title
             'manage_options', // Capability required to access the page
             'micro-crm-admin', // Menu slug
             array($this, 'micro_crm_followup_page'), // Callback function to display the page
-            'dashicons-admin-generic', // Menu icon
+            'dashicons-buddicons-replies', // Menu icon
             25 // Menu position
         );
 
         // Add a sub-menu page
         add_submenu_page(
-            null, // Parent menu slug, if null, there will be no menu item
+            null, // Parent menu slug; if null, it doesnt diplay in the side menu
+            'Sub Page', // Page title
+            'Sub Page', // Menu title
+            'manage_options', // Capability required to access the page
+            'micro-crm-modify-quote-page', // Menu slug
+            array($this, 'modify_quote_page') // Callback function to display the page
+        );
+
+        // Add a sub-menu page
+        add_submenu_page(
+            null, // Parent menu slug
             'Sub Page', // Page title
             'Sub Page', // Menu title
             'manage_options', // Capability required to access the page
@@ -43,11 +53,18 @@ class AdminMenu
         include_once(plugin_dir_path(__FILE__) . '../template/template.admin_followup.php');
     }
 
-    // Callback function to display sub-menu page
+    // Callback function for modify quote page
+    public function modify_quote_page()
+    {
+        // Include the template file
+        include_once(plugin_dir_path(__FILE__) . '../template/template.modify_quotation.php');
+    }
+
+    // Callback function to display a sub-menu page
     public function micro_crm_sub_page()
     {
         echo "<p>Sub page to be displayed...</p>";
-        // Display HTML content for sub page
+        // Display HTML content for Database Commands page
     }
 
 }

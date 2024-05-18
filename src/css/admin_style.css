@@ -31,6 +31,23 @@
   cursor: pointer; /* Change cursor on hover */
 }
 
+/* Overwrite pagination color */
+.pagination .page-link {
+    color: #000; /* Black text color */
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #ffc107; /* Warning color */
+    border-color: #ffc107; /* Warning color */
+    color: #000; /* Black text color */
+}
+
+.pagination .page-item.active .page-link:hover {
+    background-color: #e0a800; /* Darker warning color for hover */
+    border-color: #d39e00; /* Darker border color for hover */
+    color: #000; /* Black text color */
+}
+
 /* Media query for mobile responsiveness */
 @media screen and (max-width: 768px) {
   .fixed-column::after {

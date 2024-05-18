@@ -108,7 +108,12 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
 <!-- Filering menu -->
 <div class="container mt-3">
     <form action="" method="post">
-        <div class="row justify-content-start">
+        <div class="row justify-content-start align-items-center">
+            <div class="pb-2 col-md-auto">
+                <a href="<?php echo esc_url("admin.php?page=micro-crm-admin"); ?>">
+                    <img class="rounded-3" src="<?php echo plugin_dir_url(__FILE__) . '../src/images/logo_square.png'; ?>" height="38" />
+                </a>
+            </div>
             <div class="pb-2 col-md-auto">
                 <input type="text" name="search_query" class="form-control" placeholder="Rechercher par nom..." value="<?php echo $search_query ? $search_query : ''; ?>">
             </div>
@@ -122,8 +127,8 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                 <input type="text" name="tag_search_query" class="form-control" placeholder="Rechercher par balise..." value="<?php echo $tag_search_query ? $tag_search_query : ''; ?>">
             </div>
             <div class="pb-2 col-md-auto">
-                <button type="submit" name="btn-search" class="btn btn-primary">Recherche</button>
-                <button type="submit" name="btn-reset" class="btn btn-secondary">Réinitialiser</button>
+                <button type="submit" name="btn-search" class="btn btn-warning">Recherche</button>
+                <button type="submit" name="btn-reset" class="btn btn-dark">Réinitialiser</button>
             </div>
         </div>
     </form>
@@ -459,7 +464,7 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                     <option value="50" <?php echo $rows_per_page == 50 ? 'selected' : ''; ?>>50</option>
                     <option value="100" <?php echo $rows_per_page == 100 ? 'selected' : ''; ?>>100</option>
                 </select>
-                <button class="btn btn-primary" type="submit" name="btn-rows">OK</button>
+                <button class="btn btn-warning" type="submit" name="btn-rows">OK</button>
             </form>
         </div>
     </div>
