@@ -52,9 +52,6 @@ class MicroCrm
 		// Drop tables when deactivating the plugin
 		register_deactivation_hook(__FILE__, array($this, 'drop_tables'));
 
-		// hook action for PDF conversion
-		// add_action('init', array($this, 'document_conversion'));
-
 		// hook initial action for PDF download
 		add_action('init', array($this, 'document_download'));
 
@@ -158,13 +155,6 @@ class MicroCrm
 		$form_handler = new FormHandler;
 		$form_handler->handle_form_submission();
 	}
-
-	// public function document_conversion()
-	// {
-	// 	$document_converter = new DocumentConverter;
-	// 	// $document_converter->convert_pdf_save_redirect();
-	// 	// $document_converter->convert_html_to_pdf();
-	// }
 
 	public function document_download()
 	{

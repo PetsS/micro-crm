@@ -15,7 +15,7 @@
 </header>
 
 <!-- Question part -->
-<div id="formQuestion" class="bg-transparent text-white rounded hidden">
+<div id="formQuestion" class="bg-transparent text-white hidden">
 
     <div class="container-fluid p-3">
 
@@ -32,9 +32,6 @@
                         <!-- display error message -->
                         <?php if (isset($form_errors) && isset($form_errors['firstname_quest'])) : ?>
                             <span class="error"><?php echo $form_errors['firstname_quest']; ?></span>
-                            <div class="invalid-feedback">
-                                Valid first name is required.
-                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -92,20 +89,8 @@
                 <div class="p-2 col-md-auto">
                     <button id="submit-btn-question" class="w-100 btn btn-success btn-lg" type="submit" name="submit-btn-question">
                         <span class="spinner-border spinner-border-sm d-none"></span>
-                        Envoyer</button>
-                    <script>
-                        // this script adds a spinner while the page is loading after submission
-                        document.addEventListener('DOMContentLoaded', function() {
-                            var button = document.getElementById('submit-btn-question');
-                            if (button) {
-                                button.addEventListener('click', function() {
-                                    var spinner = button.querySelector('.spinner-border');
-                                    spinner.classList.remove('d-none'); // Show spinner
-                                    button.classList.add('disabled'); // Add disabled class to visually disable the button
-                                });
-                            };
-                        });
-                    </script>
+                        Envoyer
+                    </button>
                 </div>
 
             </form>
@@ -114,7 +99,7 @@
 </div>
 
 <!-- Quotation part -->
-<div id="formQuotation" class="bg-transparent text-white rounded hidden">
+<div id="formQuotation" class="bg-transparent text-white hidden">
 
     <div class="container-fluid py-3">
 
@@ -359,7 +344,10 @@
                     <?php wp_nonce_field('form_submit', 'form_nonce'); ?>
 
                     <!-- Submit form -->
-                    <button class="w-100 btn btn-success btn-lg" type="submit" name="submit-btn-quotation">Envoyer</button>
+                    <button id="submit-btn-quotation" class="w-100 btn btn-success btn-lg" type="submit" name="submit-btn-quotation">
+                        <span class="spinner-border spinner-border-sm d-none"></span>
+                        Envoyer
+                    </button>
 
                 </div>
 

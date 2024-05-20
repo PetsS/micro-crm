@@ -23,16 +23,6 @@ if ($form_data_transient && isset($form_data_transient['isSuccess'])) {
     $isSuccess = $form_data_transient['isSuccess'];
 }
 
-// var_dump($quote_id_transient);
-// die();
-
-// Retrieve quote ID from transient if available
-// if ($quote_id_transient && isset($quote_id_transient)) {
-//     $quote_id = $quote_id_transient;
-// $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover database data in quotation
-// $isUpdated = isset($_GET['update']) && trim($_GET['update']) === trim($quote_id);
-// }
-
 $isUpdated = isset($_GET['update']) && $_GET['update'] === 'true'; // If the confirm URL parameter is set and true, it shows the confirmed template.
 
 $isConfirmed = isset($_GET['confirm']) && $_GET['confirm'] === 'true'; // If the confirm URL parameter is set and true, it shows the confirmed template.

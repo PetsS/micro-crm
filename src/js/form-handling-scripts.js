@@ -4,9 +4,9 @@
 
 var buttonDiv = document.getElementById("formButtons");
 var addButton = document.getElementById("btn-add-persons");
-// var addButtonUpd = document.getElementById("btn-add-persons-update");
-// var addButtonMod = document.getElementById("btn-add-persons-modify");
 var pageElement = document.getElementById("scroll_here");
+var submitBtnQuestion = document.getElementById("submit-btn-question");
+var submitBtnQuotation = document.getElementById("submit-btn-quotation");
 
 // Using window.onload event to ensure the entire page is loaded
 window.onload = function () {
@@ -20,18 +20,19 @@ window.onload = function () {
 // Using DOMContentLoaded event to ensure DOM is fully loaded while executing the scripts
 document.addEventListener("DOMContentLoaded", function () {
   // Call the functions when the page is loaded
+  if (submitBtnQuestion) {
+    showButtonSpinner(submitBtnQuestion); // call only if btn exists in the template
+  } 
+  if (submitBtnQuotation) {
+    showButtonSpinner(submitBtnQuotation); // call only if btn exists in the template
+  }
   if (buttonDiv) {
     showFormsType(); // call only if div exists in the template
   }
   handleFormdata();
   if (addButton) {
     clonePersons(addButton); // call the function if the button with the id exists
-  } 
-  // else if (addButtonUpd) {
-  //   clonePersons(addButtonUpd); // call the function if the button with the id exists in the update form
-  // } else if (addButtonMod) {
-  //   clonePersons(addButtonMod); // call the function if the button with the id exists in the modify quote
-  // }
+  }
   restoreElements();
   showVisitetypeOptions();
   showDisplayInfo();
@@ -178,7 +179,6 @@ function clonePersons(buttonElement) {
       clonedContainer,
       lastClonedContainer.nextSibling
     );
-
 
     // add a delete button the each cloned container
     addDeleteButton(clonedContainer);
@@ -331,5 +331,14 @@ function showDisplayInfo() {
     if (target && target.matches('.containerClone input[name="nbPersons[]"]')) {
       updateDisplayInfo();
     }
+  });
+}
+
+// this script adds a spinner to the button while the page is loading after submission
+function showButtonSpinner(button) {
+  button.addEventListener("click", function () {
+    var spinner = button.querySelector(".spinner-border");
+    spinner.classList.remove("d-none"); // Show spinner
+    button.classList.add("disabled"); // Add disabled class to visually disable the button
   });
 }
