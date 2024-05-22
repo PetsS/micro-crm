@@ -225,7 +225,6 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                         <td class="<?php echo $sort_by === 'payment_id' ? 'table-light' : ''; ?>"><?php echo getPaymentById($quote->payment_id)->category; ?></td>
                         <td class="<?php echo $sort_by === 'total_ttc' ? 'table-light' : ''; ?>"><?php echo $number_currency->format($total_ttc); ?></td>
                         <td>
-
                             <?php foreach (getTagByQuoteId($quote->id) as $tag) : ?>
                                 <?php
                                 $tag_handler = new TagHandler();
@@ -243,7 +242,6 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
                                     <!-- Hidden input field to pass the tag_id to the form handling-->
                                     <input type="hidden" name="tag_id" value="<?php echo $tag->id; ?>">
                                 </form>
-
                             <?php endforeach; ?>
                         </td>
                     </tr>
@@ -435,7 +433,6 @@ if ($sort_by !== 'total_persons' && $sort_by !== 'total_ttc') {
         <div class="col-md-auto">
             <nav aria-label="Page navigation">
                 <ul class="pagination" id="pagination">
-
                     <li class="page-item <?php echo $page_number <= 1 ? 'disabled' : ''; ?>">
                         <a class="page-link " href="<?php echo esc_url(add_query_arg('page_number', $page_number - 1)); ?>" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>

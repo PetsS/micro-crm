@@ -16,8 +16,6 @@ class MailSender
         // run query method to get the latest data by id
         $quote_data = getQuoteDataById($quote_id);
 
-        
-
         try {
             // Instantiate PHPMailer
             $mail = new PHPMailer();
@@ -26,26 +24,30 @@ class MailSender
             $mail->isSMTP();
 
             // MailHog configuration
-            $mail->Host = '127.0.0.1';
-            $mail->SMTPAuth = false;
-            $mail->Username = '';
-            $mail->Password = '';
-            $mail->Port = 1025;
+            // $mail->Host = '127.0.0.1';
+            // $mail->SMTPAuth = false;
+            // $mail->Username = '';
+            // $mail->Password = '';
+            // $mail->Port = 1025;
 
-            // SMTP configuration
-            // $mail->Host       = 'smtp.example.com';  // SMTP host
-            // $mail->SMTPAuth   = true;                 // Enable SMTP authentication
-            // $mail->Username   = 'your@example.com';   // SMTP username
-            // $mail->Password   = 'your_password';      // SMTP password
-            // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
-            // $mail->Port       = 587;                  // TCP port to connect to
+            // SMTP server configuration
+            $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
+            $mail->SMTPAuth   = true;                           // Enable SMTP authentication
+            $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
+            $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
+            $mail->Port       = 587;                            // TCP port to connect to
+            $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
 
             // Sender information
-            $mail->setFrom('microzoo@example.com', 'Micro Zoo');
+            $mail->setFrom('contact@microzoo.fr', 'MicroZoo');
+
+            // Set client's name
+            $client = (!empty($quote_data->companyName) ? (strtoupper($quote_data->companyName)) : ($quote_data->firstname_quot . ' ' . strtoupper($quote_data->lastname_quot)));
 
             // Add recipients
-            $mail->addAddress('client@example.com', 'Client Example'); // Client's email, name is optional
-            $mail->addBCC('microzoo@example.com'); // Admin's email
+            $mail->addAddress($quote_data->email_quot, $client); // Client's email and name, the name is optional
+            $mail->addBCC('contact@microzoo.fr', 'MicroZoo Admin'); // Admin's email
 
             // Add reply address
             $mail->addReplyTo('mz@example.com', 'Information');
@@ -55,12 +57,12 @@ class MailSender
             if (file_exists($pdfFilePath)) {
                 $mail->addAttachment($pdfFilePath, $pdfFileName); // Add attachment
             } else {
+                error_log('Attachment file does not exist: ' . $pdfFilePath);
                 echo 'Attachment file does not exist: ' . $pdfFilePath;
             }
 
             // Email subject
             $mail->isHTML(true);
-            $client = (!empty($quote_data->companyName) ? (strtoupper($quote_data->companyName)) : ($quote_data->firstname_quot . ' ' . strtoupper($quote_data->lastname_quot)));
             $mail->Subject = 'MicroZoo devis pour ' . $client;
 
             ob_start(); // Start output buffering
@@ -95,17 +97,26 @@ class MailSender
             $mail->isSMTP();
 
             // Configure SMTP settings (MailHog or any other SMTP server)
-            $mail->Host = 'localhost';
-            $mail->SMTPAuth = false;
-            $mail->Username = '';
-            $mail->Password = '';
-            $mail->Port = 1025;
+            // $mail->Host = 'localhost';
+            // $mail->SMTPAuth = false;
+            // $mail->Username = '';
+            // $mail->Password = '';
+            // $mail->Port = 1025;
 
-            // Set noreply email sender
-            $mail->setFrom('noreply@microzoo.fr', 'MicroZoo');
+            // SMTP server configuration
+            $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
+            $mail->SMTPAuth   = true;                           // Enable SMTP authentication
+            $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
+            $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
+            $mail->Port       = 587;                            // TCP port to connect to
+            $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
+
+            // Set email sender
+            $mail->setFrom('contact@microzoo.fr', 'MicroZoo');
 
             // Add recipients (Admin's email)
-            $mail->addAddress('microzoo@example.com');
+            $mail->addAddress('contact@microzoo.fr', 'MicroZoo Admin');
 
             // Set email subject
             $mail->Subject = 'Question du ' . $form_data['firstname_quest'] . ' ' . $form_data['lastname_quest'] . ' (' . $form_data['email_quest'] . ') ' . 'sur le site web';
@@ -149,22 +160,23 @@ class MailSender
             // $mail->Password = '';
             // $mail->Port = 1025;
 
-            // SMTP configuration
-            $mail->Host       = 'smtp.hotmail.com';  // SMTP host
-            $mail->SMTPAuth   = true;                 // Enable SMTP authentication
-            $mail->Username   = SMTP_USERNAME;   // SMTP username from environment variable
-            $mail->Password   = SMTP_PASSWORD;   // SMTP password from environment variable
+            // SMTP server configuration
+            $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
+            $mail->SMTPAuth   = true;                           // Enable SMTP authentication
+            $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
+            $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
-            $mail->Port       = 587;                  // TCP port to connect to
-            
-            // Set noreply email sender
-            $mail->setFrom('noreply@microzoo.fr', 'MicroZoo');
+            $mail->Port       = 587;                            // TCP port to connect to
+            $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
+
+            // Set email sender
+            $mail->setFrom('contact@microzoo.fr', 'MicroZoo');
 
             // Add recipients (Client's email)
             $mail->addAddress($form_data['email_quest']);
 
             // Set email subject
-            $mail->Subject = 'Question du site web MicroZoo';
+            $mail->Subject = 'Merci de votre intérêt pour MicroZoo!';
 
             ob_start(); // Start another buffer
             // Email body from a separate html file

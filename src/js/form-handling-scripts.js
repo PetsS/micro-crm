@@ -7,6 +7,7 @@ var addButton = document.getElementById("btn-add-persons");
 var pageElement = document.getElementById("scroll_here");
 var submitBtnQuestion = document.getElementById("submit-btn-question");
 var submitBtnQuotation = document.getElementById("submit-btn-quotation");
+var submitBtnConfirm = document.getElementById("submit-btn-confirm");
 
 // Using window.onload event to ensure the entire page is loaded
 window.onload = function () {
@@ -25,6 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
   } 
   if (submitBtnQuotation) {
     showButtonSpinner(submitBtnQuotation); // call only if btn exists in the template
+  }
+  if (submitBtnConfirm) {
+    showButtonSpinner(submitBtnConfirm); // call only if btn exists in the template
   }
   if (buttonDiv) {
     showFormsType(); // call only if div exists in the template
