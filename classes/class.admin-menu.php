@@ -17,7 +17,8 @@ class AdminMenu
         add_menu_page(
             'Micro CRM', // Page title
             'Micro CRM', // Menu title
-            'manage_options', // Capability required to access the page
+            // 'manage_options', // Capability required to access the page. manage_options is available for administrators
+            'read', // The read capability is available to all users, including subscribers.
             'micro-crm-admin', // Menu slug
             array($this, 'micro_crm_followup_page'), // Callback function to display the page
             'dashicons-buddicons-replies', // Menu icon
@@ -29,7 +30,8 @@ class AdminMenu
             null, // Parent menu slug; if null, it doesnt diplay in the side menu
             'Sub Page', // Page title
             'Sub Page', // Menu title
-            'manage_options', // Capability required to access the page
+            // 'manage_options', // Capability required to access the page
+            'read', // The read capability is available to all users, including subscribers.
             'micro-crm-modify-quote-page', // Menu slug
             array($this, 'modify_quote_page') // Callback function to display the page
         );
@@ -39,7 +41,8 @@ class AdminMenu
             null, // Parent menu slug
             'Sub Page', // Page title
             'Sub Page', // Menu title
-            'manage_options', // Capability required to access the page
+            // 'manage_options', // Capability required to access the page
+            'read', // The read capability is available to all users, including subscribers.
             'micro-crm-sub-page', // Menu slug
             array($this, 'micro_crm_sub_page') // Callback function to display the page
         );
