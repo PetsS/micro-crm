@@ -46,34 +46,20 @@ class DocumentConverter
 
     public function __construct()
     {
-        // Retrieve data from wordpress transient which is used to store data for a limited time to pass it
-        $form_data_transient = get_transient('form_data_transient');
-        // $quote_id_transient = get_transient('quote_id_transient');
+        // Get the current user ID
+        $user_id = get_current_user_id();
+
+        // Generate the user-specific key
+        $user_key = 'user_' . $user_id;
+
+        // Retrieve the transient data using the user-specific key
+        $form_data_transient = get_transient($user_key . '_form_data_transient');
 
         // Populate form fields with transient data if available
         if ($form_data_transient && isset($form_data_transient['form_data'])) {
             $this->form_data = $form_data_transient['form_data'];
             $this->pdfFileName = $this->generatePdfFileName();
         }
-
-        // Retrieve quote ID from transient if available
-        // if ($quote_id_transient && isset($quote_id_transient)) {
-        //     $this->quote_id = $quote_id_transient;
-        // }
-
-        // Retreive one row of quote data from database
-        // $this->quote_data = getQuoteDataById($this->quote_id);
-
-        // Retrieve quote ID from transient if available
-        // if ($form_data_transient && isset($form_data_transient['quote_id'])) {
-        //     $quote_id = $form_data_transient['quote_id'];
-        //     $quote_data = getQuoteDataById($quote_id);
-        //     // Verify that quote data is valid
-        //     if ($quote_id) {
-        //         // Generate dynamic PDF file name
-        //         $this->pdfFileName = $this->generatePdfFileName($quote_data);
-        //     }
-        // }
 
     }
 

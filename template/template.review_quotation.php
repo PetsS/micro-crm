@@ -28,11 +28,14 @@ $number_decimal->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 // $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover a single quotation row from database
 // $person_data = getPersonByQuoteId($quote_id); // load sql method into variable to recover a single person row from database
 
-// var_dump($quote_id == 0 ? generateQuoteNumber() : $quote_data->number_quote);
-// die();
+// Get the current user ID
+$user_id = get_current_user_id();
 
-// Retrieve data from wordpress transient which is used to store data for a limited time to pass it
-$form_data_transient = get_transient('form_data_transient');
+// Generate the user-specific key
+$user_key = 'user_' . $user_id;
+
+// Retrieve the transient data using the user-specific key
+$form_data_transient = get_transient($user_key . '_form_data_transient');
 
 // Populate document with transient data if available
 if ($form_data_transient && isset($form_data_transient['form_data'])) {
