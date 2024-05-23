@@ -70,6 +70,12 @@ class FormHandler
                 // If there are no errors, process the form data
                 if (empty($errors)) {
 
+                    // Get the current user ID
+                    $user_id = get_current_user_id();
+
+                    // Generate a unique key for the user
+                    $user_key = 'user_' . $user_id;
+
                     // successful submit send an email to client
                     $mailSender = new MailSender();
                     $mailSender->send_email_question_to_admin($_POST); // Pass post form data to the method and send email to admin 
@@ -78,7 +84,7 @@ class FormHandler
                     // Redirect to the referer page with a parameter
                     wp_redirect(remove_query_arg('form_error', add_query_arg('question', 'true', wp_get_referer())));
 
-                    $this->eraseMemory();
+                    $this->eraseMemory($user_key);
 
                     exit;
                 } else {
@@ -88,7 +94,14 @@ class FormHandler
                         'form_errors' => $errors, // Return errors array and load it into transient
                         'form_data' => $_POST  // Store all form data for repopulation the form
                     );
-                    set_transient('form_data_transient', $data_to_store, 600); // Store data for 600 seconds
+
+                    // Get the current user ID
+                    $user_id = get_current_user_id();
+
+                    // Generate a unique key for the user
+                    $user_key = 'user_' . $user_id;
+
+                    set_transient($user_key . '_form_data_transient', $data_to_store, 600); // Store data for 600 seconds
 
                     // Redirect back to the referer page to display errors
                     wp_redirect(esc_url(add_query_arg(array('form_error' => 'form'), wp_get_referer())));
@@ -192,7 +205,14 @@ class FormHandler
                         // 'quote_id' => $quote_id, // store id to pass it as parameter
                         'isSuccess' => $isSuccess // store variable to retreive it on main template page
                     );
-                    set_transient('form_data_transient', $data_to_store, 3600); // Store data for 3600 seconds (1h)
+
+                    // Get the current user ID
+                    $user_id = get_current_user_id();
+
+                    // Generate a unique key for the user
+                    $user_key = 'user_' . $user_id;
+
+                    set_transient($user_key . '_form_data_transient', $data_to_store, 600); // Store data for 600 seconds
 
                     // If Update has been submitted from the form, redirect back to the confirm page
                     if (isset($_GET['update']) && $_GET['update'] === 'false') {
@@ -215,16 +235,20 @@ class FormHandler
                     exit;
                 } else {
 
-                    // Retrieve the quote_id from the URL parameter for updating
-                    // $quote_id = isset($_GET['update']) ? intval($_GET['update']) : 0;
-
                     // Store errors and form data in the transient
                     $data_to_store = array(
                         'form_errors' => $errors, // Return errors array and load it into transient
                         'form_data' => $_POST,  // Store all form data for repopulation the form
                         // 'quote_id' => $quote_id, // store id to pass it as parameter
                     );
-                    set_transient('form_data_transient', $data_to_store, 3600); // Store data for 3600 seconds (1h)
+
+                    // Get the current user ID
+                    $user_id = get_current_user_id();
+
+                    // Generate a unique key for the user
+                    $user_key = 'user_' . $user_id;
+
+                    set_transient($user_key . '_form_data_transient', $data_to_store, 600); // Store data for 600 seconds
 
                     wp_redirect(add_query_arg(array('form_error' => 'form'), wp_get_referer()));
 
@@ -232,6 +256,7 @@ class FormHandler
                 }
             }
         } else {
+            $this->eraseMemory(); // Clear form data for any failed or bot submissions
             // Nonce verification failed, handle error
             wp_die('Nonce verification failed', 'Error', array('response' => 403));
         }
@@ -397,10 +422,15 @@ class FormHandler
         exit;
     }
 
-    public function eraseMemory()
+    public function eraseMemory($user_key = null)
     {
-        // Delete form data transient
-        delete_transient('form_data_transient');
+        if ($user_key) {
+            // Delete form data transient for the user
+            delete_transient($user_key . '_form_data_transient');
+        } else {
+            // Delete form data transient
+            delete_transient('form_data_transient');
+        }
     }
 
     public function verify_recaptcha() {
