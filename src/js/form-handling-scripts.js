@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Call the functions when the page is loaded
   if (submitBtnQuestion) {
     showButtonSpinner(submitBtnQuestion); // call only if btn exists in the template
-  } 
+  }
   if (submitBtnQuotation) {
     showButtonSpinner(submitBtnQuotation); // call only if btn exists in the template
   }
