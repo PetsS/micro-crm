@@ -47,6 +47,9 @@ class DocumentDownloader
                 $document_number = $quote_data->number_quote;
 
                 $this->download_quote_PDF($quote_id, $document_number);
+            } else {
+                // handle error
+                wp_die('no valid pdf', 'Error', array('response' => 403));
             }
             exit;
         }
