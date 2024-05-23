@@ -57,10 +57,10 @@ class MicroCrm
 
 		// hook action for handling tag requests
 		add_action('init', array($this, 'tag_handler'));
-		
+
 		// Enqueue front assets
 		add_action('wp_enqueue_scripts', array($this, 'load_front_assets'));
-		
+
 		// Add admin menu items
 		add_action('admin_menu', array($this, 'handle_admin_menus'));
 
@@ -93,7 +93,7 @@ class MicroCrm
 
 		// Enqueue another js file
 		wp_enqueue_script('form-handling-scripts-admin', plugin_dir_url(__FILE__) . 'src/js/form-handling-scripts.js', array('jquery'), 1, true);
-		
+
 		// load Font Awesome cdn
 		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4');
 
@@ -112,13 +112,13 @@ class MicroCrm
 	{
 		// load Font Awesome cdn
 		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4');
-		
+
 		// load Bootstrap css cdn
 		wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css', array(), '5.3.3');
-		
+
 		// load Bootstrap js cdn
 		wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.3.3', true);
-		
+
 		// load Bootstrap icons cdn
 		wp_enqueue_style('bootstrap-icons-css', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
 
@@ -130,12 +130,16 @@ class MicroCrm
 
 		// load css file, email style
 		wp_enqueue_style('pdf-style', plugin_dir_url(__FILE__) . 'src/css/pdf_style.css', array(), 1, 'all');
-		
+
 		// load the js file
 		wp_enqueue_script('form-handling-scripts', plugin_dir_url(__FILE__) . 'src/js/form-handling-scripts.js', array('jquery'), 1, true);
 
 		// Localize the script with the AJAX URL
 		wp_localize_script('form-handling-scripts', 'ajax_object', array('ajaxurl' => admin_url('admin-ajax.php')));
+
+		// Enqueue reCAPTCHA script
+		wp_enqueue_script('recaptcha', 'https://www.google.com/recaptcha/enterprise.js', array(), null, false);
+
 	}
 
 	// shortcode callback function
@@ -159,7 +163,7 @@ class MicroCrm
 	public function document_download()
 	{
 		$document_downloader = new DocumentDownloader;
-		$document_downloader->download_confirmed_PDF();		
+		$document_downloader->download_confirmed_PDF();
 	}
 
 	public function tag_handler()

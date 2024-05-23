@@ -74,9 +74,20 @@
                         <?php endif; ?>
                     </div>
 
+                    <!-- reCAPTCHA -->
+                    <div class="col-12">
+                        <div class="g-recaptcha" data-sitekey="6LeA6OUpAAAAAHeJgPYWFWtK806IMgSL4xipbmO-" data-action="LOGIN"></div>
+                        <?php if (isset($form_errors) && isset($form_errors['recaptcha_quest'])) : ?>
+                            <span class="error"><?php echo $form_errors['recaptcha_quest']; ?></span>
+                        <?php endif; ?>
+                    </div>
+
                 </div>
 
                 <hr class="my-4">
+
+                <!-- hidden honeypot field for security against bots. The name is attracting bots -->
+                <input type="text" name="website_url" style="display:none;">
 
                 <input type="hidden" name="action" value="form_submission">
                 <!-- This hidden input is used to store the nonce value generated using wp_create_nonce(). -->
@@ -332,13 +343,25 @@
                     </div>
 
                     <!-- Upload file -->
-                    <div class="input-group">
+                    <!-- <div class="input-group">
                         <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
                         <button class="btn btn-warning" type="button" id="inputGroupFileAddon04">OK</button>
+                    </div> -->
+
+                    <!-- reCAPTCHA -->
+                    <div class="col-12">
+                        <div class="g-recaptcha" data-sitekey="6LeA6OUpAAAAAHeJgPYWFWtK806IMgSL4xipbmO-" data-action="LOGIN"></div>
+                        <?php if (isset($form_errors) && isset($form_errors['recaptcha_quote'])) : ?>
+                            <span class="error"><?php echo $form_errors['recaptcha_quote']; ?></span>
+                        <?php endif; ?>
                     </div>
 
                     <hr class="my-4">
 
+                    <!-- hidden honeypot field for security against bots. The name is attracting bots -->
+                    <input type="text" name="website_url" style="display:none;">
+
+                    <!-- security -->
                     <input type="hidden" name="action" value="form_submission">
                     <input type="hidden" name="form_nonce" value="<?php echo wp_create_nonce('form_submit'); ?>">
                     <?php wp_nonce_field('form_submit', 'form_nonce'); ?>

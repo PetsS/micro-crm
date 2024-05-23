@@ -233,11 +233,19 @@
                     </div>
 
                     <!-- Upload file -->
-                    <div class="col-12">
+                    <!-- <div class="col-12">
                         <div class="input-group">
                             <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
                             <button class="btn btn-warning" type="button" id="inputGroupFileAddon04">OK</button>
                         </div>
+                    </div> -->
+
+                    <!-- reCAPTCHA -->
+                    <div class="col-12">
+                        <div class="g-recaptcha" data-sitekey="6LeA6OUpAAAAAHeJgPYWFWtK806IMgSL4xipbmO-" data-action="LOGIN"></div>
+                        <?php if (isset($form_errors) && isset($form_errors['recaptcha_quote'])) : ?>
+                            <span class="error"><?php echo $form_errors['recaptcha_quote']; ?></span>
+                        <?php endif; ?>
                     </div>
 
                     <hr class="my-4">

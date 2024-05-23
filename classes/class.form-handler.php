@@ -16,7 +16,21 @@ class FormHandler
         // Verify nonce
         if (isset($_POST['form_nonce']) && wp_verify_nonce($_POST['form_nonce'], 'form_submit')) {
 
+            // Verify if th honeypot has been filled in
+            if (!empty($_POST['website_url'])) {
+                // Handle the bot submission
+                wp_die('bot detected', 'Error', array('response' => 403));
+            }
+
             if (isset($_POST['submit-btn-question'])) {
+
+                // Verify reCAPTCHA response
+                $isRecaptchaSuccess = $this->verify_recaptcha();
+
+                // reCAPTCHA validation
+                if (!$isRecaptchaSuccess) {
+                    $errors['recaptcha_quest'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
+                }
 
                 // Sanitize all input
                 $email_quest = sanitize_email($_POST['email_quest']);
@@ -80,6 +94,14 @@ class FormHandler
                     exit; // exit is to prevent further execution of the admin-post.php
                 }
             } else if (isset($_POST['submit-btn-quotation'])) {
+
+                // Verify reCAPTCHA response
+                $isRecaptchaSuccess = $this->verify_recaptcha();
+
+                // reCAPTCHA validation
+                if (!$isRecaptchaSuccess) {
+                    $errors['recaptcha_quote'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
+                }
 
                 // Sanitize inputs and store them in an array for later use
                 $email_quot = sanitize_email($_POST['email_quot']);
@@ -168,9 +190,9 @@ class FormHandler
                         'isSuccess' => $isSuccess // store variable to retreive it on main template page
                     );
                     set_transient('form_data_transient', $data_to_store, 3600); // Store data for 3600 seconds (1h)
-                    
+
                     // If Update has been submitted from the form, redirect back to the confirm page
-                    if (isset($_GET['update']) && $_GET['update'] === 'false') {                        
+                    if (isset($_GET['update']) && $_GET['update'] === 'false') {
                         wp_redirect(esc_url(remove_query_arg(array('update', 'form_error'), wp_get_referer())));
                     } else if (isset($_GET['update']) && trim($_GET['update']) === trim($quote_id)) { // If the update URL parameter exist and maching with the id, it proceed to the function that updates the corresponding data in db
 
@@ -182,7 +204,6 @@ class FormHandler
 
                         // call function in class to proceed update
                         $this->handle_update($quote_id);
-
                     } else {
                         // Redirect to referer page, clear all URL parameters
                         wp_redirect(esc_url(remove_query_arg('form_error', wp_get_referer())));
@@ -292,7 +313,7 @@ class FormHandler
 
         // Redirect back to the admin page in back office
         wp_redirect(esc_url(remove_query_arg(array('update', 'quote_id'), "admin.php?page=micro-crm-admin")));
-        
+
         $this->eraseMemory();
 
         exit;
@@ -346,7 +367,7 @@ class FormHandler
 
     public function confirm($quote_id)
     {
-                // Get the path to the folder
+        // Get the path to the folder
         $saveFolderPath = plugin_dir_path(__FILE__) . '../src/save/';
         // Get a list of PDF files
         $pdfFiles = glob($saveFolderPath . '*.pdf');
@@ -377,5 +398,27 @@ class FormHandler
     {
         // Delete form data transient
         delete_transient('form_data_transient');
+    }
+
+    public function verify_recaptcha() {
+        // Verify reCAPTCHA response
+        $recaptcha_response = $_POST['g-recaptcha-response'];
+        $recaptcha_secret = '6LeA6OUpAAAAALPvI2-vsQ6bO2keiCyvc5JpcrAF';
+        $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
+        $recaptcha_data = array(
+            'secret' => $recaptcha_secret,
+            'response' => $recaptcha_response
+        );
+        $recaptcha_options = array(
+            'http' => array(
+                'method' => 'POST',
+                'content' => http_build_query($recaptcha_data)
+            )
+        );
+        $recaptcha_context = stream_context_create($recaptcha_options);
+        $recaptcha_result = file_get_contents($recaptcha_url, false, $recaptcha_context);
+        $recaptcha_json = json_decode($recaptcha_result);
+
+        return $recaptcha_json->success;
     }
 }
