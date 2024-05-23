@@ -19,6 +19,7 @@ class FormHandler
             // Verify if th honeypot has been filled in
             if (!empty($_POST['website_url'])) {
                 // Handle the bot submission
+                $this->eraseMemory();  // Erase memory
                 wp_die('bot detected', 'Error', array('response' => 403));
             }
 
@@ -30,6 +31,7 @@ class FormHandler
                 // reCAPTCHA validation
                 if (!$isRecaptchaSuccess) {
                     $errors['recaptcha_quest'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
+                    $this->eraseMemory();  // Erase memory
                 }
 
                 // Sanitize all input
@@ -101,6 +103,7 @@ class FormHandler
                 // reCAPTCHA validation
                 if (!$isRecaptchaSuccess) {
                     $errors['recaptcha_quote'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
+                    $this->eraseMemory();  // Erase memory
                 }
 
                 // Sanitize inputs and store them in an array for later use
