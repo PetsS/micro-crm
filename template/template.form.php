@@ -76,7 +76,7 @@
 
                     <!-- reCAPTCHA -->
                     <div class="col-12">
-                        <div class="g-recaptcha" data-sitekey="6LeA6OUpAAAAAHeJgPYWFWtK806IMgSL4xipbmO-" data-action="LOGIN"></div>
+                        <div class="g-recaptcha" data-sitekey="<?php echo SITE_KEY ?>" data-action="LOGIN"></div>
                         <?php if (isset($form_errors) && isset($form_errors['recaptcha_quest'])) : ?>
                             <span class="error"><?php echo $form_errors['recaptcha_quest']; ?></span>
                         <?php endif; ?>
@@ -350,7 +350,7 @@
 
                     <!-- reCAPTCHA -->
                     <div class="col-12">
-                        <div class="g-recaptcha" data-sitekey="6LeA6OUpAAAAAHeJgPYWFWtK806IMgSL4xipbmO-" data-action="LOGIN"></div>
+                        <div class="g-recaptcha" data-sitekey="<?php echo SITE_KEY ?>" data-action="LOGIN"></div>
                         <?php if (isset($form_errors) && isset($form_errors['recaptcha_quote'])) : ?>
                             <span class="error"><?php echo $form_errors['recaptcha_quote']; ?></span>
                         <?php endif; ?>

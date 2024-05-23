@@ -403,7 +403,7 @@ class FormHandler
     public function verify_recaptcha() {
         // Verify reCAPTCHA response
         $recaptcha_response = $_POST['g-recaptcha-response'];
-        $recaptcha_secret = '6LeA6OUpAAAAALPvI2-vsQ6bO2keiCyvc5JpcrAF';
+        $recaptcha_secret = SECRET_KEY;
         $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
         $recaptcha_data = array(
             'secret' => $recaptcha_secret,
