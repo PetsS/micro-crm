@@ -48,10 +48,10 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                             <input type="text" class="form-control" id="email_quest" name="email_quest" placeholder="email@example.com" value="<?php echo isset($form_data['email_quest']) ? esc_attr(stripslashes($form_data['email_quest'])) : ''; ?>" />
-                            <?php if (isset($form_errors) && isset($form_errors['email_quest'])) : ?>
-                                <span class="error"><?php echo $form_errors['email_quest']; ?></span>
-                            <?php endif; ?>
                         </div>
+                        <?php if (isset($form_errors) && isset($form_errors['email_quest'])) : ?>
+                            <span class="error"><?php echo $form_errors['email_quest']; ?></span>
+                        <?php endif; ?>
                     </div>
 
                     <div class="col-12">
