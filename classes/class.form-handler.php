@@ -8,6 +8,9 @@
 
 class FormHandler
 {
+    private $banThreshold = 5; // Number of attempts before banning
+    private $banDuration = 3600; // Ban duration in seconds (1 hour)
+
     public function __construct()
     {
         // Ensure session is started when the class is instantiated
@@ -25,9 +28,14 @@ class FormHandler
             // Start session if not already started
             $this->initialize_session();
 
+            // Check if user is banned
+            if ($this->is_user_banned()) {
+                wp_die('You have been banned from submitting forms.', 'Error', array('response' => 403));
+            }
+
             // Verify if th honeypot has been filled in
             if (!empty($_POST['website_url']) || !empty($_POST['website_name']) || !empty($_POST['website_address'])) {
-                $this->eraseMemory();
+                $this->handle_honeypot_detection();
                 wp_die('bot detected', 'Error', array('response' => 403));
             }
 
@@ -537,5 +545,34 @@ class FormHandler
         if (session_status() == PHP_SESSION_NONE) { // PHP_SESSION_NONE: Sessions are enabled, but no session has been started.
             session_start();
         }
+    }
+
+    private function handle_honeypot_detection()
+    {
+        // Track honeypot violations
+        $honeypot_violations = isset($_SESSION['honeypot_violations']) ? $_SESSION['honeypot_violations'] : 0;
+        $honeypot_violations++;
+        $_SESSION['honeypot_violations'] = $honeypot_violations;
+
+        // If the number of violations exceeds the threshold, ban the user
+        if ($honeypot_violations >= $this->banThreshold) {
+            $this->ban_user();
+        }
+
+        // Erase memory as a security measure
+        $this->eraseMemory();
+    }
+
+    private function ban_user()
+    {
+        $_SESSION['banned_until'] = time() + $this->banDuration;
+    }
+
+    private function is_user_banned()
+    {
+        if (isset($_SESSION['banned_until']) && $_SESSION['banned_until'] > time()) {
+            return true;
+        }
+        return false;
     }
 }
