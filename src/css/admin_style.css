@@ -48,6 +48,14 @@
     color: #000; /* Black text color */
 }
 
+/* display error message */
+.error {
+  color: red;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
 /* Media query for mobile responsiveness */
 @media screen and (max-width: 768px) {
   .fixed-column::after {

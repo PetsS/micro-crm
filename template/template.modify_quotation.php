@@ -1,5 +1,10 @@
 <?php
 
+// Check if session is started and destroy session for non-logged-in users
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Check if user is logged in
 if (is_user_logged_in()) {
     $user_id = get_current_user_id();
@@ -78,8 +83,13 @@ $discount_unit_ht = $results['discount_unit_ht'];
 $discount_amount_ht = $results['discount_amount_ht'];
 $discount_amount_ttc = $results['discount_amount_ttc'];
 
+$css_content = file_get_contents(plugin_dir_url(__FILE__) . '../src/css/admin_style.css');
+
 ?>
 
+<style>
+    <?php echo $css_content; ?>
+</style>
 
 <div class="m-0 container py-3">
     <!-- header -->
@@ -465,7 +475,18 @@ $discount_amount_ttc = $results['discount_amount_ttc'];
                         <textarea id="comment_mod" class="form-control" name="comment" rows="4" placeholder="Votre commentaire..."><?php echo esc_textarea(stripslashes($quote_data->comment)); ?></textarea>
                     </div>
 
+                    <!-- reCAPTCHA -->
+                    <div class="col-12">
+                        <div class="g-recaptcha" data-sitekey="<?php echo esc_attr(SITE_KEY); ?>" data-action="LOGIN"></div>
+                        <?php if (isset($form_errors) && isset($form_errors['recaptcha_quote'])) : ?>
+                            <span class="error"><?php echo $form_errors['recaptcha_quote']; ?></span>
+                        <?php endif; ?>
+                    </div>
+
                     <hr class="my-4">
+
+                    <!-- hidden field for JavaScript validation -->
+                    <input type="hidden" name="js_validation" value="">
 
                     <input type="hidden" name="action" value="form_submission">
                     <input type="hidden" name="form_nonce" value="<?php echo wp_create_nonce('form_submit'); ?>">

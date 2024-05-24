@@ -250,6 +250,9 @@
 
                     <hr class="my-4">
 
+                    <!-- hidden field for JavaScript validation -->
+                    <input type="hidden" name="js_validation" value="">
+                    
                     <input type="hidden" name="action" value="form_submission">
                     <input type="hidden" name="form_nonce" value="<?php echo wp_create_nonce('form_submit'); ?>">
                     <?php wp_nonce_field('form_submit', 'form_nonce'); ?>

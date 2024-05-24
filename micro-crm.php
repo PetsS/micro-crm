@@ -105,6 +105,9 @@ class MicroCrm
 
 		// load Bootstrap icons cdn
 		wp_enqueue_style('bootstrap-icons-css', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
+
+		// Enqueue reCAPTCHA script
+		wp_enqueue_script('recaptcha', 'https://www.google.com/recaptcha/enterprise.js', array(), null, false);
 	}
 
 	// Enqueue CSS qnd JS on the Front End side
