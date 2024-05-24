@@ -95,10 +95,10 @@ class FormHandler
                     $mailSender->send_email_question_to_admin($_POST); // Pass post form data to the method and send email to admin 
                     $mailSender->send_email_question_to_client($_POST); // Pass post form data to the method and send email to client
 
+                    $this->eraseMemory($user_key);
+                    
                     // Redirect to the referer page with a parameter
                     wp_redirect(remove_query_arg('form_error', add_query_arg('question', 'true', wp_get_referer())));
-
-                    $this->eraseMemory($user_key);
 
                     exit;
                 } else {
