@@ -8,6 +8,12 @@
 
 class FormHandler
 {
+    public function __construct()
+    {
+        // Ensure session is started when the class is instantiated
+        $this->initialize_session();
+    }
+
     public function handle_form_submission()
     {
         // Define $errors to store error messages
@@ -15,6 +21,9 @@ class FormHandler
 
         // Verify nonce
         if (isset($_POST['form_nonce']) && wp_verify_nonce($_POST['form_nonce'], 'form_submit')) {
+
+            // Start session if not already started
+            $this->initialize_session();
 
             // Verify if th honeypot has been filled in
             if (!empty($_POST['website_url'])) {
@@ -70,11 +79,16 @@ class FormHandler
                 // If there are no errors, process the form data
                 if (empty($errors)) {
 
-                    // Get the current user ID
-                    $user_id = get_current_user_id();
-
-                    // Generate a unique key for the user
-                    $user_key = 'user_' . $user_id;
+                    if (is_user_logged_in()) {
+                        $user_id = get_current_user_id(); // Get the current user ID                    
+                        $user_key = 'user_' . $user_id; // Generate a unique key for the user
+                    } else {
+                        // Use session ID for non-logged-in users
+                        if (!isset($_SESSION['user_key'])) {
+                            $_SESSION['user_key'] = 'user_' . session_id();
+                        }
+                        $user_key = $_SESSION['user_key'];
+                    }
 
                     // successful submit send an email to client
                     $mailSender = new MailSender();
@@ -95,12 +109,18 @@ class FormHandler
                         'form_data' => $_POST  // Store all form data for repopulation the form
                     );
 
-                    // Get the current user ID
-                    $user_id = get_current_user_id();
+                    if (is_user_logged_in()) {
+                        $user_id = get_current_user_id(); // Get the current user ID                    
+                        $user_key = 'user_' . $user_id; // Generate a unique key for the user
+                    } else {
+                        // Use session ID for non-logged-in users
+                        if (!isset($_SESSION['user_key'])) {
+                            $_SESSION['user_key'] = 'user_' . session_id();
+                        }
+                        $user_key = $_SESSION['user_key'];
+                    }
 
-                    // Generate a unique key for the user
-                    $user_key = 'user_' . $user_id;
-
+                    // Set transient with user-specific key
                     set_transient($user_key . '_form_data_transient', $data_to_store, 600); // Store data for 600 seconds
 
                     // Redirect back to the referer page to display errors
@@ -206,12 +226,18 @@ class FormHandler
                         'isSuccess' => $isSuccess // store variable to retreive it on main template page
                     );
 
-                    // Get the current user ID
-                    $user_id = get_current_user_id();
+                    if (is_user_logged_in()) {
+                        $user_id = get_current_user_id(); // Get the current user ID                    
+                        $user_key = 'user_' . $user_id; // Generate a unique key for the user
+                    } else {
+                        // Use session ID for non-logged-in users
+                        if (!isset($_SESSION['user_key'])) {
+                            $_SESSION['user_key'] = 'user_' . session_id();
+                        }
+                        $user_key = $_SESSION['user_key'];
+                    }
 
-                    // Generate a unique key for the user
-                    $user_key = 'user_' . $user_id;
-
+                    // Set transient with user-specific key
                     set_transient($user_key . '_form_data_transient', $data_to_store, 600); // Store data for 600 seconds
 
                     // If Update has been submitted from the form, redirect back to the confirm page
@@ -242,12 +268,18 @@ class FormHandler
                         // 'quote_id' => $quote_id, // store id to pass it as parameter
                     );
 
-                    // Get the current user ID
-                    $user_id = get_current_user_id();
+                    if (is_user_logged_in()) {
+                        $user_id = get_current_user_id(); // Get the current user ID                    
+                        $user_key = 'user_' . $user_id; // Generate a unique key for the user
+                    } else {
+                        // Use session ID for non-logged-in users
+                        if (!isset($_SESSION['user_key'])) {
+                            $_SESSION['user_key'] = 'user_' . session_id();
+                        }
+                        $user_key = $_SESSION['user_key'];
+                    }
 
-                    // Generate a unique key for the user
-                    $user_key = 'user_' . $user_id;
-
+                    // Set transient with user-specific key
                     set_transient($user_key . '_form_data_transient', $data_to_store, 600); // Store data for 600 seconds
 
                     wp_redirect(add_query_arg(array('form_error' => 'form'), wp_get_referer()));
@@ -268,11 +300,17 @@ class FormHandler
         // If the confirm URL parameter is true, proceed to database query
         if (isset($_POST['submit-btn-confirm'])) {
 
-            // Get the current user ID
-            $user_id = get_current_user_id();
-
-            // Generate the user-specific key
-            $user_key = 'user_' . $user_id;
+            // Check if user is logged in
+            if (is_user_logged_in()) {
+                $user_id = get_current_user_id();
+                $user_key = 'user_' . $user_id;
+            } else {
+                // Use session ID for non-logged-in users
+                if (!isset($_SESSION['user_key'])) {
+                    $_SESSION['user_key'] = 'user_' . session_id();
+                }
+                $user_key = $_SESSION['user_key'];
+            }
 
             // Retrieve the transient data using the user-specific key
             $form_data_transient = get_transient($user_key . '_form_data_transient');
@@ -280,6 +318,8 @@ class FormHandler
             // Recover $_POST data from transient and load it into a $form_data variable
             if ($form_data_transient && isset($form_data_transient['form_data'])) {
                 $form_data = $form_data_transient['form_data'];
+            } else {
+                wp_die('no data in transient', 'Error', array('response' => 403));
             }
 
             // Sanitize POST inputs recovered from transient $form_data before sending to database
@@ -437,9 +477,26 @@ class FormHandler
             // Delete form data transient
             delete_transient('form_data_transient');
         }
+
+        // Check if session is started and destroy session for non-logged-in users
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_SESSION['user_key'])) {
+            // Unset session variable
+            unset($_SESSION['user_key']);
+
+            // Destroy the session
+            session_destroy();
+
+            // Regenerate session ID for extra security
+            session_regenerate_id(true);
+        }
     }
 
-    public function verify_recaptcha() {
+    public function verify_recaptcha()
+    {
         // Verify reCAPTCHA response
         $recaptcha_response = $_POST['g-recaptcha-response'];
         $recaptcha_secret = SECRET_KEY;
@@ -459,5 +516,12 @@ class FormHandler
         $recaptcha_json = json_decode($recaptcha_result);
 
         return $recaptcha_json->success;
+    }
+
+    public function initialize_session()
+    {
+        if (session_status() == PHP_SESSION_NONE) { // PHP_SESSION_NONE: Sessions are enabled, but no session has been started.
+            session_start();
+        }
     }
 }

@@ -1,10 +1,16 @@
 <?php
 
-// Get the current user ID
-$user_id = get_current_user_id();
-
-// Generate the user-specific key
-$user_key = 'user_' . $user_id;
+// Check if user is logged in
+if (is_user_logged_in()) {
+    $user_id = get_current_user_id();
+    $user_key = 'user_' . $user_id;
+} else {
+    // Use session ID for non-logged-in users
+    if (!isset($_SESSION['user_key'])) {
+        $_SESSION['user_key'] = 'user_' . session_id();
+    }
+    $user_key = $_SESSION['user_key'];
+}
 
 // Retrieve the transient data using the user-specific key
 $form_data_transient = get_transient($user_key . '_form_data_transient');
@@ -13,6 +19,8 @@ $form_data_transient = get_transient($user_key . '_form_data_transient');
 if ($form_data_transient && isset($form_data_transient['quote_id'])) {
     $quote_id = $form_data_transient['quote_id'];
     $quote_data = getQuoteDataById($quote_id); // load sql method into variable to recover quotation data from database
+} else {
+    wp_die('no data in transient', 'Error', array('response' => 403));
 }
 
 // Generate plain text content
