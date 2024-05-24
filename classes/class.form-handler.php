@@ -26,10 +26,18 @@ class FormHandler
             $this->initialize_session();
 
             // Verify if th honeypot has been filled in
-            if (!empty($_POST['website_url'])) {
-                // Handle the bot submission
-                $this->eraseMemory();  // Erase memory
+            if (!empty($_POST['website_url']) || !empty($_POST['website_name']) || !empty($_POST['website_address'])) {
+                $this->eraseMemory();
                 wp_die('bot detected', 'Error', array('response' => 403));
+            }
+
+            // timestamp to validate that enough time has passed before the form is submitted
+            if (isset($_POST['form_timestamp'])) {
+                $form_submission_time = time() - intval($_POST['form_timestamp']);
+                if ($form_submission_time < 5) { // Less than 5 seconds to submit the form
+                    $this->eraseMemory();
+                    wp_die('Form submitted too quickly', 'Error', array('response' => 403));
+                }
             }
 
             if (isset($_POST['submit-btn-question'])) {

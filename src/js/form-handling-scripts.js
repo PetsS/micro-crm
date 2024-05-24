@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
   restoreElements();
   showVisitetypeOptions();
   showDisplayInfo();
+  validate_hidden_field();
 
   // Call scrollToTop function again in DOMContentLoaded event
   if (pageElement) {
@@ -344,4 +345,11 @@ function showButtonSpinner(button) {
     spinner.classList.remove("d-none"); // Show spinner
     button.classList.add("disabled"); // Add disabled class to visually disable the button
   });
+}
+
+function validate_hidden_field() {
+  var elements = document.getElementsByName("js_validation");
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].value = "validated";
+  }
 }

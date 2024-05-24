@@ -86,8 +86,16 @@
 
                 <hr class="my-4">
 
-                <!-- hidden honeypot field for security against bots. The name is attracting bots -->
-                <input type="text" name="website_url" style="display:none;">
+                <!-- hidden honeypots field for security against bots. The name is attracting bots -->
+                <input type="text" name="website_url" style="display:none !important;" tabindex="-1" autocomplete="off">
+                <input type="text" name="website_name" style="display:none !important;" tabindex="-1" autocomplete="off">
+                <input type="text" name="website_address" style="display:none !important;" tabindex="-1" autocomplete="off">
+
+                <!-- timpestamp validation for security -->
+                <input type="hidden" name="form_timestamp" value="<?php echo time(); ?>">
+
+                <!-- hidden field for JavaScript validation -->
+                <input type="hidden" name="js_validation" value="">
 
                 <input type="hidden" name="action" value="form_submission">
                 <!-- This hidden input is used to store the nonce value generated using wp_create_nonce(). -->
@@ -358,10 +366,18 @@
 
                     <hr class="my-4">
 
-                    <!-- hidden honeypot field for security against bots. The name is attracting bots -->
-                    <input type="text" name="website_url" style="display:none;">
+                    <!-- hidden honeypot fields for security against bots. The name is attracting bots -->
+                    <input type="text" name="website_url" style="display:none !important;" tabindex="-1" autocomplete="off">
+                    <input type="text" name="website_name" style="display:none !important;" tabindex="-1" autocomplete="off">
+                    <input type="text" name="website_address" style="display:none !important;" tabindex="-1" autocomplete="off">
 
-                    <!-- security -->
+                    <!-- timpestamp validation for security -->
+                    <input type="hidden" name="form_timestamp" value="<?php echo time(); ?>">
+
+                    <!-- hidden field for JavaScript validation -->
+                    <input type="hidden" name="js_validation" value="">
+
+                    <!-- nonce validation -->
                     <input type="hidden" name="action" value="form_submission">
                     <input type="hidden" name="form_nonce" value="<?php echo wp_create_nonce('form_submit'); ?>">
                     <?php wp_nonce_field('form_submit', 'form_nonce'); ?>
