@@ -77,25 +77,14 @@ class FormHandler
                 }
 
                 // If there are no errors, process the form data
-                if (empty($errors)) {
-
-                    if (is_user_logged_in()) {
-                        $user_id = get_current_user_id(); // Get the current user ID                    
-                        $user_key = 'user_' . $user_id; // Generate a unique key for the user
-                    } else {
-                        // Use session ID for non-logged-in users
-                        if (!isset($_SESSION['user_key'])) {
-                            $_SESSION['user_key'] = 'user_' . session_id();
-                        }
-                        $user_key = $_SESSION['user_key'];
-                    }
+                if (empty($errors)) {  
 
                     // successful submit send an email to client
                     $mailSender = new MailSender();
                     $mailSender->send_email_question_to_admin($_POST); // Pass post form data to the method and send email to admin 
                     $mailSender->send_email_question_to_client($_POST); // Pass post form data to the method and send email to client
 
-                    $this->eraseMemory($user_key);
+                    $this->eraseMemory();
                     
                     // Redirect to the referer page with a parameter
                     wp_redirect(remove_query_arg('form_error', add_query_arg('question', 'true', wp_get_referer())));
@@ -468,8 +457,19 @@ class FormHandler
         exit;
     }
 
-    public function eraseMemory($user_key = null)
+    public function eraseMemory()
     {
+        if (is_user_logged_in()) {
+            $user_id = get_current_user_id(); // Get the current user ID                    
+            $user_key = 'user_' . $user_id; // Generate a unique key for the user
+        } else {
+            // Use session ID for non-logged-in users
+            if (!isset($_SESSION['user_key'])) {
+                $_SESSION['user_key'] = 'user_' . session_id();
+            }
+            $user_key = $_SESSION['user_key'];
+        }
+
         if ($user_key) {
             // Delete form data transient for the user
             delete_transient($user_key . '_form_data_transient');
