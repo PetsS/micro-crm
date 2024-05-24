@@ -77,9 +77,14 @@
                     <!-- reCAPTCHA -->
                     <div class="col-12">
                         <div class="g-recaptcha" data-sitekey="<?php echo esc_attr(SITE_KEY); ?>" data-action="LOGIN"></div>
-                        <?php if (isset($form_errors) && isset($form_errors['recaptcha_quest'])) : ?>
-                            <span class="error"><?php echo $form_errors['recaptcha_quest']; ?></span>
-                        <?php endif; ?>
+                    </div>
+
+                    <!-- custom captcha -->
+                    <div class="col-12">
+                        <div class="input-group">
+                            <span class="input-group-text">2 + 3 = ?</span>
+                            <input type="text" class="form-control" name="captcha" id="captcha">
+                        </div>
                     </div>
 
                 </div>
@@ -359,9 +364,6 @@
                     <!-- reCAPTCHA -->
                     <div class="col-12">
                         <div class="g-recaptcha" data-sitekey="<?php echo esc_attr(SITE_KEY); ?>" data-action="LOGIN"></div>
-                        <?php if (isset($form_errors) && isset($form_errors['recaptcha_quote'])) : ?>
-                            <span class="error"><?php echo $form_errors['recaptcha_quote']; ?></span>
-                        <?php endif; ?>
                     </div>
 
                     <hr class="my-4">

@@ -47,8 +47,14 @@ class FormHandler
 
                 // reCAPTCHA validation
                 if (!$isRecaptchaSuccess) {
-                    $errors['recaptcha_quest'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
+                    // $errors['recaptcha_quest'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
                     $this->eraseMemory();  // Erase memory
+                }
+
+                // custom captcha validation
+                if (empty($_POST['captcha']) || trim($_POST['captcha']) !== '5') {
+                    $this->eraseMemory();
+                    wp_die('CAPTCHA failed', 'Error', array('response' => 403));
                 }
 
                 // Sanitize all input
@@ -132,7 +138,7 @@ class FormHandler
 
                 // reCAPTCHA validation
                 if (!$isRecaptchaSuccess) {
-                    $errors['recaptcha_quote'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
+                    // $errors['recaptcha_quote'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
                     $this->eraseMemory();  // Erase memory
                 }
 
