@@ -28,35 +28,18 @@ class FormHandler
             // Start session if not already started
             $this->initialize_session();
 
-            // Check if user is banned
-            if ($this->is_user_banned()) {
-                wp_die('You have been banned from submitting forms.', 'Error', array('response' => 403));
-            }
-
-            // Verify if th honeypot has been filled in
-            if (!empty($_POST['website_url']) || !empty($_POST['website_name']) || !empty($_POST['website_address'])) {
-                $this->handle_honeypot_detection();
-                wp_die('bot detected', 'Error', array('response' => 403));
-            }
-
-            // timestamp to validate that enough time has passed before the form is submitted
-            if (isset($_POST['form_timestamp'])) {
-                $form_submission_time = time() - intval($_POST['form_timestamp']);
-                if ($form_submission_time < 5) { // Less than 5 seconds to submit the form
-                    $this->eraseMemory();
-                    wp_die('Form submitted too quickly', 'Error', array('response' => 403));
-                }
-            }
-
             if (isset($_POST['submit-btn-question'])) {
+
+                // call security checks
+                $this->security_check();
 
                 // Verify reCAPTCHA response
                 $isRecaptchaSuccess = $this->verify_recaptcha();
 
                 // reCAPTCHA validation
                 if (!$isRecaptchaSuccess) {
-                    // $errors['recaptcha_quest'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
-                    $this->eraseMemory();  // Erase memory
+                    $errors['recaptcha_quest'] = 'Vérifiez reCAPTCHA.';
+                    // $this->eraseMemory();  // Erase memory
                 }
 
                 // custom captcha validation
@@ -141,13 +124,16 @@ class FormHandler
                 }
             } else if (isset($_POST['submit-btn-quotation'])) {
 
+                // call security checks
+                $this->security_check();
+
                 // Verify reCAPTCHA response
                 $isRecaptchaSuccess = $this->verify_recaptcha();
 
                 // reCAPTCHA validation
                 if (!$isRecaptchaSuccess) {
-                    // $errors['recaptcha_quote'] = 'La vérification reCAPTCHA a échoué. Veuillez réessayer.';
-                    $this->eraseMemory();  // Erase memory
+                    $errors['recaptcha_quote'] = 'Vérifiez reCAPTCHA.';
+                    // $this->eraseMemory();  // Erase memory
                 }
 
                 // Sanitize inputs and store them in an array for later use
@@ -547,7 +533,7 @@ class FormHandler
         }
     }
 
-    private function handle_honeypot_detection()
+    public function handle_honeypot_detection()
     {
         // Track honeypot violations
         $honeypot_violations = isset($_SESSION['honeypot_violations']) ? $_SESSION['honeypot_violations'] : 0;
@@ -563,16 +549,39 @@ class FormHandler
         $this->eraseMemory();
     }
 
-    private function ban_user()
+    public function ban_user()
     {
-        $_SESSION['banned_until'] = time() + $this->banDuration;
+        $_SESSION['banned_until'] = time() + $this->banDuration; // this bannes form submission
     }
 
-    private function is_user_banned()
+    public function is_user_banned()
     {
         if (isset($_SESSION['banned_until']) && $_SESSION['banned_until'] > time()) {
             return true;
         }
         return false;
+    }
+
+    private function security_check()
+    {
+        // Check if user is banned
+        if ($this->is_user_banned()) {
+            wp_die('banned', 'Error', array('response' => 403));
+        }
+
+        // Verify if the honeypot has been filled in
+        if (!empty($_POST['website_url']) || !empty($_POST['website_name']) || !empty($_POST['website_address'])) {
+            $this->handle_honeypot_detection();
+            wp_die('bot detected', 'Error', array('response' => 403));
+        }
+
+        // timestamp to validate that enough time has passed before the form is submitted
+        if (isset($_POST['form_timestamp'])) {
+            $form_submission_time = time() - intval($_POST['form_timestamp']);
+            if ($form_submission_time < 5) { // Less than 5 seconds to submit the form
+                $this->eraseMemory();
+                wp_die('Form submitted too quickly', 'Error', array('response' => 403));
+            }
+        }
     }
 }
