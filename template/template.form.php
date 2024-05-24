@@ -9,8 +9,8 @@
     </div>
 
     <div class="pt-3 text-center" id="formButtons">
-        <button class="btn btn-outline-light" id="buttonQuotation">Devis!</button>
-        <button class="btn btn-outline-light" id="buttonQuestion">Question?</button>
+        <button class="btn btn-warning" id="buttonQuotation">Devis!</button>
+        <button class="btn btn-warning" id="buttonQuestion">Question?</button>
     </div>
 </header>
 

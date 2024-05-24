@@ -45,6 +45,12 @@
   padding: 6px 14px; /* Reduce padding */
 }
 
+#buttonQuotation, 
+#buttonQuestion {
+  font-size: 19px;
+  padding: 10px 24px;
+}
+
 .btn.btn-outline-light {
   /* Your custom styles here */
   color: #f8f9fa; /* Change text color */
