@@ -15,6 +15,7 @@ class FormHandler
     {
         // Ensure session is started when the class is instantiated
         $this->initialize_session();
+        
     }
 
     public function handle_form_submission()
@@ -491,15 +492,14 @@ class FormHandler
             session_start();
         }
 
+        session_regenerate_id();
+
         if (isset($_SESSION['user_key'])) {
             // Unset session variable
             unset($_SESSION['user_key']);
 
             // Destroy the session
             session_destroy();
-
-            // Regenerate session ID for extra security
-            session_regenerate_id(true);
         }
     }
 
@@ -573,6 +573,12 @@ class FormHandler
         if (!empty($_POST['website_url']) || !empty($_POST['website_name']) || !empty($_POST['website_address'])) {
             $this->handle_honeypot_detection();
             wp_die('bot detected', 'Error', array('response' => 403));
+        }
+
+        // Validate JS dynamically generated hidden field value
+        if (empty($_POST['js_validation']) || $_POST['js_validation'] !== 'validated') {
+            $this->eraseMemory();
+            wp_die('JavaScript validation failed', 'Error', array('response' => 403));
         }
 
         // timestamp to validate that enough time has passed before the form is submitted

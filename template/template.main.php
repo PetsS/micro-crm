@@ -2,6 +2,11 @@
 
 $isSuccess = false; // Initialize to false by default
 
+// Check if session is started and destroy session for non-logged-in users
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Check if user is logged in
 if (is_user_logged_in()) {
     $user_id = get_current_user_id();
