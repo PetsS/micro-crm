@@ -15,7 +15,6 @@ class FormHandler
     {
         // Ensure session is started when the class is instantiated
         $this->initialize_session();
-        
     }
 
     public function handle_form_submission()
@@ -40,7 +39,6 @@ class FormHandler
                 // reCAPTCHA validation
                 if (!$isRecaptchaSuccess) {
                     $errors['recaptcha_quest'] = 'Vérifiez reCAPTCHA.';
-                    // $this->eraseMemory();  // Erase memory
                 }
 
                 // custom captcha validation
@@ -83,7 +81,7 @@ class FormHandler
                 }
 
                 // If there are no errors, process the form data
-                if (empty($errors)) {  
+                if (empty($errors)) {
 
                     // successful submit send an email to client
                     $mailSender = new MailSender();
@@ -91,7 +89,7 @@ class FormHandler
                     $mailSender->send_email_question_to_client($_POST); // Pass post form data to the method and send email to client
 
                     $this->eraseMemory();
-                    
+
                     // Redirect to the referer page with a parameter
                     wp_redirect(remove_query_arg('form_error', add_query_arg('question', 'true', wp_get_referer())));
 
@@ -562,7 +560,7 @@ class FormHandler
         return false;
     }
 
-    private function security_check()
+    public function security_check()
     {
         // Check if user is banned
         if ($this->is_user_banned()) {

@@ -26,6 +26,7 @@ require_once(plugin_dir_path(__FILE__) . 'classes/class.document-converter.php')
 require_once(plugin_dir_path(__FILE__) . 'classes/class.admin-menu.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.quote-calculator.php');
 require_once(plugin_dir_path(__FILE__) . 'classes/class.document-downloader.php');
+require_once(plugin_dir_path(__FILE__) . 'classes/class.test-form-submit.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.quote.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.person.php');
 require_once(plugin_dir_path(__FILE__) . 'model/model.tag.php');
@@ -67,19 +68,15 @@ class MicroCrm
 		// Enqueue assets for all admin pages
 		add_action('admin_enqueue_scripts', array($this, 'load_admin_assets'));
 
+		// Register test data insertion hook
+		add_action('admin_init', array($this, 'test_form_submissions'));
+
 		// add shortcode which is called 'micro-crm'
 		add_shortcode('micro-crm', array($this, 'load_shortcode_plugin'));
 
 		// hook actions, which WordPress will call when processing form submissions for logged-in and non-logged-in users, respectively.
 		add_action('admin_post_form_submission', array($this, 'form_submission'));
 		add_action('admin_post_nopriv_form_submission', array($this, 'form_submission')); // For non-logged-in users
-	}
-
-	// creating a custom post type using register_post_type() function
-	public function handle_admin_menus()
-	{
-		$admin_menu = new AdminMenu();
-		$admin_menu->add_admin_menus();
 	}
 
 	// Enqueue CSS stylesheets for all admin pages on the admin side
@@ -142,7 +139,6 @@ class MicroCrm
 
 		// Enqueue reCAPTCHA script
 		wp_enqueue_script('recaptcha', 'https://www.google.com/recaptcha/enterprise.js', array(), null, false);
-
 	}
 
 	// shortcode callback function
@@ -157,10 +153,65 @@ class MicroCrm
 		return ob_get_clean();
 	}
 
+	// creating a menu on the admin side
+	public function handle_admin_menus()
+	{
+		$admin_menu = new AdminMenu();
+		$admin_menu->add_admin_menus();
+	}
+
 	public function form_submission()
 	{
 		$form_handler = new FormHandler;
 		$form_handler->handle_form_submission();
+	}
+
+	public function test_form_submissions()
+	{
+		$test_form_submit = new TestFormSubmit(); // initialize test class
+
+		// Check if the URL parameter is set
+		if (isset($_GET['test_question_form']) && $_GET['test_question_form'] === 'true') {
+			if (current_user_can('manage_options')) { // Check if the current user can manage options (admin role)
+				try {
+					$test_form_submit->submit_question_form();
+					// Display success notice
+					add_action('admin_notices', function () {
+						echo '<div class="notice notice-success"><p>Test form submission simulated successfully!<p>Email has been sent!</p></p></div>';
+					});
+				} catch (Exception $e) {
+					// Display error notice
+					add_action('admin_notices', function () use ($e) {
+						echo '<div class="notice notice-error"><p>Form submission test failed: ' . esc_html($e->getMessage()) . '</p></div>';
+					});
+				}
+			} else {
+				add_action('admin_notices', function () {
+					echo '<div class="notice notice-error"><p>You are not authorized to run data simulation!</p></div>';
+				});
+			}
+		} else if (isset($_GET['test_quotation_form']) && $_GET['test_quotation_form'] === 'true') {
+			if (current_user_can('manage_options')) {
+				try {
+					$test_form_submit->submit_quotation_form();
+					// Display success notice
+					add_action('admin_notices', function () use ($test_form_submit) {
+						echo '<div class="notice notice-success"><p>Test form submission simulated successfully!</p></div>';
+						// call the review method
+						$test_form_submit->review_quotation();
+					});
+				} catch (Exception $e) {
+					// Display error notice
+					add_action('admin_notices', function () use ($e) {
+						echo '<div class="notice notice-error"><p>Form submission test failed: ' . esc_html($e->getMessage()) . '</p></div>';
+					});
+				}
+			} else {
+				add_action('admin_notices', function () {
+					echo '<div class="notice notice-error"><p>You are not authorized to run data simulation!</p></div>';
+				});
+			}
+		}
 	}
 
 	public function document_download()
