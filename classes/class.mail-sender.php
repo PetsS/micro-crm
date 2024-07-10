@@ -175,8 +175,9 @@ class MailSender
             // Add recipients (Client's email)
             $mail->addAddress($form_data['email_quest']);
 
-            // Set email subject
-            $mail->Subject = 'Merci de votre intérêt pour MicroZoo!';
+            // Set email subject with encoding
+            $subject = 'Merci de votre intérêt pour MicroZoo!';
+            $mail->Subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 
             ob_start(); // Start another buffer
             // Email body from a separate html file

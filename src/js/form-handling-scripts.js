@@ -42,10 +42,10 @@ document.addEventListener("DOMContentLoaded", function () {
   validate_hidden_field();
 
   // Call scrollToTop function again in DOMContentLoaded event
-  if (pageElement) {
-    // Call scrollToTop function after the DOM is fully loaded
-    scrollToTop(pageElement);
-  }
+  // if (pageElement) {
+  //   // Call scrollToTop function after the DOM is fully loaded
+  //   scrollToTop(pageElement);
+  // }
 });
 
 /**
