@@ -12,29 +12,44 @@ var submitBtnConfirm = document.getElementById("submit-btn-confirm");
 // Using window.onload event to ensure the entire page is loaded
 window.onload = function () {
   if (pageElement) {
-    // Call scrollToTop function after the page is fully loaded
-    scrollToTop(pageElement);
+    // Call scrollToTop function after a short delay to ensure other scripts have finished
+    setTimeout(() => {
+      scrollToTop(pageElement);
+    }, 500);
+  }
+};
+
+// Using window.onerror event to ensure scrollToTop is called even if there's an error
+window.onerror = function (message) {
+  if (message.includes("The iframe contentDocument is null.")) {
+    console.error("Global error handler:", message);
+    if (pageElement) {
+      // Call scrollToTop function if there's an error related to the iframe
+      setTimeout(() => {
+        scrollToTop(pageElement);
+      }, 500);
+    }
   }
 };
 
 // Using DOMContentLoaded event to ensure DOM is fully loaded while executing the scripts
 document.addEventListener("DOMContentLoaded", function () {
   // Call the functions when the page is loaded
-  if (submitBtnQuestion) {
+  if (typeof submitBtnQuestion !== 'undefined' && submitBtnQuestion) {
     showButtonSpinner(submitBtnQuestion); // call only if btn exists in the template
   }
-  if (submitBtnQuotation) {
+  if (typeof submitBtnQuotation !== 'undefined' && submitBtnQuotation) {
     showButtonSpinner(submitBtnQuotation); // call only if btn exists in the template
   }
-  if (submitBtnConfirm) {
+  if (typeof submitBtnConfirm !== 'undefined' && submitBtnConfirm) {
     showButtonSpinner(submitBtnConfirm); // call only if btn exists in the template
   }
-  if (buttonDiv) {
+  if (typeof buttonDiv !== 'undefined' && buttonDiv) {
     showFormsType(); // call only if div exists in the template
   }
   handleFormdata();
-  if (addButton) {
-    clonePersons(addButton); // call the function if the button with the id exists
+  if (typeof addButton !== 'undefined' && addButton) {
+    addButton.addEventListener("click", clonePersons); // attach event listener if the button exists
   }
   restoreElements();
   showVisitetypeOptions();
@@ -42,10 +57,10 @@ document.addEventListener("DOMContentLoaded", function () {
   validate_hidden_field();
 
   // Call scrollToTop function again in DOMContentLoaded event
-  // if (pageElement) {
-  //   // Call scrollToTop function after the DOM is fully loaded
-  //   scrollToTop(pageElement);
-  // }
+  if (pageElement) {
+    // Call scrollToTop function after the DOM is fully loaded
+    scrollToTop(pageElement);
+  }
 });
 
 /**
@@ -110,87 +125,91 @@ function scrollToTop(element) {
 }
 
 // Function to clone container with persons and ages
-function clonePersons(buttonElement) {
-  buttonElement.addEventListener("click", () => {
-    // clone the container div
-    var container = document.querySelector(".containerClone");
-    var clonedContainer = container.cloneNode(true);
+function clonePersons() {
+  // clone the container div
+  var container = document.querySelector(".containerClone");
+  if (!container) return; // Ensure container exists before cloning
 
-    // Increment container ID by 1
-    var lastContainerId =
-      document.querySelectorAll(".containerClone").length - 1;
-    var newContainerId = "container-" + (parseInt(lastContainerId) + 1);
+  var clonedContainer = container.cloneNode(true);
 
-    // Check if the new container ID already exists, if yes, increment by 1 until it's unique
-    while (document.getElementById(newContainerId)) {
-      lastContainerId++;
-      newContainerId = "container-" + lastContainerId;
+  // Increment container ID by 1
+  var lastContainerId = document.querySelectorAll(".containerClone").length - 1;
+  var newContainerId = "container-" + (parseInt(lastContainerId) + 1);
+
+  // Check if the new container ID already exists, if yes, increment by 1 until it's unique
+  while (document.getElementById(newContainerId)) {
+    lastContainerId++;
+    newContainerId = "container-" + lastContainerId;
+  }
+
+  clonedContainer.id = newContainerId;
+
+  // Increment 'for' attributes for labels and IDs for inputs and selects by 1
+  var inputs = clonedContainer.querySelectorAll("label, input, select");
+  inputs.forEach((input) => {
+    var inputId = input.getAttribute("id");
+    if (inputId) {
+      var newInputId =
+        inputId.replace(/-\d+$/, "") + "-" + (parseInt(lastContainerId) + 1);
+      // Check if the new input ID already exists, if yes, increment by 1 until it's unique
+      while (document.getElementById(newInputId)) {
+        lastContainerId++;
+        newInputId = inputId.replace(/-\d+$/, "") + "-" + lastContainerId;
+      }
+      input.setAttribute("id", newInputId);
     }
 
-    clonedContainer.id = newContainerId;
-
-    // Increment 'for' attributes for labels and IDs for inputs and selects by 1
-    var inputs = clonedContainer.querySelectorAll("label, input, select");
-    inputs.forEach((input) => {
-      var inputId = input.getAttribute("id");
-      if (inputId) {
-        var newInputId =
-          inputId.replace(/-\d+$/, "") + "-" + (parseInt(lastContainerId) + 1);
-        // Check if the new input ID already exists, if yes, increment by 1 until it's unique
-        while (document.getElementById(newInputId)) {
+    if (input.tagName === "LABEL") {
+      var forAttribute = input.getAttribute("for");
+      if (forAttribute) {
+        var newForAttribute =
+          forAttribute.replace(/-\d+$/, "") +
+          "-" +
+          (parseInt(lastContainerId) + 1);
+        // Check if the new 'for' attribute already exists, if yes, increment by 1 until it's unique
+        while (document.getElementById(newForAttribute)) {
           lastContainerId++;
-          newInputId = inputId.replace(/-\d+$/, "") + "-" + lastContainerId;
+          newForAttribute =
+            forAttribute.replace(/-\d+$/, "") + "-" + lastContainerId;
         }
-        input.setAttribute("id", newInputId);
+        input.setAttribute("for", newForAttribute);
       }
-
-      if (input.tagName === "LABEL") {
-        var forAttribute = input.getAttribute("for");
-        if (forAttribute) {
-          var newForAttribute =
-            forAttribute.replace(/-\d+$/, "") +
-            "-" +
-            (parseInt(lastContainerId) + 1);
-          // Check if the new 'for' attribute already exists, if yes, increment by 1 until it's unique
-          while (document.getElementById(newForAttribute)) {
-            lastContainerId++;
-            newForAttribute =
-              forAttribute.replace(/-\d+$/, "") + "-" + lastContainerId;
-          }
-          input.setAttribute("for", newForAttribute);
-        }
-      }
-    });
-
-    // reset input values
-    var inputs = clonedContainer.querySelectorAll("input, select");
-    inputs.forEach((input) => {
-      if (input.tagName === "INPUT") {
-        input.value = "";
-      } else if (input.tagName === "SELECT") {
-        input.value = "default";
-      }
-    });
-
-    // Find the last cloned container
-    var lastClonedContainer =
-      document.querySelectorAll(".containerClone")[
-        document.querySelectorAll(".containerClone").length - 1
-      ];
-
-    // Append the cloned container div after the last cloned container
-    lastClonedContainer.parentNode.insertBefore(
-      clonedContainer,
-      lastClonedContainer.nextSibling
-    );
-
-    // add a delete button the each cloned container
-    addDeleteButton(clonedContainer);
+    }
   });
+
+  // reset input values
+  var inputs = clonedContainer.querySelectorAll("input, select");
+  inputs.forEach((input) => {
+    if (input.tagName === "INPUT") {
+      input.value = "";
+    } else if (input.tagName === "SELECT") {
+      input.value = "default";
+    }
+  });
+
+  // Find the last cloned container
+  var lastClonedContainer =
+    document.querySelectorAll(".containerClone")[
+      document.querySelectorAll(".containerClone").length - 1
+    ];
+
+  // Append the cloned container div after the last cloned container
+  lastClonedContainer.parentNode.insertBefore(
+    clonedContainer,
+    lastClonedContainer.nextSibling
+  );
+
+  // add a delete button the each cloned container
+  addDeleteButton(clonedContainer);
 }
 
 // Function to add a delete button icon to the cloned container
 function addDeleteButton(clonedContainer) {
+  // Remove any existing delete buttons
+  var existingDeleteButtons = clonedContainer.querySelectorAll(".btn-danger");
+  existingDeleteButtons.forEach((button) => button.remove());
+
+  // Create a new delete button
   var deleteButton = document.createElement("button");
   deleteButton.innerHTML = '<i class="fas fa-minus"></i>';
   deleteButton.classList.add("btn", "btn-danger");

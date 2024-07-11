@@ -83,12 +83,12 @@
                     </div>
 
                     <!-- custom captcha -->
-                    <div class="col-12">
+                    <!-- <div class="col-12">
                         <div class="input-group">
                             <span class="input-group-text">2 + 3 = ?</span>
                             <input type="text" class="form-control" name="captcha" id="captcha">
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
 

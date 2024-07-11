@@ -42,10 +42,10 @@ class FormHandler
                 }
 
                 // custom captcha validation
-                if (empty($_POST['captcha']) || trim($_POST['captcha']) !== '5') {
-                    $this->eraseMemory();
-                    wp_die('CAPTCHA failed', 'Error', array('response' => 403));
-                }
+                // if (empty($_POST['captcha']) || trim($_POST['captcha']) !== '5') {
+                //     $this->eraseMemory();
+                //     wp_die('CAPTCHA failed', 'Error', array('response' => 403));
+                // }
 
                 // Sanitize all input
                 $email_quest = sanitize_email($_POST['email_quest']);

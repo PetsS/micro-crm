@@ -24,20 +24,20 @@ class MailSender
             $mail->isSMTP();
 
             // MailHog configuration
-            // $mail->Host = '127.0.0.1';
-            // $mail->SMTPAuth = false;
-            // $mail->Username = '';
-            // $mail->Password = '';
-            // $mail->Port = 1025;
+            $mail->Host = '127.0.0.1';
+            $mail->SMTPAuth = false;
+            $mail->Username = '';
+            $mail->Password = '';
+            $mail->Port = 1025;
 
             // SMTP server configuration
-            $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
-            $mail->SMTPAuth   = true;                           // Enable SMTP authentication
-            $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
-            $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
-            $mail->Port       = 587;                            // TCP port to connect to
-            $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
+            // $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
+            // $mail->SMTPAuth   = true;                           // Enable SMTP authentication
+            // $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
+            // $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
+            // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
+            // $mail->Port       = 587;                            // TCP port to connect to
+            // $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
 
             // Sender information
             $mail->setFrom('contact@microzoo.fr', 'MicroZoo');
@@ -97,20 +97,20 @@ class MailSender
             $mail->isSMTP();
 
             // Configure SMTP settings (MailHog or any other SMTP server)
-            // $mail->Host = 'localhost';
-            // $mail->SMTPAuth = false;
-            // $mail->Username = '';
-            // $mail->Password = '';
-            // $mail->Port = 1025;
+            $mail->Host = 'localhost';
+            $mail->SMTPAuth = false;
+            $mail->Username = '';
+            $mail->Password = '';
+            $mail->Port = 1025;
 
             // SMTP server configuration
-            $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
-            $mail->SMTPAuth   = true;                           // Enable SMTP authentication
-            $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
-            $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
-            $mail->Port       = 587;                            // TCP port to connect to
-            $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
+            // $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
+            // $mail->SMTPAuth   = true;                           // Enable SMTP authentication
+            // $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
+            // $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
+            // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
+            // $mail->Port       = 587;                            // TCP port to connect to
+            // $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
 
             // Set email sender
             $mail->setFrom('contact@microzoo.fr', 'MicroZoo');
@@ -154,20 +154,20 @@ class MailSender
             $mail->isSMTP();
 
             // Configure SMTP settings (MailHog)
-            // $mail->Host = 'localhost';
-            // $mail->SMTPAuth = false;
-            // $mail->Username = '';
-            // $mail->Password = '';
-            // $mail->Port = 1025;
+            $mail->Host = 'localhost';
+            $mail->SMTPAuth = false;
+            $mail->Username = '';
+            $mail->Password = '';
+            $mail->Port = 1025;
 
             // SMTP server configuration
-            $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
-            $mail->SMTPAuth   = true;                           // Enable SMTP authentication
-            $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
-            $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
-            $mail->Port       = 587;                            // TCP port to connect to
-            $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
+            // $mail->Host       = 'ex5.mail.ovh.net';             // SMTP host
+            // $mail->SMTPAuth   = true;                           // Enable SMTP authentication
+            // $mail->Username   = SMTP_USERNAME;                  // SMTP username from environment variable
+            // $mail->Password   = SMTP_PASSWORD;                  // SMTP password from environment variable
+            // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
+            // $mail->Port       = 587;                            // TCP port to connect to
+            // $mail->CharSet    = 'UTF-8';                        // Set character encoding to UTF-8
 
             // Set email sender
             $mail->setFrom('contact@microzoo.fr', 'MicroZoo');
